@@ -92,7 +92,7 @@ Same as renaming a column - see above.
 
 ### Removing a column
 
-Tell ActiveRecord to [ignore the column](http://pedro.herokuapp.com/past/2011/7/13/rails_migrations_with_no_downtime/) from its cache.
+Tell ActiveRecord to ignore the column from its cache.
 
 ```ruby
 class User
