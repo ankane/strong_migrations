@@ -106,7 +106,7 @@ Once it’s deployed, create a migration to remove the column.
 
 ### Adding a json column
 
-There’s no equality operator for the `json` column type. Replace all calls to `uniq` with a custom scope.
+There’s no equality operator for the `json` column type, which causes issues for `SELECT DISTINCT` queries. Replace all calls to `uniq` with a custom scope.
 
 ```ruby
 scope :uniq_on_id, -> { select("DISTINCT ON (your_table.id) your_table.*") }
