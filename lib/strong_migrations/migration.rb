@@ -83,9 +83,7 @@ end
 
 Once it's deployed, wrap this step in a safety_assured { ... } block."
         when :rename_column
-"There's no way to rename a column without downtime.
-
-If you really have to:
+"If you really have to:
 
 1. Create a new column
 2. Write to both columns
@@ -94,9 +92,7 @@ If you really have to:
 5. Stop writing to the old column
 6. Drop the old column"
         when :rename_table
-"There's no way to rename a table without downtime.
-
-If you really have to:
+"If you really have to:
 
 1. Create a new table
 2. Write to both tables

@@ -75,8 +75,6 @@ end
 
 ### Renaming or changing the type of a column
 
-There’s no way to do this without downtime.
-
 If you really have to:
 
 1. Create a new column
@@ -88,7 +86,14 @@ If you really have to:
 
 ### Renaming a table
 
-Same as renaming a column - see above.
+If you really have to:
+
+1. Create a new table
+2. Write to both tables
+3. Backfill data from the old table to new table
+4. Move reads from the old table to the new table
+5. Stop writing to the old table
+6. Drop the old table
 
 ### Removing a column
 
