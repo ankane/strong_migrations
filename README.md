@@ -15,12 +15,12 @@ gem 'strong_migrations'
 ## Dangerous Operations
 
 - adding an index non-concurrently
-- adding a column with a non-null default value
+- adding a column with a non-null default value to an existing table
 - changing the type of a column
 - renaming a table
 - renaming a column
 - removing a column
-- adding a `json` column (Postgres only)
+- adding a `json` column to an existing table (Postgres only)
 
 For more info, check out:
 
