@@ -29,19 +29,6 @@ For more info, check out:
 
 ## The Zero Downtime Way
 
-### Adding an index
-
-Add indexes concurrently.
-
-```ruby
-class AddSomeIndexToUsers < ActiveRecord::Migration
-  def change
-    commit_db_transaction
-    add_index :users, :some_index, algorithm: :concurrently
-  end
-end
-```
-
 ### Adding a column with a default value
 
 1. Add the column without a default value
@@ -109,7 +96,20 @@ end
 
 Once it’s deployed, create a migration to remove the column.
 
-### Adding a json column
+### Adding an index (Postgres)
+
+Add indexes concurrently.
+
+```ruby
+class AddSomeIndexToUsers < ActiveRecord::Migration
+  def change
+    commit_db_transaction
+    add_index :users, :some_index, algorithm: :concurrently
+  end
+end
+```
+
+### Adding a json column (Postgres)
 
 There’s no equality operator for the `json` column type, which causes issues for `SELECT DISTINCT` queries. Replace all calls to `uniq` with a custom scope.
 
