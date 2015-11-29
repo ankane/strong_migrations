@@ -9,7 +9,7 @@ gemfile:
 script: bundle exec rake test
 before_script:
   - psql -c 'create database strong_migrations_test;' -U postgres
-  - mysql -e 'create database groupdate_test;'
+  - mysql -e 'create database strong_migrations_test;'
 notifications:
   email:
     on_success: never
