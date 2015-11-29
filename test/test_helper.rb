@@ -5,7 +5,8 @@ require "minitest/pride"
 
 Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
 
-ActiveRecord::Base.establish_connection "postgres://localhost/strong_migrations_test"
+adapter = ENV["ADAPTER"] || "postgres"
+ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migrations_test")
 
 def migrate(migration)
   ActiveRecord::Migration.suppress_messages do
@@ -22,3 +23,9 @@ class CreateUsers < ActiveRecord::Migration
   end
 end
 migrate CreateUsers
+
+class Minitest::Test
+  def postgres?
+    ENV["ADAPTER"].nil?
+  end
+end

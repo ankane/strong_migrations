@@ -12,7 +12,7 @@ class AddIndexChange < ActiveRecord::Migration
   end
 end
 
-class AddIndexSafe < ActiveRecord::Migration
+class AddIndexSafePostgres < ActiveRecord::Migration
   def self.up
     add_index :users, :name, algorithm: :concurrently
   end
@@ -75,10 +75,12 @@ end
 
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
+    skip unless postgres?
     assert_unsafe AddIndex
   end
 
   def test_add_index_change
+    skip unless postgres?
     assert_unsafe AddIndexChange
   end
 
@@ -90,8 +92,9 @@ class StrongMigrationsTest < Minitest::Test
     assert_safe AddIndexSchema
   end
 
-  def test_add_index_safe
-    assert_safe AddIndexSafe
+  def test_add_index_safe_postgres
+    skip unless postgres?
+    assert_safe AddIndexSafePostgres
   end
 
   def test_add_column_default

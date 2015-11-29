@@ -23,7 +23,7 @@ module StrongMigrations
           raise_error :rename_column
         when :add_index
           options = args[2]
-          unless options && options[:algorithm] == :concurrently
+          if %w(PostgreSQL PostGIS).include?(connection.adapter_name) && !(options && options[:algorithm] == :concurrently)
             raise_error :add_index
           end
         when :add_column
