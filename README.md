@@ -2,6 +2,8 @@
 
 Catch unsafe migrations at dev time
 
+:tangerine: Battle-tested at [Instacart](https://www.instacart.com/opensource)
+
 [![Build Status](https://travis-ci.org/ankane/strong_migrations.svg)](https://travis-ci.org/ankane/strong_migrations)
 
 ## Installation
