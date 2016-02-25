@@ -8,8 +8,13 @@ module StrongMigrations
       @safe = previous_value
     end
 
+    def migrate(direction)
+      @direction = direction
+      super
+    end
+
     def method_missing(method, *args, &block)
-      unless @safe || is_a?(ActiveRecord::Schema)
+      unless @safe || is_a?(ActiveRecord::Schema) || @direction == :down
         case method
         when :remove_column
           raise_error :remove_column

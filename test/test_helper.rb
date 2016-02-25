@@ -8,15 +8,15 @@ Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
 adapter = ENV["ADAPTER"] || "postgres"
 ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migrations_test")
 
-def migrate(migration)
+def migrate(migration, direction: :up)
   ActiveRecord::Migration.suppress_messages do
-    migration.migrate(:up)
+    migration.migrate(direction)
   end
   true
 end
 
 class CreateUsers < ActiveRecord::Migration
-  def self.up
+  def change
     create_table "users", force: :cascade do |t|
       t.string :name
     end

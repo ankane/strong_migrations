@@ -1,75 +1,81 @@
 require_relative "test_helper"
 
 class AddIndex < ActiveRecord::Migration
-  def self.up
-    add_index :users, :name
-  end
-end
-
-class AddIndexChange < ActiveRecord::Migration
   def change
     add_index :users, :name
   end
 end
 
-class AddIndexSafePostgres < ActiveRecord::Migration
+class AddIndexUp < ActiveRecord::Migration
   def self.up
+    add_index :users, :name
+  end
+end
+
+class AddIndexSafePostgres < ActiveRecord::Migration
+  def change
     add_index :users, :name, algorithm: :concurrently
   end
 end
 
 class AddIndexSafetyAssured < ActiveRecord::Migration
-  def self.up
+  def change
     safety_assured { add_index :users, :name, name: "boom" }
   end
 end
 
 class AddIndexSchema < ActiveRecord::Schema
-  def self.up
+  def change
     add_index :users, :name, name: "boom2"
   end
 end
 
 class AddColumnDefault < ActiveRecord::Migration
-  def self.up
+  def change
     add_column :users, :nice, :boolean, default: true
   end
 end
 
 class AddColumnDefaultSafe < ActiveRecord::Migration
-  def self.up
+  def change
     add_column :users, :nice, :boolean
     change_column_default :users, :nice, false
   end
 end
 
 class AddColumnJson < ActiveRecord::Migration
-  def self.up
+  def change
     add_column :users, :properties, :json
   end
 end
 
 class ChangeColumn < ActiveRecord::Migration
-  def self.up
+  def change
     change_column :users, :properties, :bad_name
   end
 end
 
 class RenameColumn < ActiveRecord::Migration
-  def self.up
+  def change
     rename_column :users, :properties, :bad_name
   end
 end
 
 class RenameTable < ActiveRecord::Migration
-  def self.up
+  def change
     rename_table :users, :bad_name
   end
 end
 
 class RemoveColumn < ActiveRecord::Migration
-  def self.up
+  def change
     remove_column :users, :name
+  end
+end
+
+class SafeUp < ActiveRecord::Migration
+  def change
+    add_column :users, :email, :string
   end
 end
 
@@ -79,9 +85,9 @@ class StrongMigrationsTest < Minitest::Test
     assert_unsafe AddIndex
   end
 
-  def test_add_index_change
+  def test_add_index_up
     skip unless postgres?
-    assert_unsafe AddIndexChange
+    assert_unsafe AddIndexUp
   end
 
   def test_add_index_safety_assured
@@ -125,11 +131,16 @@ class StrongMigrationsTest < Minitest::Test
     assert_unsafe RemoveColumn
   end
 
+  def test_down
+    assert_safe SafeUp
+    assert_safe SafeUp, direction: :down
+  end
+
   def assert_unsafe(migration)
     assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration) }
   end
 
-  def assert_safe(migration)
-    assert migrate(migration)
+  def assert_safe(migration, direction: :up)
+    assert migrate(migration, direction: direction)
   end
 end
