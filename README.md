@@ -29,6 +29,10 @@ For more info, check out:
 - [Rails Migrations with No Downtime](http://pedro.herokuapp.com/past/2011/7/13/rails_migrations_with_no_downtime/)
 - [Safe Operations For High Volume PostgreSQL](https://www.braintreepayments.com/blog/safe-operations-for-high-volume-postgresql/) (if it’s relevant)
 
+Also checks for best practices:
+
+- keeping indexes under three columns
+
 ## The Zero Downtime Way
 
 ### Adding a column with a default value
