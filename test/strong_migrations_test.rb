@@ -79,6 +79,12 @@ class SafeUp < ActiveRecord::Migration
   end
 end
 
+class AddIndexColumns < ActiveRecord::Migration
+  def change
+    add_index :users, [:name, :city, :state, :zip_code]
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     skip unless postgres?
@@ -131,13 +137,20 @@ class StrongMigrationsTest < Minitest::Test
     assert_unsafe RemoveColumn
   end
 
+  def test_add_index_columns
+    assert_unsafe AddIndexColumns, /more than three columns/
+  end
+
   def test_down
     assert_safe SafeUp
     assert_safe SafeUp, direction: :down
   end
 
-  def assert_unsafe(migration)
-    assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration) }
+  def assert_unsafe(migration, message = nil)
+    error = assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration) }
+    if message
+      assert_match message, error.message
+    end
   end
 
   def assert_safe(migration, direction: :up)

@@ -27,6 +27,10 @@ module StrongMigrations
         when :rename_column
           raise_error :rename_column
         when :add_index
+          columns = args[1]
+          if columns.is_a?(Array) && columns.size > 3
+            raise_error :add_index_columns
+          end
           options = args[2]
           if %w(PostgreSQL PostGIS).include?(connection.adapter_name) && !(options && options[:algorithm] == :concurrently)
             raise_error :add_index
@@ -112,6 +116,10 @@ Once it's deployed, wrap this step in a safety_assured { ... } block."
     commit_db_transaction
     add_index :users, :some_column, algorithm: :concurrently
   end"
+        when :add_index_columns
+"Adding an index with more than three columns only helps on extremely large tables.
+
+If you're sure this is what you want, wrap it in a safety_assured { ... } block."
         when :change_table
 "The strong_migrations gem does not support inspecting what happens inside a
 change_table block, so cannot help you here. Please make really sure that what
