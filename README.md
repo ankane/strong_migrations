@@ -31,7 +31,7 @@ For more info, check out:
 
 Also checks for best practices:
 
-- keeping indexes under three columns
+- keeping indexes to three columns or less
 
 ## The Zero Downtime Way
 
