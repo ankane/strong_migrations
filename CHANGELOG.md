@@ -1,5 +1,6 @@
 ## 0.1.3 [unreleased]
 
+- Disabled dangerous rake tasks in production
 - Added ability to use `SAFETY_ASSURED` env var
 
 ## 0.1.2
