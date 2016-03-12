@@ -135,9 +135,9 @@ class MySafeMigration < ActiveRecord::Migration
 end
 ```
 
-## Production Tasks [master]
+## Production
 
-This gem also disables dangerous rake tasks in production - `db:drop`, `db:reset`, `db:schema:load`, and `db:structure:load`. To get around this, use:
+Dangerous rake tasks are disabled in production - `db:drop`, `db:reset`, `db:schema:load`, and `db:structure:load`. To get around this, use:
 
 ```sh
 SAFETY_ASSURED=1 rake db:drop
