@@ -135,7 +135,7 @@ class MySafeMigration < ActiveRecord::Migration
 end
 ```
 
-## Production
+## Dangerous Tasks
 
 For safety, dangerous rake tasks are disabled in production - `db:drop`, `db:reset`, `db:schema:load`, and `db:structure:load`. To get around this, use:
 
