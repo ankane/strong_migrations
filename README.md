@@ -152,7 +152,7 @@ ActiveRecord::Base.dump_schema_after_migration = Rails.env.development? &&
   !`git status db/migrate/`.include?("working directory clean")
 ```
 
-## Schema Sanity [master]
+## Schema Sanity
 
 Columns can flip order in `db/schema.rb` when you have multiple developers. One way to prevent this is to [alphabetize them](https://www.pgrs.net/2008/03/13/alphabetize-schema-rb-columns/). Add to the end of your `Rakefile`:
 
