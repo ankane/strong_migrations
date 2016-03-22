@@ -11,8 +11,8 @@ namespace :strong_migrations do
     ActiveRecord::Base.logger.level = Logger::INFO
 
     class << ActiveRecord::Base.connection
-      alias_method :old_columns, :columns unless self.instance_methods.include?("old_columns")
-      alias_method :old_extensions, :extensions unless self.instance_methods.include?("old_extensions")
+      alias_method :old_columns, :columns unless instance_methods.include?("old_columns")
+      alias_method :old_extensions, :extensions unless instance_methods.include?("old_extensions")
 
       def columns(*args)
         old_columns(*args).sort_by(&:name)
