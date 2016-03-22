@@ -143,6 +143,25 @@ For safety, dangerous rake tasks are disabled in production - `db:drop`, `db:res
 SAFETY_ASSURED=1 rake db:drop
 ```
 
+## Faster Migrations
+
+Only dump the schema when you’re adding a new migration. If you use Git, create an initializer with:
+
+```ruby
+ActiveRecord::Base.dump_schema_after_migration = Rails.env.development? &&
+  !`git status db/migrate/`.include?("working directory clean")
+```
+
+## Schema [master]
+
+Columns can flip order in your `db/schema.rb` when you have multiple developers. One way to prevent this is to [alphabetize them](https://www.pgrs.net/2008/03/13/alphabetize-schema-rb-columns/).
+
+Add to the end of your `Rakefile`:
+
+```ruby
+task "db:schema:dump": "strong_migrations:alphabetize_columns"
+```
+
 ## Credits
 
 Thanks to Bob Remeika and David Waller for the [original code](https://github.com/foobarfighter/safe-migrations).

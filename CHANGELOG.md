@@ -1,3 +1,7 @@
+## 0.1.4 [unreleased]
+
+- Added alphabetize columns
+
 ## 0.1.3
 
 - Disabled dangerous rake tasks in production
