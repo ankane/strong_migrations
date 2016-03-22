@@ -126,8 +126,7 @@ change_table block, so cannot help you here. Please make really sure that what
 you're doing is safe before proceding, then wrap it in a safety_assured { ... } block."
         end
 
-
-      message.prepend '
+      wait_message = '
  __          __     _____ _______ _
  \ \        / /\   |_   _|__   __| |
   \ \  /\  / /  \    | |    | |  | |
@@ -136,9 +135,8 @@ you're doing is safe before proceding, then wrap it in a safety_assured { ... } 
      \/  \/_/    \_\_____|  |_|  (_)
 
 '
-      message << "\n"
 
-      raise StrongMigrations::UnsafeMigration, message
+      raise StrongMigrations::UnsafeMigration, "#{wait_message}#{message}\n"
     end
   end
 end
