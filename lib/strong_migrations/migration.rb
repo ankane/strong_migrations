@@ -16,6 +16,9 @@ module StrongMigrations
     def method_missing(method, *args, &block)
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down
         case method
+        when :create_table
+          options = args[1]
+          raise_error :create_table if !options || !options.key?(:id) || options[:id] == true
         when :remove_column
           raise_error :remove_column
         when :remove_timestamps
@@ -53,6 +56,14 @@ module StrongMigrations
     def raise_error(message_key)
       message =
         case message_key
+        when :create_table
+"create_table is creating a primary key of integer (4 bytes) by default.
+You might run out of id's if you insert a lot of data. Max value is 2,147,483,647.
+You might want to use bigint (8 bytes) type instead. Max value is 9,223,372,036,854,775,807.
+
+create_table :example, id: false do |t|
+  t.integer :id, limit: 8, primary_key: true # bigint (8 bytes)
+end"
         when :add_column_default
 "Adding a column with a non-null default requires
 the entire table and indexes to be rewritten. Instead:

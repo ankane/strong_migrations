@@ -16,6 +16,7 @@ gem 'strong_migrations'
 
 ## Dangerous Operations
 
+- create a table with default primary key type (integer: 4 bytes)
 - adding a column with a non-null default value to an existing table
 - changing the type of a column
 - renaming a table
@@ -34,6 +35,18 @@ Also checks for best practices:
 - keeping indexes to three columns or less
 
 ## The Zero Downtime Way
+
+### Create a table with default primary key type (integer: 4 bytes)
+
+create_table is creating a primary key of integer (4 bytes) by default.
+You might run out of id's if you insert a lot of data. Max value is 2,147,483,647.
+You might want to use bigint (8 bytes) type instead. Max value is 9,223,372,036,854,775,807.
+
+```ruby
+create_table :example, id: false do |t|
+  t.integer :id, limit: 8, primary_key: true # bigint (8 bytes)
+end
+```
 
 ### Adding a column with a default value
 
