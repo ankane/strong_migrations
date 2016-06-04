@@ -1,5 +1,10 @@
 module StrongMigrations
   module Migration
+    # An easy way to mark a full migration as safe
+    def full_safety_assured!
+      @fully_safe = true
+    end
+
     def safety_assured
       previous_value = @safe
       @safe = true
@@ -14,7 +19,7 @@ module StrongMigrations
     end
 
     def method_missing(method, *args, &block)
-      unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down
+      unless safety_of_method_assured?
         case method
         when :remove_column
           raise_error :remove_column
@@ -49,6 +54,11 @@ module StrongMigrations
     end
 
     private
+
+    def safety_of_method_assured?
+      @fully_safe || @safe || ENV['SAFETY_ASSURED'] ||
+        is_a?(ActiveRecord::Schema) || @direction == :down
+    end
 
     def raise_error(message_key)
       message =
