@@ -1,3 +1,7 @@
+## 0.1.5
+
+- Fixed error with Ruby 2.3 frozen strings
+
 ## 0.1.4
 
 - Added alphabetize columns
