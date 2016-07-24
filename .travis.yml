@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - 2.2
+  - 2.3.1
 gemfile:
   - Gemfile
   - test/gemfiles/activerecord32.gemfile
