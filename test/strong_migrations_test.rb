@@ -85,6 +85,12 @@ class AddIndexColumns < ActiveRecord::Migration
   end
 end
 
+class RemoveIndexColumn < ActiveRecord::Migration
+  def change
+    remove_index :users, :name
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     skip unless postgres?
@@ -139,6 +145,10 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_add_index_columns
     assert_unsafe AddIndexColumns, /more than three columns/
+  end
+
+  def test_remove_index
+    assert_unsafe RemoveIndexColumn
   end
 
   def test_down
