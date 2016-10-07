@@ -24,6 +24,15 @@ class AddIndexSafetyAssured < ActiveRecord::Migration
   end
 end
 
+class AddIndexNewTable < ActiveRecord::Migration
+  def change
+    create_table "new_users", force: :cascade do |t|
+      t.string :name
+    end
+    add_index :new_users, :name
+  end
+end
+
 class AddIndexSchema < ActiveRecord::Schema
   def change
     add_index :users, :name, name: "boom2"
@@ -98,6 +107,10 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_add_index_safety_assured
     assert_safe AddIndexSafetyAssured
+  end
+
+  def test_add_index_new_table
+    assert_safe AddIndexNewTable
   end
 
   def test_schema

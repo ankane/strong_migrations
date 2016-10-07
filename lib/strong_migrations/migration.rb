@@ -32,7 +32,7 @@ module StrongMigrations
             raise_error :add_index_columns
           end
           options = args[2]
-          if %w(PostgreSQL PostGIS).include?(connection.adapter_name) && !(options && options[:algorithm] == :concurrently)
+          if %w(PostgreSQL PostGIS).include?(connection.adapter_name) && !(options && options[:algorithm] == :concurrently) && !@new_tables.to_a.include?(args[0].to_s)
             raise_error :add_index
           end
         when :add_column
@@ -42,6 +42,8 @@ module StrongMigrations
           raise_error :add_column_json if type.to_s == "json"
         when :change_column
           raise_error :change_column
+        when :create_table
+          (@new_tables ||= []) << args[0].to_s
         end
       end
 

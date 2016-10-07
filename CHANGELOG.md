@@ -1,3 +1,7 @@
+## 0.1.6 [unreleased]
+
+- Adding an index to a newly created table is now safe
+
 ## 0.1.5
 
 - Fixed error with Ruby 2.3 frozen strings
