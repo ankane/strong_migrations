@@ -149,7 +149,7 @@ Only dump the schema when adding a new migration. If you use Git, create an init
 
 ```ruby
 ActiveRecord::Base.dump_schema_after_migration = Rails.env.development? &&
-  !`git status db/migrate/`.include?("nothing to commit")
+  `git status db/migrate/ --porcelain`.present?
 ```
 
 ## Schema Sanity
