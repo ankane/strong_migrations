@@ -53,7 +53,7 @@ class AddSomeColumnToUsers < ActiveRecord::Migration
 
     # 3
     User.find_in_batches do |users|
-      User.where(id: users.map(&:id)).update_all some_column: "default_value"
+      User.where(id: users.pluck(:id)).update_all some_column: "default_value"
     end
 
     # 4
