@@ -1,4 +1,4 @@
-## 0.1.6 [unreleased]
+## 0.1.6
 
 - Adding an index to a newly created table is now safe
 
