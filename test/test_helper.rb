@@ -17,7 +17,8 @@ end
 
 class CreateUsers < ActiveRecord::Migration
   def change
-    create_table "users", force: :cascade do |t|
+    create_table "users", id: false, force: :cascade do |t|
+      t.integer :id, limit: 8, primary_key: true
       t.string :name
     end
   end

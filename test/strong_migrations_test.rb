@@ -1,5 +1,19 @@
 require_relative "test_helper"
 
+class CreateTablePrimaryKeyTypeSafe < ActiveRecord::Migration
+  def change
+    create_table :example, id: false, force: :cascade do |t|
+      t.integer :id, limit: 8, primary_key: true # bigint (8 bytes)
+    end
+  end
+end
+
+class CreateTablePrimaryKeyTypeUnsafe < ActiveRecord::Migration
+  def change
+    create_table :table, force: :cascade
+  end
+end
+
 class AddIndex < ActiveRecord::Migration
   def change
     add_index :users, :name
@@ -95,6 +109,14 @@ class AddIndexColumns < ActiveRecord::Migration
 end
 
 class StrongMigrationsTest < Minitest::Test
+  def test_create_table_primary_key_type_safe
+    assert_safe CreateTablePrimaryKeyTypeSafe
+  end
+
+  def test_create_table_primary_key_type_unsafe
+    assert_unsafe CreateTablePrimaryKeyTypeUnsafe
+  end
+
   def test_add_index
     skip unless postgres?
     assert_unsafe AddIndex
