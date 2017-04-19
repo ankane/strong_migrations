@@ -94,6 +94,13 @@ class AddIndexColumns < ActiveRecord::Migration
   end
 end
 
+class AddColumnDefaultFullSafety < ActiveRecord::Migration
+  def change
+    full_safety_assured!
+    add_column :users, :fully_safe, :boolean, default: true
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     skip unless postgres?
@@ -157,6 +164,11 @@ class StrongMigrationsTest < Minitest::Test
   def test_down
     assert_safe SafeUp
     assert_safe SafeUp, direction: :down
+  end
+
+  def test_add_column_default_full_safety
+    assert_safe AddColumnDefaultFullSafety
+    assert_safe AddColumnDefaultFullSafety, direction: :down
   end
 
   def assert_unsafe(migration, message = nil)
