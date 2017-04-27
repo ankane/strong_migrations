@@ -1,3 +1,7 @@
+## 0.1.7 [unreleased]
+
+- Added `auto_analyze` option
+
 ## 0.1.6
 
 - Adding an index to a newly created table is now safe

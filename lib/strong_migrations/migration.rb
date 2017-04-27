@@ -32,7 +32,7 @@ module StrongMigrations
             raise_error :add_index_columns
           end
           options = args[2]
-          if %w(PostgreSQL PostGIS).include?(connection.adapter_name) && !(options && options[:algorithm] == :concurrently) && !@new_tables.to_a.include?(args[0].to_s)
+          if postgresql? && !(options && options[:algorithm] == :concurrently) && !@new_tables.to_a.include?(args[0].to_s)
             raise_error :add_index
           end
         when :add_column
@@ -47,10 +47,20 @@ module StrongMigrations
         end
       end
 
-      super
+      result = super
+
+      if StrongMigrations.auto_analyze && postgresql? && method == :add_index
+        connection.execute "ANALYZE VERBOSE #{connection.quote_table_name(args[0])}"
+      end
+
+      result
     end
 
     private
+
+    def postgresql?
+      %w(PostgreSQL PostGIS).include?(connection.adapter_name)
+    end
 
     def raise_error(message_key)
       message =
