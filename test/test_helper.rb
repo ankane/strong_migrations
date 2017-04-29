@@ -24,7 +24,7 @@ def migration_version
 end
 
 TestMigration = activerecord5? ? ActiveRecord::Migration[migration_version] : ActiveRecord::Migration
-TestSchema = activerecord5? ? ActiveRecord::Schema[migration_version] : ActiveRecord::Schema
+TestSchema = ActiveRecord::Schema
 
 class CreateUsers < TestMigration
   def change
