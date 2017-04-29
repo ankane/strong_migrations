@@ -17,4 +17,3 @@ matrix:
   include:
     - gemfile: test/gemfiles/mysql2.gemfile
       env: ADAPTER=mysql2
-      rvm: 2.2
