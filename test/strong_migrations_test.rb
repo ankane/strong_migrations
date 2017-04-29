@@ -1,30 +1,30 @@
 require_relative "test_helper"
 
-class AddIndex < ActiveRecord::Migration
+class AddIndex < TestMigration
   def change
     add_index :users, :name
   end
 end
 
-class AddIndexUp < ActiveRecord::Migration
+class AddIndexUp < TestMigration
   def self.up
     add_index :users, :name
   end
 end
 
-class AddIndexSafePostgres < ActiveRecord::Migration
+class AddIndexSafePostgres < TestMigration
   def change
     add_index :users, :name, algorithm: :concurrently
   end
 end
 
-class AddIndexSafetyAssured < ActiveRecord::Migration
+class AddIndexSafetyAssured < TestMigration
   def change
     safety_assured { add_index :users, :name, name: "boom" }
   end
 end
 
-class AddIndexNewTable < ActiveRecord::Migration
+class AddIndexNewTable < TestMigration
   def change
     create_table "new_users", force: :cascade do |t|
       t.string :name
@@ -33,62 +33,62 @@ class AddIndexNewTable < ActiveRecord::Migration
   end
 end
 
-class AddIndexSchema < ActiveRecord::Schema
+class AddIndexSchema < TestSchema
   def change
     add_index :users, :name, name: "boom2"
   end
 end
 
-class AddColumnDefault < ActiveRecord::Migration
+class AddColumnDefault < TestMigration
   def change
     add_column :users, :nice, :boolean, default: true
   end
 end
 
-class AddColumnDefaultSafe < ActiveRecord::Migration
+class AddColumnDefaultSafe < TestMigration
   def change
     add_column :users, :nice, :boolean
     change_column_default :users, :nice, false
   end
 end
 
-class AddColumnJson < ActiveRecord::Migration
+class AddColumnJson < TestMigration
   def change
     add_column :users, :properties, :json
   end
 end
 
-class ChangeColumn < ActiveRecord::Migration
+class ChangeColumn < TestMigration
   def change
     change_column :users, :properties, :bad_name
   end
 end
 
-class RenameColumn < ActiveRecord::Migration
+class RenameColumn < TestMigration
   def change
     rename_column :users, :properties, :bad_name
   end
 end
 
-class RenameTable < ActiveRecord::Migration
+class RenameTable < TestMigration
   def change
     rename_table :users, :bad_name
   end
 end
 
-class RemoveColumn < ActiveRecord::Migration
+class RemoveColumn < TestMigration
   def change
     remove_column :users, :name
   end
 end
 
-class SafeUp < ActiveRecord::Migration
+class SafeUp < TestMigration
   def change
     add_column :users, :email, :string
   end
 end
 
-class AddIndexColumns < ActiveRecord::Migration
+class AddIndexColumns < TestMigration
   def change
     add_index :users, [:name, :city, :state, :zip_code]
   end

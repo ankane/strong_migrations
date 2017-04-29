@@ -15,7 +15,18 @@ def migrate(migration, direction: :up)
   true
 end
 
-class CreateUsers < ActiveRecord::Migration
+def activerecord5?
+  ActiveRecord::VERSION::MAJOR >= 5
+end
+
+def migration_version
+  ActiveRecord.version.to_s.to_f
+end
+
+TestMigration = activerecord5? ? ActiveRecord::Migration[migration_version] : ActiveRecord::Migration
+TestSchema = activerecord5? ? ActiveRecord::Schema[migration_version] : ActiveRecord::Schema
+
+class CreateUsers < TestMigration
   def change
     create_table "users", force: :cascade do |t|
       t.string :name
