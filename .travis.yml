@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - 2.4.1
+  - 2.4.0
 gemfile:
   - Gemfile
   - test/gemfiles/activerecord50.gemfile
