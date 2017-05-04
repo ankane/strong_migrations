@@ -35,6 +35,8 @@ module StrongMigrations
           if postgresql? && !(options && options[:algorithm] == :concurrently) && !@new_tables.to_a.include?(args[0].to_s)
             raise_error :add_index
           end
+        when :remove_index
+          raise_error :remove_index
         when :add_column
           type = args[2]
           options = args[3]
@@ -128,6 +130,16 @@ Once it's deployed, wrap this step in a safety_assured { ... } block."
     commit_db_transaction
     add_index :users, :some_column, algorithm: :concurrently
   end"
+        when :remove_index
+"If you are looking to change an index. Instead, use:
+
+  def change
+    commit_db_transaction
+    add_index :users, :some_column, options
+    safety_assured { remove_index :users, name: old_index_name }
+  end
+
+If you are looking to delete an unused index, wrap this step in a safety_assured { ... } block."
         when :add_index_columns
 "Adding an index with more than three columns only helps on extremely large tables.
 
