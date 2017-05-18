@@ -93,7 +93,13 @@ If you really have to:
 Tell ActiveRecord to ignore the column from its cache.
 
 ```ruby
-class User
+# For Rails 5+
+class User < ActiveRecord::Base
+  self.ignored_columns = %w(some_column)
+end
+
+# For Rails < 5
+class User < ActiveRecord::Base
   def self.columns
     super.reject { |c| c.name == "some_column" }
   end
