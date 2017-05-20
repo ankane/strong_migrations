@@ -30,10 +30,15 @@ class CreateUsers < TestMigration
   def change
     create_table "users", force: :cascade do |t|
       t.string :name
+      t.timestamp :created_at
     end
   end
 end
 migrate CreateUsers
+
+class User < ActiveRecord::Base
+  self.ignored_columns = %w(created_at) if activerecord5?
+end
 
 class Minitest::Test
   def postgres?

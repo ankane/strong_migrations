@@ -17,7 +17,12 @@ module StrongMigrations
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down
         case method
         when :remove_column
-          raise_error :remove_column
+          table = args[0]
+          column = args[1]
+          model = ActiveRecord::Base.descendants.find { |m| m.table_name == table.to_s }
+          if !model || model.column_names.include?(column.to_s)
+            raise_error :remove_column
+          end
         when :remove_timestamps
           raise_error :remove_column
         when :change_table
