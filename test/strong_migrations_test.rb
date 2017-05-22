@@ -94,6 +94,20 @@ class AddIndexColumns < TestMigration
   end
 end
 
+class AddReference < TestMigration
+  def change
+    add_reference :users, :device, index: true
+  end
+end
+
+class SafeAddReference < TestMigration
+  def change
+    add_reference :users, :country, index: false
+    commit_db_transaction
+    add_index :users, :country_id, algorithm: :concurrently
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     skip unless postgres?
@@ -152,6 +166,16 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_add_index_columns
     assert_unsafe AddIndexColumns, /more than three columns/
+  end
+
+  def test_add_reference
+    skip unless postgres?
+    assert_unsafe AddReference
+  end
+
+  def test_safe_add_reference
+    skip unless postgres?
+    assert_safe SafeAddReference
   end
 
   def test_down
