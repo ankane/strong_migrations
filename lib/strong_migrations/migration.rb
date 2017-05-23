@@ -44,6 +44,11 @@ module StrongMigrations
           raise_error :change_column
         when :create_table
           (@new_tables ||= []) << args[0].to_s
+        when :add_reference
+          options = args[2]
+          if postgresql? && options && options[:index]
+            raise_error :add_reference
+          end
         end
       end
 
@@ -121,6 +126,14 @@ Once it's deployed, wrap this step in a safety_assured { ... } block."
 4. Move reads from the old table to the new table
 5. Stop writing to the old table
 6. Drop the old table"
+        when :add_reference
+"Adding a non-concurrent index locks the table. Instead, use:
+
+  def change
+    add_reference :users, :reference, index: false
+    commit_db_transaction
+    add_index :users, :reference_id, algorithm: :concurrently
+  end"
         when :add_index
 "Adding a non-concurrent index locks the table. Instead, use:
 
