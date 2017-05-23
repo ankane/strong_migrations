@@ -45,8 +45,9 @@ module StrongMigrations
         when :create_table
           (@new_tables ||= []) << args[0].to_s
         when :add_reference
-          options = args[2]
-          if postgresql? && options && options[:index]
+          options = args[2] || {}
+          index_value = options.fetch(:index, ActiveRecord::VERSION::MAJOR >= 5 ? true : false)
+          if postgresql? && index_value
             raise_error :add_reference
           end
         end

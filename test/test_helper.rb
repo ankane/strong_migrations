@@ -8,6 +8,8 @@ Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
 adapter = ENV["ADAPTER"] || "postgres"
 ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migrations_test")
 
+# ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout)
+
 def migrate(migration, direction: :up)
   ActiveRecord::Migration.suppress_messages do
     migration.migrate(direction)

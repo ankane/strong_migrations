@@ -108,6 +108,12 @@ class SafeAddReference < TestMigration
   end
 end
 
+class AddReferenceDefault < TestMigration
+  def change
+    add_reference :users, :ip
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     skip unless postgres?
@@ -176,6 +182,15 @@ class StrongMigrationsTest < Minitest::Test
   def test_safe_add_reference
     skip unless postgres?
     assert_safe SafeAddReference
+  end
+
+  def test_add_reference_default
+    skip unless postgres?
+    if ActiveRecord::VERSION::MAJOR >= 5
+      assert_unsafe AddReferenceDefault
+    else
+      assert_safe AddReferenceDefault
+    end
   end
 
   def test_down
