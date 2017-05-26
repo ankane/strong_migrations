@@ -25,7 +25,21 @@ def migration_version
   ActiveRecord.version.to_s.to_f
 end
 
+def with_safety_assumed_prior_to(version)
+  previous_version = StrongMigrations.assume_safety_prior_to_version
+  StrongMigrations.assume_safety_prior_to_version = version
+  yield
+ensure
+  StrongMigrations.assume_safety_prior_to_version = previous_version
+end
+
 TestMigration = activerecord5? ? ActiveRecord::Migration[migration_version] : ActiveRecord::Migration
+TestMigration.class_eval do
+  def version
+    20170515205830 # arbitrary for test cases
+  end
+end
+
 TestSchema = ActiveRecord::Schema
 
 class CreateUsers < TestMigration

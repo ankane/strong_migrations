@@ -2,6 +2,7 @@
 
 - Added check for `force` option with `create_table`
 - Added `auto_analyze` option
+- Added `assume_safety_prior_to_version` option
 
 ## 0.1.6
 

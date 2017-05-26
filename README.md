@@ -149,6 +149,10 @@ For safety, dangerous rake tasks are disabled in production - `db:drop`, `db:res
 SAFETY_ASSURED=1 rake db:drop
 ```
 
+## Treating All Existing Migrations As Safe
+
+You can set `StrongMigrations.assume_safety_prior_to_version` to a version number to assume the safety of any migration whose version number is less than or equal to that setting. Use this to introduce `strong_migrations` into a codebase with pre-existing unsafe migrations.
+
 ## Faster Migrations
 
 Only dump the schema when adding a new migration. If you use Git, create an initializer with:

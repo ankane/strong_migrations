@@ -212,6 +212,24 @@ class StrongMigrationsTest < StrongMigrationsTestBase
     assert_safe SafeUp, direction: :down
   end
 
+  def test_old_remove_column_assumed_safe
+    with_safety_assumed_prior_to(RemoveColumn.new.version + 1) do
+      assert_safe RemoveColumn
+    end
+  end
+
+  def test_remove_column_at_cutoff_version_assumed_safe
+    with_safety_assumed_prior_to(RemoveColumn.new.version) do
+      assert_safe RemoveColumn
+    end
+  end
+
+  def test_new_remove_column_not_assumed_safe
+    with_safety_assumed_prior_to(RemoveColumn.new.version - 1) do
+      assert_unsafe RemoveColumn
+    end
+  end
+
   def assert_unsafe(migration, message = nil)
     error = assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration) }
     assert_match message, error.message if message

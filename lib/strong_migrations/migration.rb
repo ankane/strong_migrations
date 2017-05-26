@@ -70,7 +70,11 @@ module StrongMigrations
     private
 
     def safety_overridden?
-      @safe || ENV["SAFETY_ASSURED"]
+      @safe || ENV["SAFETY_ASSURED"] || should_assume_safety_due_to_version?
+    end
+
+    def should_assume_safety_due_to_version?
+      version && version <= StrongMigrations.assume_safety_prior_to_version
     end
 
     def postgresql?
