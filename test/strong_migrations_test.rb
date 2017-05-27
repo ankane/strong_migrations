@@ -26,9 +26,13 @@ end
 
 class AddIndexNewTable < TestMigration
   def change
-    create_table "new_users", force: :cascade do |t|
-      t.string :name
+    # needed for force: :cascade
+    safety_assured do
+      create_table "new_users", force: :cascade do |t|
+        t.string :name
+      end
     end
+
     add_index :new_users, :name
   end
 end
@@ -114,6 +118,14 @@ class AddReferenceDefault < TestMigration
   end
 end
 
+class CreateTableForce < TestMigration
+  def change
+    create_table "users", force: :cascade do |t|
+      t.string :name
+    end
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     skip unless postgres?
@@ -191,6 +203,10 @@ class StrongMigrationsTest < Minitest::Test
     else
       assert_safe AddReferenceDefault
     end
+  end
+
+  def test_create_table_force
+    assert_unsafe CreateTableForce
   end
 
   def test_down

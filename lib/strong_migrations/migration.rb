@@ -43,7 +43,8 @@ module StrongMigrations
         when :change_column
           raise_error :change_column
         when :create_table
-          (@new_tables ||= []) << args[0].to_s
+          options = args[1]
+          raise_error :create_table if options[:force]
         when :add_reference
           options = args[2] || {}
           index_value = options.fetch(:index, ActiveRecord::VERSION::MAJOR >= 5 ? true : false)
@@ -51,6 +52,10 @@ module StrongMigrations
             raise_error :add_reference
           end
         end
+      end
+
+      if method == :create_table
+        (@new_tables ||= []) << args[0].to_s
       end
 
       result = super
@@ -150,6 +155,10 @@ If you're sure this is what you want, wrap it in a safety_assured { ... } block.
 "The strong_migrations gem does not support inspecting what happens inside a
 change_table block, so cannot help you here. Please make really sure that what
 you're doing is safe before proceding, then wrap it in a safety_assured { ... } block."
+        when :create_table
+"The force option will destroy existing tables.
+If this is intended, drop the existing table first.
+Otherwise, remove the option."
         end
 
       wait_message = '

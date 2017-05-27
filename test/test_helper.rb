@@ -30,8 +30,11 @@ TestSchema = ActiveRecord::Schema
 
 class CreateUsers < TestMigration
   def change
-    create_table "users", force: :cascade do |t|
-      t.string :name
+    # needed for force: :cascade
+    safety_assured do
+      create_table "users", force: :cascade do |t|
+        t.string :name
+      end
     end
   end
 end
