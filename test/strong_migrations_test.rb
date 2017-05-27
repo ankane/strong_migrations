@@ -107,8 +107,6 @@ end
 class SafeAddReference < TestMigration
   def change
     add_reference :users, :country, index: false
-    commit_db_transaction
-    add_index :users, :country_id, algorithm: :concurrently
   end
 end
 
