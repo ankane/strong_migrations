@@ -1,5 +1,6 @@
 ## 0.1.7 [unreleased]
 
+- Added check for `force` option with `create_table`
 - Added `auto_analyze` option
 
 ## 0.1.6
