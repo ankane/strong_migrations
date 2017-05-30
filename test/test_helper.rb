@@ -38,10 +38,24 @@ class CreateUsers < TestMigration
     end
   end
 end
-migrate CreateUsers
 
-class Minitest::Test
+class StrongMigrationsTestBase < Minitest::Test
   def postgres?
     ENV["ADAPTER"].nil?
+  end
+
+  # Create users table before each test and drop all tables
+  # after each test so tests can execute independently.
+
+  def setup
+    migrate CreateUsers
+  end
+
+  def teardown
+    conn = ActiveRecord::Base.connection
+    tables = conn.tables
+    tables.each do |table|
+      conn.drop_table(table)
+    end
   end
 end

@@ -124,7 +124,7 @@ class CreateTableForce < TestMigration
   end
 end
 
-class StrongMigrationsTest < Minitest::Test
+class StrongMigrationsTest < StrongMigrationsTestBase
   def test_add_index
     skip unless postgres?
     assert_unsafe AddIndex
