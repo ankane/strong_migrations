@@ -68,6 +68,12 @@ class ChangeColumn < TestMigration
   end
 end
 
+class ExecuteArbitrarySQL < TestMigration
+  def change
+    execute 'SELECT CURRENT_TIMESTAMP'
+  end
+end
+
 class RenameColumn < TestMigration
   def change
     rename_column :users, :properties, :bad_name
@@ -166,6 +172,10 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_change_column
     assert_unsafe ChangeColumn
+  end
+
+  def test_execute_arbitrary_sql
+    assert_unsafe ExecuteArbitrarySQL
   end
 
   def test_rename_column

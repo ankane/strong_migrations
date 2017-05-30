@@ -51,6 +51,8 @@ module StrongMigrations
           if postgresql? && index_value
             raise_error :add_reference
           end
+        when :execute
+          raise_error :execute
         end
       end
 
@@ -154,11 +156,15 @@ If you're sure this is what you want, wrap it in a safety_assured { ... } block.
         when :change_table
 "The strong_migrations gem does not support inspecting what happens inside a
 change_table block, so cannot help you here. Please make really sure that what
-you're doing is safe before proceding, then wrap it in a safety_assured { ... } block."
+you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block."
         when :create_table
 "The force option will destroy existing tables.
 If this is intended, drop the existing table first.
 Otherwise, remove the option."
+        when :execute
+"The strong_migrations gem does not support inspecting what happens inside an
+execute call, so cannot help you here. Please make really sure that what
+you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block."
         end
 
       wait_message = '
