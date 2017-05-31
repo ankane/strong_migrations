@@ -38,7 +38,7 @@ module StrongMigrations
         when :add_column
           type = args[2]
           options = args[3] || {}
-          raise_error :add_column_default if !options[:default].nil?
+          raise_error :add_column_default unless options[:default].nil?
           raise_error :add_column_json if type.to_s == "json"
         when :change_column
           raise_error :change_column
