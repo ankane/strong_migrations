@@ -1,5 +1,6 @@
-## 0.1.8 [unreleased]
+## 0.1.8
 
+- Fixed error with `create_table`
 - Added check for executing arbitrary SQL
 
 ## 0.1.7
