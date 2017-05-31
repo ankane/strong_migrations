@@ -1,4 +1,4 @@
-## 0.1.8
+## 0.1.8 [unreleased]
 
 - Added check for executing arbitrary SQL
 
