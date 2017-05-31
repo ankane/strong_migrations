@@ -31,14 +31,14 @@ module StrongMigrations
           if columns.is_a?(Array) && columns.size > 3
             raise_error :add_index_columns
           end
-          options = args[2]
-          if postgresql? && !(options && options[:algorithm] == :concurrently) && !@new_tables.to_a.include?(args[0].to_s)
+          options = args[2] || {}
+          if postgresql? && options[:algorithm] != :concurrently && !@new_tables.to_a.include?(args[0].to_s)
             raise_error :add_index
           end
         when :add_column
           type = args[2]
-          options = args[3]
-          raise_error :add_column_default if options && !options[:default].nil?
+          options = args[3] || {}
+          raise_error :add_column_default if !options[:default].nil?
           raise_error :add_column_json if type.to_s == "json"
         when :change_column
           raise_error :change_column
