@@ -43,7 +43,7 @@ module StrongMigrations
         when :change_column
           raise_error :change_column
         when :create_table
-          options = args[1]
+          options = args[1] || {}
           raise_error :create_table if options[:force]
         when :add_reference
           options = args[2] || {}

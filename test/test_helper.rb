@@ -28,13 +28,13 @@ end
 TestMigration = activerecord5? ? ActiveRecord::Migration[migration_version] : ActiveRecord::Migration
 TestSchema = ActiveRecord::Schema
 
+ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users")
+ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS new_users")
+
 class CreateUsers < TestMigration
   def change
-    # needed for force: :cascade
-    safety_assured do
-      create_table "users", force: :cascade do |t|
-        t.string :name
-      end
+    create_table "users" do |t|
+      t.string :name
     end
   end
 end

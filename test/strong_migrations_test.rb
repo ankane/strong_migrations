@@ -26,11 +26,8 @@ end
 
 class AddIndexNewTable < TestMigration
   def change
-    # needed for force: :cascade
-    safety_assured do
-      create_table "new_users", force: :cascade do |t|
-        t.string :name
-      end
+    create_table "new_users" do |t|
+      t.string :name
     end
 
     add_index :new_users, :name
