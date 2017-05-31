@@ -1,3 +1,7 @@
+## 0.1.8
+
+- Added check for executing arbitrary SQL
+
 ## 0.1.7
 
 - Added check for `force` option with `create_table`

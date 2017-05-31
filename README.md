@@ -21,6 +21,7 @@ gem 'strong_migrations'
 - renaming a table
 - renaming a column
 - removing a column
+- executing arbitrary SQL
 - adding an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
 
