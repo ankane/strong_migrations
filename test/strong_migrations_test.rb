@@ -127,7 +127,7 @@ class CreateTableForce < TestMigration
   end
 end
 
-class StrongMigrationsTest < Minitest::Test
+class StrongMigrationsTest < StrongMigrationsTestBase
   def test_add_index
     skip unless postgres?
     assert_unsafe AddIndex
@@ -217,6 +217,24 @@ class StrongMigrationsTest < Minitest::Test
   def test_down
     assert_safe SafeUp
     assert_safe SafeUp, direction: :down
+  end
+
+  def test_old_remove_column_assumed_safe
+    with_safety_assumed_prior_to(RemoveColumn.new.version + 1) do
+      assert_safe RemoveColumn
+    end
+  end
+
+  def test_remove_column_at_cutoff_version_assumed_safe
+    with_safety_assumed_prior_to(RemoveColumn.new.version) do
+      assert_safe RemoveColumn
+    end
+  end
+
+  def test_new_remove_column_not_assumed_safe
+    with_safety_assumed_prior_to(RemoveColumn.new.version - 1) do
+      assert_unsafe RemoveColumn
+    end
   end
 
   def assert_unsafe(migration, message = nil)

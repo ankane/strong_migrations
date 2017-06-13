@@ -25,7 +25,21 @@ def migration_version
   ActiveRecord.version.to_s.to_f
 end
 
+def with_safety_assumed_prior_to(version)
+  previous_version = StrongMigrations.assume_safety_prior_to_version
+  StrongMigrations.assume_safety_prior_to_version = version
+  yield
+ensure
+  StrongMigrations.assume_safety_prior_to_version = previous_version
+end
+
 TestMigration = activerecord5? ? ActiveRecord::Migration[migration_version] : ActiveRecord::Migration
+TestMigration.class_eval do
+  def version
+    20170515205830 # arbitrary for test cases
+  end
+end
+
 TestSchema = ActiveRecord::Schema
 
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users")
@@ -38,10 +52,24 @@ class CreateUsers < TestMigration
     end
   end
 end
-migrate CreateUsers
 
-class Minitest::Test
+class StrongMigrationsTestBase < Minitest::Test
   def postgres?
     ENV["ADAPTER"].nil?
+  end
+
+  # Create users table before each test and drop all tables
+  # after each test so tests can execute independently.
+
+  def setup
+    migrate CreateUsers
+  end
+
+  def teardown
+    conn = ActiveRecord::Base.connection
+    tables = conn.tables
+    tables.each do |table|
+      conn.drop_table(table)
+    end
   end
 end
