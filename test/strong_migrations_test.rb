@@ -127,6 +127,26 @@ class CreateTableForce < TestMigration
   end
 end
 
+class VersionSafe < TestMigration
+  def change
+    add_column :users, :nice2, :boolean, default: true
+  end
+
+  def version
+    20170101000000
+  end
+end
+
+class VersionUnsafe < TestMigration
+  def change
+    add_column :users, :nice2, :boolean, default: true
+  end
+
+  def version
+    20170101000001
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     skip unless postgres?
@@ -212,6 +232,14 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_create_table_force
     assert_unsafe CreateTableForce
+  end
+
+  def test_version_safe
+    assert_safe VersionSafe
+  end
+
+  def test_version_unsafe
+    assert_unsafe VersionUnsafe
   end
 
   def test_down

@@ -1,3 +1,7 @@
+## 0.1.9 [unreleased]
+
+- Added `start_after` option
+
 ## 0.1.8
 
 - Fixed error with `create_table`

@@ -8,6 +8,8 @@ Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
 adapter = ENV["ADAPTER"] || "postgres"
 ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migrations_test")
 
+StrongMigrations.start_after = 20170101000000
+
 # ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout)
 
 def migrate(migration, direction: :up)

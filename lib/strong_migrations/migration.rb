@@ -14,7 +14,7 @@ module StrongMigrations
     end
 
     def method_missing(method, *args, &block)
-      unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down
+      unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
         case method
         when :remove_column
           raise_error :remove_column
@@ -73,6 +73,10 @@ module StrongMigrations
 
     def postgresql?
       %w(PostgreSQL PostGIS).include?(connection.adapter_name)
+    end
+
+    def version_safe?
+      version && version <= StrongMigrations.start_after
     end
 
     def raise_error(message_key)

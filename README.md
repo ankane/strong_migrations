@@ -145,6 +145,14 @@ class MySafeMigration < ActiveRecord::Migration
 end
 ```
 
+## Existing Migrations [master]
+
+To mark migrations as safe that were created before installing this gem, create an initializer with:
+
+```ruby
+StrongMigrations.start_after = 20170101000000
+```
+
 ## Dangerous Tasks
 
 For safety, dangerous rake tasks are disabled in production - `db:drop`, `db:reset`, `db:schema:load`, and `db:structure:load`. To get around this, use:
