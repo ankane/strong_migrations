@@ -54,7 +54,7 @@ class AddSomeColumnToUsers < ActiveRecord::Migration
 
     # 3.a (Rails 5+)
     User.in_batches.update_all some_column: "default_value"
-                                                             
+
     # 3.b (Rails < 5)
     User.find_in_batches do |users|
       User.where(id: users.map(&:id)).update_all some_column: "default_value"
@@ -168,6 +168,14 @@ Columns can flip order in `db/schema.rb` when you have multiple developers. One 
 
 ```ruby
 task "db:schema:dump": "strong_migrations:alphabetize_columns"
+```
+
+## Analyze Tables (Postgres)
+
+Analyze tables automatically (to update planner statistics) after an index is added. Create an initializer with:
+
+```ruby
+StrongMigrations.auto_analyze = true
 ```
 
 ## Credits
