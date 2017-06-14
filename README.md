@@ -145,7 +145,7 @@ class MySafeMigration < ActiveRecord::Migration
 end
 ```
 
-## Existing Migrations [master]
+## Existing Migrations
 
 To mark migrations as safe that were created before installing this gem, create an initializer with:
 
