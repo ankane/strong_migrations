@@ -153,6 +153,8 @@ To mark migrations as safe that were created before installing this gem, create 
 StrongMigrations.start_after = 20170101000000
 ```
 
+Use the version from your latest migration.
+
 ## Dangerous Tasks
 
 For safety, dangerous rake tasks are disabled in production - `db:drop`, `db:reset`, `db:schema:load`, and `db:structure:load`. To get around this, use:
