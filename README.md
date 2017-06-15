@@ -188,6 +188,14 @@ Analyze tables automatically (to update planner statistics) after an index is ad
 StrongMigrations.auto_analyze = true
 ```
 
+## Lock Timeout (Postgres)
+
+It’s a good idea to set a lock timeout for the database user that runs migrations. This way, if migrations can’t acquire a lock in a timely manner, other statements won’t be stuck behind it.
+
+```sql
+ALTER ROLE myuser SET lock_timeout = '10s';
+```
+
 ## Credits
 
 Thanks to Bob Remeika and David Waller for the [original code](https://github.com/foobarfighter/safe-migrations).
