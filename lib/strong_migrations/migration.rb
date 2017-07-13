@@ -87,9 +87,9 @@ module StrongMigrations
 the entire table and indexes to be rewritten. Instead:
 
 1. Add the column without a default value
-2. Commit the transaction
-3. Backfill the column
-4. Add the default value"
+2. Add the default value
+3. Commit the transaction
+4. Backfill the column"
         when :add_column_json
 "There's no equality operator for the json column type.
 Replace all calls to uniq with a custom scope.
