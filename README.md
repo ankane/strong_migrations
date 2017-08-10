@@ -22,7 +22,7 @@ gem 'strong_migrations'
 - renaming a column
 - removing a column
 - executing arbitrary SQL
-- adding an index non-concurrently (Postgres only)
+- adding/removing an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
 
 For more info, check out:
@@ -112,7 +112,7 @@ end
 
 Once it’s deployed, create a migration to remove the column.
 
-### Adding an index (Postgres)
+### Adding/Removing an index (Postgres)
 
 Add indexes concurrently.
 
@@ -124,6 +124,16 @@ class AddSomeIndexToUsers < ActiveRecord::Migration
   end
 end
 ```
+
+Remove indexed concurrently.
+
+```ruby
+class RemoveSomeIndexToUsers < ActiveRecord::Migration
+  def change
+    commit_db_transaction
+    remove_index :users, column: :some_column, algorithm: :concurrently
+  end
+end
 
 ### Adding a json column (Postgres)
 

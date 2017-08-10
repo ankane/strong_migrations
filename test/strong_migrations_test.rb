@@ -40,6 +40,36 @@ class AddIndexSchema < TestSchema
   end
 end
 
+class RemoveIndex < TestMigration
+  def change
+    safety_assured { add_index :users, :name, name: "remove_boom" }
+    remove_index :users, name: :remove_boom
+  end
+end
+
+class RemoveIndexUp < TestMigration
+  def self.up
+    safety_assured { add_index :users, :name, name: "remove_boom2" }
+    remove_index :users, name: :remove_boom2
+  end
+end
+
+class RemoveIndexSafePostgres < TestMigration
+  def change
+    safety_assured { add_index :users, :name, name: "remove_boom3" }
+    remove_index :users, name: :remove_boom3, algorithm: :concurrently
+  end
+end
+
+class RemoveIndexSafetyAssured < TestMigration
+  def change
+    safety_assured do
+      add_index :users, :name, name: "remove_boom4"
+      remove_index :users, name: :remove_boom4
+    end
+  end
+end
+
 class AddColumnDefault < TestMigration
   def change
     add_column :users, :nice, :boolean, default: true
@@ -173,6 +203,25 @@ class StrongMigrationsTest < Minitest::Test
   def test_add_index_safe_postgres
     skip unless postgres?
     assert_safe AddIndexSafePostgres
+  end
+
+  def test_remove_index
+    skip unless postgres?
+    assert_unsafe RemoveIndex
+  end
+
+  def test_remove_index_up
+    skip unless postgres?
+    assert_unsafe RemoveIndexUp
+  end
+
+  def test_remove_index_safety_assured
+    assert_safe RemoveIndexSafetyAssured
+  end
+
+  def test_remove_index_safe
+    skip unless postgres?
+    assert_safe RemoveIndexSafePostgres
   end
 
   def test_add_column_default
