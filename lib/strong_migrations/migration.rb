@@ -53,6 +53,8 @@ module StrongMigrations
           end
         when :execute
           raise_error :execute
+        when :add_foreign_key
+          raise_error :add_foreign_key if StrongMigrations.no_integrity
         end
       end
 
@@ -169,6 +171,8 @@ Otherwise, remove the option."
 "The strong_migrations gem does not support inspecting what happens inside an
 execute call, so cannot help you here. Please make really sure that what
 you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block."
+        when :add_foreign_key
+"Foreign keys have been disabled for this project"
         end
 
       wait_message = '

@@ -147,6 +147,21 @@ class VersionUnsafe < TestMigration
   end
 end
 
+class AddForeignKey < TestMigration
+  def change
+    add_foreign_key :users, :users, column: "id"
+  end
+end
+
+class CreateTableForeignKey < TestMigration
+  def change
+    create_table :posts do |t|
+      t.references :user, foreign_key: true
+      p t
+    end
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     skip unless postgres?
@@ -232,6 +247,14 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_create_table_force
     assert_unsafe CreateTableForce
+  end
+
+  def test_add_foreign_key
+    assert_unsafe AddForeignKey
+  end
+
+  def test_create_table_foreign_key
+    assert_unsafe CreateTableForeignKey
   end
 
   def test_version_safe

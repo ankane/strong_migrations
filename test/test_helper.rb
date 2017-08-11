@@ -9,6 +9,7 @@ adapter = ENV["ADAPTER"] || "postgres"
 ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migrations_test")
 
 StrongMigrations.start_after = 20170101000000
+StrongMigrations.no_integrity = true
 
 # ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout)
 
@@ -30,12 +31,13 @@ end
 TestMigration = activerecord5? ? ActiveRecord::Migration[migration_version] : ActiveRecord::Migration
 TestSchema = ActiveRecord::Schema
 
-ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users")
+ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users CASCADE")
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS new_users")
+ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS posts")
 
 class CreateUsers < TestMigration
   def change
-    create_table "users" do |t|
+    create_table :users do |t|
       t.string :name
     end
   end

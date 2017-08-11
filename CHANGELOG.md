@@ -1,3 +1,7 @@
+## 0.2.0 [unreleased]
+
+- Added `no_integrity` option
+
 ## 0.1.9
 
 - Added `start_after` option
