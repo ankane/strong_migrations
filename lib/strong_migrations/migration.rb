@@ -35,6 +35,13 @@ module StrongMigrations
           if postgresql? && options[:algorithm] != :concurrently && !@new_tables.to_a.include?(args[0].to_s)
             raise_error :add_index
           end
+        when :remove_index
+          if postgresql?
+            options = args[1]
+            if !options.is_a?(Hash) || options[:algorithm] != :concurrently
+              raise_error :remove_index
+            end
+          end
         when :add_column
           type = args[2]
           options = args[3] || {}
@@ -157,6 +164,13 @@ Once it's deployed, wrap this step in a safety_assured { ... } block."
 "Adding an index with more than three columns only helps on extremely large tables.
 
 If you're sure this is what you want, wrap it in a safety_assured { ... } block."
+        when :remove_index
+"Removing a non-concurrent index locks the table. Instead, use:
+
+def change
+  commit_db_transaction
+  remove_index :users, column: :some_column, algorithm: :concurrently
+end"
         when :change_table
 "The strong_migrations gem does not support inspecting what happens inside a
 change_table block, so cannot help you here. Please make really sure that what
