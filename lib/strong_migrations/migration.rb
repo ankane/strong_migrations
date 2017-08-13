@@ -51,6 +51,9 @@ module StrongMigrations
           if postgresql? && index_value
             raise_error :add_reference
           end
+          if StrongMigrations.no_integrity && options[:foreign_key]
+            raise_error :add_foreign_key
+          end
         when :execute
           raise_error :execute
         when :add_foreign_key
@@ -62,7 +65,15 @@ module StrongMigrations
         (@new_tables ||= []) << args[0].to_s
       end
 
-      result = super
+      if StrongMigrations.no_integrity and method == :create_table
+        result = super(method, *args) do |t|
+          result2 = yield(t)
+          raise_error :add_foreign_key if t.foreign_keys.any? || t.columns.any? { |t2| t2.options[:foreign_key] }
+          result2
+        end
+      else
+        result = super
+      end
 
       if StrongMigrations.auto_analyze && postgresql? && method == :add_index
         connection.execute "ANALYZE VERBOSE #{connection.quote_table_name(args[0])}"

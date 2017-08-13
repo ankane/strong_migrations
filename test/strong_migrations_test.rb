@@ -153,14 +153,28 @@ class AddForeignKey < TestMigration
   end
 end
 
+class AddReferenceForeignKey < TestMigration
+  def change
+    add_reference :users, :device, index: false, foreign_key: true
+  end
+end
+
 class CreateTableForeignKey < TestMigration
   def change
     create_table :posts do |t|
       t.references :user, foreign_key: true
-      p t
     end
   end
 end
+
+class CreateTableForeignKeyColumn < TestMigration
+  def change
+    create_table :posts do |t|
+      t.integer :user_id, foreign_key: true
+    end
+  end
+end
+
 
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
@@ -253,8 +267,16 @@ class StrongMigrationsTest < Minitest::Test
     assert_unsafe AddForeignKey
   end
 
+  def test_add_reference_foreign_key
+    assert_unsafe AddReferenceForeignKey
+  end
+
   def test_create_table_foreign_key
     assert_unsafe CreateTableForeignKey
+  end
+
+  def test_create_table_foreign_key_column
+    assert_unsafe CreateTableForeignKeyColumn
   end
 
   def test_version_safe
