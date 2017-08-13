@@ -183,7 +183,7 @@ Otherwise, remove the option."
 execute call, so cannot help you here. Please make really sure that what
 you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block."
         when :add_foreign_key
-"Foreign keys have been disabled for this project"
+"Foreign keys have been disabled for this project."
         end
 
       wait_message = '
