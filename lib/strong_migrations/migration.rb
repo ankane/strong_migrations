@@ -65,7 +65,7 @@ module StrongMigrations
         (@new_tables ||= []) << args[0].to_s
       end
 
-      if StrongMigrations.no_integrity and method == :create_table
+      if StrongMigrations.no_integrity && method == :create_table
         result = super(method, *args) do |t|
           result2 = yield(t)
           raise_error :add_foreign_key if t.foreign_keys.any? || t.columns.any? { |t2| t2.respond_to?(:options) && t2.options[:foreign_key] }
