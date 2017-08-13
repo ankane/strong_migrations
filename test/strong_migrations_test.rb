@@ -276,6 +276,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_create_table_foreign_key_column
+    skip if ActiveRecord.version < Gem::Version.new("5.1.0")
     assert_unsafe CreateTableForeignKeyColumn
   end
 
