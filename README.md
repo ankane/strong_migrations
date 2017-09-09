@@ -16,12 +16,13 @@ gem 'strong_migrations'
 
 ## Dangerous Operations
 
+The following operations can cause downtime:
+
 - adding a column with a non-null default value to an existing table
 - changing the type of a column
 - renaming a table
 - renaming a column
 - removing a column
-- executing arbitrary SQL
 - adding an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
 
