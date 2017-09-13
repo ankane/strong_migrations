@@ -16,7 +16,7 @@ gem 'strong_migrations'
 
 ## Dangerous Operations
 
-The following operations can cause downtime:
+The following operations can cause downtime or errors:
 
 - adding a column with a non-null default value to an existing table
 - changing the type of a column
