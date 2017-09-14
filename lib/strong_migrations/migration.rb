@@ -80,97 +80,6 @@ module StrongMigrations
     end
 
     def raise_error(message_key)
-      message =
-        case message_key
-        when :add_column_default
-"Adding a column with a non-null default requires
-the entire table and indexes to be rewritten. Instead:
-
-1. Add the column without a default value
-2. Add the default value
-3. Commit the transaction
-4. Backfill the column"
-        when :add_column_json
-"There's no equality operator for the json column type.
-Replace all calls to uniq with a custom scope.
-
-  scope :uniq_on_id, -> { select(\"DISTINCT ON (your_table.id) your_table.*\") }
-
-Once it's deployed, wrap this step in a safety_assured { ... } block."
-        when :change_column
-"Changing the type of an existing column requires
-the entire table and indexes to be rewritten.
-
-If you really have to:
-
-1. Create a new column
-2. Write to both columns
-3. Backfill data from the old column to the new column
-4. Move reads from the old column to the new column
-5. Stop writing to the old column
-6. Drop the old column"
-        when :remove_column
-"ActiveRecord caches attributes which causes problems
-when removing columns. Be sure to ignored the column:
-
-class User
-  def self.columns
-    super.reject { |c| c.name == \"some_column\" }
-  end
-end
-
-Once it's deployed, wrap this step in a safety_assured { ... } block."
-        when :rename_column
-"If you really have to:
-
-1. Create a new column
-2. Write to both columns
-3. Backfill data from the old column to new column
-4. Move reads from the old column to the new column
-5. Stop writing to the old column
-6. Drop the old column"
-        when :rename_table
-"If you really have to:
-
-1. Create a new table
-2. Write to both tables
-3. Backfill data from the old table to new table
-4. Move reads from the old table to the new table
-5. Stop writing to the old table
-6. Drop the old table"
-        when :add_reference
-"Adding a non-concurrent index locks the table. Instead, use:
-
-  def change
-    add_reference :users, :reference, index: false
-    commit_db_transaction
-    add_index :users, :reference_id, algorithm: :concurrently
-  end"
-        when :add_index
-"Adding a non-concurrent index locks the table. Instead, use:
-
-  def change
-    commit_db_transaction
-    add_index :users, :some_column, algorithm: :concurrently
-  end"
-        when :add_index_columns
-"Adding an index with more than three columns only helps on extremely large tables.
-
-If you're sure this is what you want, wrap it in a safety_assured { ... } block."
-        when :change_table
-"The strong_migrations gem does not support inspecting what happens inside a
-change_table block, so cannot help you here. Please make really sure that what
-you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block."
-        when :create_table
-"The force option will destroy existing tables.
-If this is intended, drop the existing table first.
-Otherwise, remove the option."
-        when :execute
-"The strong_migrations gem does not support inspecting what happens inside an
-execute call, so cannot help you here. Please make really sure that what
-you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block."
-        end
-
       wait_message = '
  __          __     _____ _______ _
  \ \        / /\   |_   _|__   __| |
@@ -181,7 +90,7 @@ you're doing is safe before proceeding, then wrap it in a safety_assured { ... }
 
 '
 
-      raise StrongMigrations::UnsafeMigration, "#{wait_message}#{message}\n"
+      raise StrongMigrations::UnsafeMigration, "#{wait_message}#{StrongMigrations.error_messages[message_key]}\n"
     end
   end
 end
