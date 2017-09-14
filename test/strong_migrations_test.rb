@@ -150,12 +150,12 @@ end
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     skip unless postgres?
-    assert_unsafe AddIndex
+    assert_unsafe AddIndex, StrongMigrations::UnsafeMigration::Messages::AddIndex
   end
 
   def test_add_index_up
     skip unless postgres?
-    assert_unsafe AddIndexUp
+    assert_unsafe AddIndexUp, StrongMigrations::UnsafeMigration::Messages::AddIndex
   end
 
   def test_add_index_safety_assured
@@ -176,7 +176,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_column_default
-    assert_unsafe AddColumnDefault
+    assert_unsafe AddColumnDefault, StrongMigrations::UnsafeMigration::Messages::AddColumnDefault
   end
 
   def test_add_column_default_safe
@@ -184,36 +184,36 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_column_json
-    assert_unsafe AddColumnJson
+    assert_unsafe AddColumnJson, StrongMigrations::UnsafeMigration::Messages::AddColumnJson
   end
 
   def test_change_column
-    assert_unsafe ChangeColumn
+    assert_unsafe ChangeColumn, StrongMigrations::UnsafeMigration::Messages::ChangeColumn
   end
 
   def test_execute_arbitrary_sql
-    assert_unsafe ExecuteArbitrarySQL
+    assert_unsafe ExecuteArbitrarySQL, StrongMigrations::UnsafeMigration::Messages::Execute
   end
 
   def test_rename_column
-    assert_unsafe RenameColumn
+    assert_unsafe RenameColumn, StrongMigrations::UnsafeMigration::Messages::RenameColumn
   end
 
   def test_rename_table
-    assert_unsafe RenameTable
+    assert_unsafe RenameTable, StrongMigrations::UnsafeMigration::Messages::RenameTable
   end
 
   def test_remove_column
-    assert_unsafe RemoveColumn
+    assert_unsafe RemoveColumn, StrongMigrations::UnsafeMigration::Messages::RemoveColumn
   end
 
   def test_add_index_columns
-    assert_unsafe AddIndexColumns, /more than three columns/
+    assert_unsafe AddIndexColumns, StrongMigrations::UnsafeMigration::Messages::AddIndexColumns
   end
 
   def test_add_reference
     skip unless postgres?
-    assert_unsafe AddReference
+    assert_unsafe AddReference, StrongMigrations::UnsafeMigration::Messages::AddReference
   end
 
   def test_safe_add_reference
@@ -224,14 +224,14 @@ class StrongMigrationsTest < Minitest::Test
   def test_add_reference_default
     skip unless postgres?
     if ActiveRecord::VERSION::MAJOR >= 5
-      assert_unsafe AddReferenceDefault
+      assert_unsafe AddReferenceDefault, StrongMigrations::UnsafeMigration::Messages::AddReference
     else
       assert_safe AddReferenceDefault
     end
   end
 
   def test_create_table_force
-    assert_unsafe CreateTableForce
+    assert_unsafe CreateTableForce, StrongMigrations::UnsafeMigration::Messages::CreateTable
   end
 
   def test_version_safe
@@ -240,6 +240,16 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_version_unsafe
     assert_unsafe VersionUnsafe
+  end
+
+  def test_custom_error_message_remove_index
+    original_message = StrongMigrations.error_messages[:remove_column]
+
+    custom_message = 'This is a custom error message for remove_column'
+    StrongMigrations.error_messages[:remove_column] = custom_message
+    assert_unsafe RemoveColumn, custom_message
+
+    StrongMigrations.error_messages[:remove_column] = original_message
   end
 
   def test_down
