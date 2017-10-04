@@ -111,7 +111,7 @@ If you really have to:
 6. Drop the old column"
         when :remove_column
 "ActiveRecord caches attributes which causes problems
-when removing columns. Be sure to ignored the column:
+when removing columns. Be sure to ignore the column:
 
 class User
   def self.columns
@@ -119,7 +119,7 @@ class User
   end
 end
 
-Once it's deployed, wrap this step in a safety_assured { ... } block."
+Once that's deployed, wrap this step in a safety_assured { ... } block."
         when :rename_column
 "If you really have to:
 
