@@ -1,3 +1,7 @@
+## 0.1.10 [unreleased]
+
+- Updated instructions for adding a column with a default value
+
 ## 0.1.9
 
 - Added `start_after` option
