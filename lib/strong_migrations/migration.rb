@@ -148,9 +148,9 @@ Once that's deployed, wrap this step in a safety_assured { ... } block."
   end"
         when :add_index
 "Adding a non-concurrent index locks the table. Instead, use:
+  disable_ddl_transaction!
 
   def change
-    commit_db_transaction
     add_index :users, :some_column, algorithm: :concurrently
   end"
         when :add_index_columns

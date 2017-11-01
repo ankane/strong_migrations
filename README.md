@@ -119,8 +119,9 @@ Add indexes concurrently.
 
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration
+  disable_ddl_transaction!
+  
   def change
-    commit_db_transaction
     add_index :users, :some_index, algorithm: :concurrently
   end
 end
