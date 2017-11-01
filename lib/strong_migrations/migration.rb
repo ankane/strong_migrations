@@ -110,6 +110,16 @@ If you really have to:
 5. Stop writing to the old column
 6. Drop the old column"
         when :remove_column
+          if ActiveRecord::VERSION::MAJOR >= 5
+"ActiveRecord caches attributes which causes problems
+when removing columns. Be sure to ignore the column:
+
+class User
+  self.ignored_columns = %w(some_column)
+end
+
+Once that's deployed, wrap this step in a safety_assured { ... } block."
+          else
 "ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:
 
@@ -120,6 +130,7 @@ class User
 end
 
 Once that's deployed, wrap this step in a safety_assured { ... } block."
+          end
         when :rename_column
 "If you really have to:
 
