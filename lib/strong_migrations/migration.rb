@@ -51,6 +51,9 @@ module StrongMigrations
           if postgresql? && index_value
             raise_error :add_reference
           end
+        when :change_column_null
+          unsafe = !args[2]
+          raise_error :change_column_null if unsafe
         when :execute
           raise_error :execute
         end
@@ -176,6 +179,9 @@ you're doing is safe before proceeding, then wrap it in a safety_assured { ... }
 "The force option will destroy existing tables.
 If this is intended, drop the existing table first.
 Otherwise, remove the option."
+        when :change_column_null
+"Adding a null constraint is not a safe operation. Please make really sure that what
+you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block."
         when :execute
 "The strong_migrations gem does not support inspecting what happens inside an
 execute call, so cannot help you here. Please make really sure that what

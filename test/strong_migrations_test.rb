@@ -127,6 +127,13 @@ class CreateTableForce < TestMigration
   end
 end
 
+class ChangeColumnNull < TestMigration
+  def change
+    add_column :users, :nickname, :boolean
+    change_column_null :users, :nickname, false
+  end
+end
+
 class VersionSafe < TestMigration
   def change
     add_column :users, :nice2, :boolean, default: true
@@ -228,6 +235,10 @@ class StrongMigrationsTest < Minitest::Test
     else
       assert_safe AddReferenceDefault
     end
+  end
+
+  def test_change_column_null
+    assert_unsafe ChangeColumnNull
   end
 
   def test_create_table_force
