@@ -24,6 +24,7 @@ The following operations can cause downtime or errors:
 - renaming a column
 - removing a column
 - adding an index non-concurrently (Postgres only)
+- removing an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
 
 For more info, check out:
@@ -125,7 +126,20 @@ class AddSomeIndexToUsers < ActiveRecord::Migration
   end
 end
 ```
+### Removing an index (Postgres)
 
+Remove indexes concurrently.
+
+```ruby
+class RemoveEmailIndexFromUsers < ActiveRecord::Migration
+  def change
+    commit_db_transaction
+    safety_assured
+      execute 'DROP INDEX CONCURRENTLY IF EXISTS index_users_email'
+    end
+  end
+end
+```
 ### Adding a json column (Postgres)
 
 There’s no equality operator for the `json` column type, which causes issues for `SELECT DISTINCT` queries. Replace all calls to `uniq` with a custom scope.
