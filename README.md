@@ -100,7 +100,7 @@ ActiveRecord caches database columns at runtime. So if you drop a column that Ac
 1. Tell ActiveRecord to ignore the column from its cache (code below)
 2. Deploy step 1.
 3. Write a migration to remove the column.
-4. Deploy step 2.
+4. Deploy step 3.
 
 
 ```ruby
