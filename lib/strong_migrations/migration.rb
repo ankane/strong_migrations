@@ -118,7 +118,9 @@ class User
   self.ignored_columns = %w(some_column)
 end
 
-Once that's deployed, wrap this step in a safety_assured { ... } block."
+Once that's deployed, wrap this step in a safety_assured { ... } block.
+
+More information: https://github.com/ankane/strong_migrations#removing-a-column"
           else
 "ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:
@@ -129,7 +131,9 @@ class User
   end
 end
 
-Once that's deployed, wrap this step in a safety_assured { ... } block."
+Once that's deployed, wrap this step in a safety_assured { ... } block.
+
+More information: https://github.com/ankane/strong_migrations#removing-a-column"
           end
         when :rename_column
 "If you really have to:
