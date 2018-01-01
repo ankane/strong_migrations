@@ -95,7 +95,13 @@ If you really have to:
 
 ### Removing a column
 
-Tell ActiveRecord to ignore the column from its cache.
+ActiveRecord caches database columns at runtime. So if you drop a column that ActiveRecord expects, it might cause it to crash when performing other queries until your app reboots. The better strategy is to first tell ActiveRecord to ignore the column, and then once all instances of your app are ignoring the column, drop it.
+
+1. Tell ActiveRecord to ignore the column from its cache (code below)
+2. Deploy step 1.
+3. Write a migration to remove the column.
+4. Deploy step 2.
+
 
 ```ruby
 # For Rails 5+
@@ -110,8 +116,6 @@ class User < ActiveRecord::Base
   end
 end
 ```
-
-Once it’s deployed, create a migration to remove the column.
 
 ### Adding an index (Postgres)
 
