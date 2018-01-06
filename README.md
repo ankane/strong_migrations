@@ -189,6 +189,8 @@ To customize specific error messages, create an initializer with:
 StrongMigrations.error_messages[:add_column_default] = "Your custom instructions"
 ```
 
+Check the source code for the list of keys.
+
 ## Analyze Tables (Postgres)
 
 Analyze tables automatically (to update planner statistics) after an index is added. Create an initializer with:
