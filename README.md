@@ -181,6 +181,14 @@ Columns can flip order in `db/schema.rb` when you have multiple developers. One 
 task "db:schema:dump": "strong_migrations:alphabetize_columns"
 ```
 
+## Customizing Error Messages [master]
+
+To customize specific error messages, create an initializer with:
+
+```ruby
+StrongMigrations.error_messages[:add_column_default] = "Your custom instructions"
+```
+
 ## Analyze Tables (Postgres)
 
 Analyze tables automatically (to update planner statistics) after an index is added. Create an initializer with:
