@@ -115,6 +115,15 @@ ActiveRecord caches database columns at runtime, so if you drop a column, it can
 
 2. Deploy code
 3. Write a migration to remove the column (wrap in `safety_assured` block)
+
+  ```ruby
+  class RemoveSomeColumnFromUsers < ActiveRecord::Migration
+    def change
+      safety_assured { remove_column :users, :some_column }
+    end
+  end
+  ```
+
 4. Deploy and run migration
 
 ### Adding an index (Postgres)
