@@ -207,6 +207,8 @@ It’s a good idea to set a lock timeout for the database user that runs migrati
 ALTER ROLE myuser SET lock_timeout = '10s';
 ```
 
+There’s also [a gem](https://github.com/gocardless/activerecord-safer_migrations) you can use for this.
+
 ## Credits
 
 Thanks to Bob Remeika and David Waller for the [original code](https://github.com/foobarfighter/safe-migrations).
