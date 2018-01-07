@@ -41,7 +41,7 @@ Also checks for best practices:
 
 1. Add the column without a default value
 2. Add the default value
-3. Commit the transaction
+3. Commit the transaction - **extremely important if you are backfilling in the migration**
 4. Backfill the column
 
 ```ruby
