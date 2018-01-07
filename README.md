@@ -95,23 +95,27 @@ If you really have to:
 
 ### Removing a column
 
-Tell ActiveRecord to ignore the column from its cache.
+ActiveRecord caches database columns at runtime, so if you drop a column, it can cause exceptions until your app reboots. To avoid this:
 
-```ruby
-# For Rails 5+
-class User < ApplicationRecord
-  self.ignored_columns = %w(some_column)
-end
+1. Tell ActiveRecord to ignore the column from its cache
 
-# For Rails < 5
-class User < ActiveRecord::Base
-  def self.columns
-    super.reject { |c| c.name == "some_column" }
+  ```ruby
+  # For Rails 5+
+  class User < ApplicationRecord
+    self.ignored_columns = %w(some_column)
   end
-end
-```
 
-Once it’s deployed, create a migration to remove the column.
+  # For Rails < 5
+  class User < ActiveRecord::Base
+    def self.columns
+      super.reject { |c| c.name == "some_column" }
+    end
+  end
+  ```
+
+2. Deploy code
+3. Write a migration to remove the column (wrap in `safety_assured` block)
+4. Deploy and run migration
 
 ### Adding an index (Postgres)
 
