@@ -194,7 +194,7 @@ Columns can flip order in `db/schema.rb` when you have multiple developers. One 
 task "db:schema:dump": "strong_migrations:alphabetize_columns"
 ```
 
-## Customizing Error Messages [master]
+## Custom Error Messages
 
 To customize specific error messages, create an initializer with:
 

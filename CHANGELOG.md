@@ -1,4 +1,4 @@
-## 0.1.10 [unreleased]
+## 0.2.0
 
 - Added customizable error messages
 - Updated instructions for adding a column with a default value
