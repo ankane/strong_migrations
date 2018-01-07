@@ -46,7 +46,7 @@ If you really have to:
 "ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:
 
-class User
+class User < ApplicationRecord
   self.ignored_columns = %w(some_column)
 end
 
@@ -55,7 +55,7 @@ Once that's deployed, wrap this step in a safety_assured { ... } block."
 "ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:
 
-class User
+class User < ActiveRecord::Base
   def self.columns
     super.reject { |c| c.name == \"some_column\" }
   end
