@@ -95,7 +95,7 @@ If you really have to:
 
 ### Removing a column
 
-ActiveRecord caches database columns at runtime, so if you drop a column, it can cause exceptions until your app reboots. To avoid this:
+ActiveRecord caches database columns at runtime, so if you drop a column, it can cause exceptions until your app reboots. To prevent this:
 
 1. Tell ActiveRecord to ignore the column from its cache
 
