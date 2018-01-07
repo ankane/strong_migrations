@@ -99,7 +99,7 @@ Tell ActiveRecord to ignore the column from its cache.
 
 ```ruby
 # For Rails 5+
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   self.ignored_columns = %w(some_column)
 end
 
