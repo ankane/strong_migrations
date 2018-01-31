@@ -206,7 +206,7 @@ To customize specific messages, create an initializer with:
 StrongMigrations.error_messages[:add_column_default] = "Your custom instructions"
 ```
 
-Check the source code for the list of keys.
+Check the [source code](https://github.com/ankane/strong_migrations/blob/master/lib/strong_migrations.rb) for the list of keys.
 
 ## Analyze Tables (Postgres)
 
