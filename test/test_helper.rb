@@ -10,7 +10,7 @@ ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migration
 
 StrongMigrations.start_after = 20170101000000
 
-# ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout)
+ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout) if ENV["VERBOSE"]
 
 def migrate(migration, direction: :up)
   ActiveRecord::Migration.suppress_messages do
