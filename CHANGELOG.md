@@ -1,3 +1,7 @@
+## 0.2.1 [unreleased]
+
+- Changing `varchar` to `text` is safe in Postgres 9.1+
+
 ## 0.2.0
 
 - Added customizable error messages

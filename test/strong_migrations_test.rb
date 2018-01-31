@@ -65,6 +65,12 @@ class ChangeColumn < TestMigration
   end
 end
 
+class ChangeColumnVarcharToText < TestMigration
+  def change
+    change_column :users, :name, :text
+  end
+end
+
 class ExecuteArbitrarySQL < TestMigration
   def change
     execute 'SELECT CURRENT_TIMESTAMP'
@@ -189,6 +195,11 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_change_column
     assert_unsafe ChangeColumn
+  end
+
+  def test_change_column_varchar_to_text
+    skip unless postgres?
+    assert_safe ChangeColumnVarcharToText
   end
 
   def test_execute_arbitrary_sql

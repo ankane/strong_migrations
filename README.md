@@ -82,6 +82,8 @@ If you really have to:
 5. Stop writing to the old column
 6. Drop the old column
 
+**Note:** Changing a `varchar` column to `text` is safe in Postgres 9.1+
+
 ### Renaming a table
 
 If you really have to:

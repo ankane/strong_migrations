@@ -41,7 +41,13 @@ module StrongMigrations
           raise_error :add_column_default unless options[:default].nil?
           raise_error :add_column_json if type.to_s == "json"
         when :change_column
-          raise_error :change_column
+          safe = false
+          # assume Postgres 9.1+ since previous versions are EOL
+          if postgresql? && args[2].to_s == "text"
+            column = connection.columns(args[0]).find { |c| c.name.to_s == args[1].to_s }
+            safe = column && column.type == :string
+          end
+          raise_error :change_column unless safe
         when :create_table
           options = args[1] || {}
           raise_error :create_table if options[:force]
