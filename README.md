@@ -71,6 +71,8 @@ class AddSomeColumnToUsers < ActiveRecord::Migration
 end
 ```
 
+Committing the transaction in step 3 prevents locking during the backfill. Check out [this article](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/) for more info.
+
 ### Renaming or changing the type of a column
 
 If you really have to:
