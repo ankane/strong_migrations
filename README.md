@@ -105,7 +105,7 @@ If you really have to:
 5. Stop writing to the old column
 6. Drop the old column
 
-One exception is changing a `varchar` column to `text`, which is safe in Postgres 9.1+
+One exception is changing a `varchar` column to `text`, which is safe in Postgres 9.1+.
 
 ### Renaming a table
 
