@@ -28,10 +28,10 @@ module StrongMigrations
           raise_error :rename_column
         when :add_index
           columns = args[1]
-          if columns.is_a?(Array) && columns.size > 3
+          options = args[2] || {}
+          if columns.is_a?(Array) && columns.size > 3 && !options[:unique]
             raise_error :add_index_columns
           end
-          options = args[2] || {}
           if postgresql? && options[:algorithm] != :concurrently && !@new_tables.to_a.include?(args[0].to_s)
             raise_error :add_index
           end

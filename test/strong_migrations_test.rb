@@ -107,6 +107,14 @@ class AddIndexColumns < TestMigration
   end
 end
 
+class AddIndexColumnsUnique < TestMigration
+  disable_ddl_transaction!
+
+  def change
+    add_index :users, [:name, :name, :name, :name], unique: true, algorithm: :concurrently
+  end
+end
+
 class AddReference < TestMigration
   def change
     add_reference :users, :device, index: true
@@ -220,6 +228,11 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_add_index_columns
     assert_unsafe AddIndexColumns, /more than three columns/
+  end
+
+  def test_add_index_columns_unique
+    skip unless postgres?
+    assert_safe AddIndexColumnsUnique
   end
 
   def test_add_reference
