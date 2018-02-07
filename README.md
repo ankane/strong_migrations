@@ -79,7 +79,7 @@ end
 **Very important:** If you need to backfill, use the Rails console or a separate migration with `disable_ddl_transaction!`. Check out [this article](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/) for more info.
 
 ```ruby
-class AddSomeColumnToUsers < ActiveRecord::Migration[5.1]
+class BackfillSomeColumn < ActiveRecord::Migration[5.1]
   disable_ddl_transaction!
 
   def change
