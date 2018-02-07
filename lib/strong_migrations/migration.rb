@@ -39,7 +39,13 @@ module StrongMigrations
           type = args[2]
           options = args[3] || {}
           raise_error :add_column_default unless options[:default].nil?
-          raise_error :add_column_json if type.to_s == "json"
+          if type.to_s == "json"
+            if postgresql? && postgresql_version >= 90400
+              raise_error :add_column_json_use_jsonb
+            else
+              raise_error :add_column_json
+            end
+          end
         when :change_column
           safe = false
           # assume Postgres 9.1+ since previous versions are EOL
@@ -79,6 +85,10 @@ module StrongMigrations
 
     def postgresql?
       %w(PostgreSQL PostGIS).include?(connection.adapter_name)
+    end
+
+    def postgresql_version
+      @postgresql_version ||= connection.execute("SHOW server_version_num").first["server_version_num"].to_i
     end
 
     def version_safe?

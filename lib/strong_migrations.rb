@@ -30,6 +30,9 @@ Replace all calls to uniq with a custom scope.
 
 Once it's deployed, wrap this step in a safety_assured { ... } block.",
 
+    add_column_json_use_jsonb:
+"Use jsonb instead.",
+
     change_column:
 "Changing the type of an existing column requires
 the entire table and indexes to be rewritten.
