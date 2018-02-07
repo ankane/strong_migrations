@@ -26,11 +26,6 @@ The following operations can cause downtime or errors:
 - adding an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
 
-For more info, check out:
-
-- [Rails Migrations with No Downtime](http://pedro.herokuapp.com/past/2011/7/13/rails_migrations_with_no_downtime/)
-- [Safe Operations For High Volume PostgreSQL](https://www.braintreepayments.com/blog/safe-operations-for-high-volume-postgresql/) (if it’s relevant)
-
 Also checks for best practices:
 
 - keeping indexes to three columns or less
@@ -239,6 +234,11 @@ ALTER ROLE myuser SET lock_timeout = '10s';
 ```
 
 There’s also [a gem](https://github.com/gocardless/activerecord-safer_migrations) you can use for this.
+
+## Additional Reading
+
+- [Rails Migrations with No Downtime](http://pedro.herokuapp.com/past/2011/7/13/rails_migrations_with_no_downtime/)
+- [Safe Operations For High Volume PostgreSQL](https://www.braintreepayments.com/blog/safe-operations-for-high-volume-postgresql/)
 
 ## Credits
 
