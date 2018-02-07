@@ -45,8 +45,8 @@ The following operations can cause downtime or errors:
 - adding a column with a non-null default value to an existing table
 - removing a column
 - changing the type of a column
-- renaming a table
 - renaming a column
+- renaming a table
 - adding an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
 
