@@ -102,6 +102,8 @@ More info: https://github.com/ankane/strong_migrations#removing-a-column"
     add_reference:
 "Adding a non-concurrent index locks the table. Instead, use:
 
+  disable_ddl_transaction!
+
   def change
     add_reference :users, :reference, index: false
     add_index :users, :reference_id, algorithm: :concurrently
@@ -109,6 +111,8 @@ More info: https://github.com/ankane/strong_migrations#removing-a-column"
 
     add_index:
 "Adding a non-concurrent index locks the table. Instead, use:
+
+  disable_ddl_transaction!
 
   def change
     add_index :users, :some_column, algorithm: :concurrently
