@@ -162,6 +162,8 @@ class AddSomeIndexToUsers < ActiveRecord::Migration
 end
 ```
 
+**Note:** Indexes on new tables (those created in the same migration) don’t require this.
+
 ### Adding a json column (Postgres)
 
 There’s no equality operator for the `json` column type, which causes issues for `SELECT DISTINCT` queries.
