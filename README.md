@@ -16,7 +16,7 @@ gem 'strong_migrations'
 
 ## How It Works
 
-Strong Migrations detects potentially dangerous operations in migrations, prevents them from running, and gives instructions on safer ways to do it.
+Strong Migrations detects potentially dangerous operations in migrations, prevents them from running, and gives instructions on safer ways to do what you want.
 
 ```
  __          __     _____ _______ _
