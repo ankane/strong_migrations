@@ -13,12 +13,18 @@ module StrongMigrations
   self.error_messages = {
     add_column_default:
 "Adding a column with a non-null default requires
-the entire table and indexes to be rewritten. Instead:
+the entire table to be rewritten.
 
-1. Add the column without a default value
-2. Add the default value
-3. Commit the transaction
-4. Backfill the column
+Instead, add the column without a default value, then add it.
+
+  def up
+    add_column :users, :some_column, :text
+    change_column_default :users, :some_column, \"default_value\"
+  end
+
+  def down
+    remove_column :users, :some_column
+  end
 
 More info: https://github.com/ankane/strong_migrations#adding-a-column-with-a-default-value",
 
@@ -98,7 +104,6 @@ More info: https://github.com/ankane/strong_migrations#removing-a-column"
 
   def change
     add_reference :users, :reference, index: false
-    commit_db_transaction
     add_index :users, :reference_id, algorithm: :concurrently
   end",
 
@@ -106,7 +111,6 @@ More info: https://github.com/ankane/strong_migrations#removing-a-column"
 "Adding a non-concurrent index locks the table. Instead, use:
 
   def change
-    commit_db_transaction
     add_index :users, :some_column, algorithm: :concurrently
   end",
 

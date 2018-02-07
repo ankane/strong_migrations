@@ -59,30 +59,15 @@ Also checks for best practices:
 
 ### Adding a column with a default value
 
-1. Add the column without a default value
-2. Add the default value
-3. Commit the transaction - **extremely important if you are backfilling in the migration**
-4. Backfill the column
+Adding a column with a non-null default causes the entire table to be rewritten.
+
+Instead, add the column without a default value, then add it.
 
 ```ruby
 class AddSomeColumnToUsers < ActiveRecord::Migration
   def up
-    # 1
     add_column :users, :some_column, :text
-
-    # 2
     change_column_default :users, :some_column, "default_value"
-
-    # 3
-    commit_db_transaction
-
-    # 4.a (Rails 5+)
-    User.in_batches.update_all some_column: "default_value"
-
-    # 4.b (Rails < 5)
-    User.find_in_batches do |users|
-      User.where(id: users.map(&:id)).update_all some_column: "default_value"
-    end
   end
 
   def down
@@ -91,7 +76,23 @@ class AddSomeColumnToUsers < ActiveRecord::Migration
 end
 ```
 
-Committing the transaction in step 3 prevents locking during the backfill. Check out [this article](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/) for more info.
+**Very important:** If you need to backfill, use the Rails console or a separate migration with `disable_ddl_transaction!`. Check out [this article](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/) for more info.
+
+```ruby
+class AddSomeColumnToUsers < ActiveRecord::Migration
+  disable_ddl_transaction!
+
+  def change
+    # Rails 5+
+    User.in_batches.update_all some_column: "default_value"
+
+    # Rails < 5
+    User.find_in_batches do |users|
+      User.where(id: users.map(&:id)).update_all some_column: "default_value"
+    end
+  end
+end
+```
 
 ### Renaming or changing the type of a column
 
@@ -104,7 +105,7 @@ If you really have to:
 5. Stop writing to the old column
 6. Drop the old column
 
-**Note:** Changing a `varchar` column to `text` is safe in Postgres 9.1+
+One exception is changing a `varchar` column to `text`, which is safe in Postgres 9.1+
 
 ### Renaming a table
 
@@ -177,14 +178,17 @@ Add indexes concurrently.
 
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration
+  disable_ddl_transaction!
+
   def change
-    commit_db_transaction
     add_index :users, :some_index, algorithm: :concurrently
   end
 end
 ```
 
-**Note:** Indexes on new tables (those created in the same migration) don’t require this.
+If you forget `disable_ddl_transaction!`, the migration will fail.
+
+Also, note that indexes on new tables (those created in the same migration) don’t require this.
 
 ### Adding a json column (Postgres)
 
