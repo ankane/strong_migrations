@@ -14,6 +14,30 @@ Add this line to your application’s Gemfile:
 gem 'strong_migrations'
 ```
 
+## How It Works
+
+Strong Migrations detects potentially dangerous operations in migrations, prevents them from running, and gives instructions on safer ways to do it.
+
+```
+ __          __     _____ _______ _
+ \ \        / /\   |_   _|__   __| |
+  \ \  /\  / /  \    | |    | |  | |
+   \ \/  \/ / /\ \   | |    | |  | |
+    \  /\  / ____ \ _| |_   | |  |_|
+     \/  \/_/    \_\_____|  |_|  (_)
+
+ActiveRecord caches attributes which causes problems
+when removing columns. Be sure to ignore the column:
+
+class User < ApplicationRecord
+  self.ignored_columns = %w(some_column)
+end
+
+Once that's deployed, wrap this step in a safety_assured { ... } block.
+
+More info: https://github.com/ankane/strong_migrations#removing-a-column
+```
+
 ## Dangerous Operations
 
 The following operations can cause downtime or errors:
