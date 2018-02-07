@@ -12,7 +12,7 @@ module StrongMigrations
   self.start_after = 0
   self.error_messages = {
     add_column_default:
-"Adding a column with a non-null default requires
+"Adding a column with a non-null default causes
 the entire table to be rewritten.
 
 Instead, add the column without a default value, then add it.
