@@ -76,7 +76,25 @@ class AddSomeColumnToUsers < ActiveRecord::Migration[5.1]
 end
 ```
 
-**Very important:** If you need to backfill data, check out [this section](#backfilling-data).
+### Backfilling data
+
+To backfill data, use the Rails console or a separate migration with `disable_ddl_transaction!`. Avoid backfilling in a transaction, especially one that alters a table. See [this great article](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/) on why.
+
+```ruby
+class BackfillSomeColumn < ActiveRecord::Migration[5.1]
+  disable_ddl_transaction!
+
+  def change
+    # Rails 5+
+    User.in_batches.update_all some_column: "default_value"
+
+    # Rails < 5
+    User.find_in_batches do |users|
+      User.where(id: users.map(&:id)).update_all some_column: "default_value"
+    end
+  end
+end
+```
 
 ### Renaming or changing the type of a column
 
@@ -194,26 +212,6 @@ Then add the column:
 class AddJsonColumnToUsers < ActiveRecord::Migration[5.1]
   def change
     safety_assured { add_column :users, :some_column, :json }
-  end
-end
-```
-
-### Backfilling data
-
-To backfill data, use the Rails console or a separate migration with `disable_ddl_transaction!`. Avoid backfilling in a transaction, especially one that alters a table. See [this great article](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/) on why.
-
-```ruby
-class BackfillSomeColumn < ActiveRecord::Migration[5.1]
-  disable_ddl_transaction!
-
-  def change
-    # Rails 5+
-    User.in_batches.update_all some_column: "default_value"
-
-    # Rails < 5
-    User.find_in_batches do |users|
-      User.where(id: users.map(&:id)).update_all some_column: "default_value"
-    end
   end
 end
 ```
