@@ -108,8 +108,6 @@ class AddIndexColumns < TestMigration
 end
 
 class AddIndexColumnsUnique < TestMigration
-  disable_ddl_transaction!
-
   def change
     add_index :users, [:name, :name, :name, :name], unique: true, algorithm: :concurrently
   end
