@@ -18,7 +18,9 @@ the entire table and indexes to be rewritten. Instead:
 1. Add the column without a default value
 2. Add the default value
 3. Commit the transaction
-4. Backfill the column",
+4. Backfill the column
+
+More info: https://github.com/ankane/strong_migrations#adding-a-column-with-a-default-value",
 
     add_column_json:
 "There's no equality operator for the json column type.
