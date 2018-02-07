@@ -47,7 +47,6 @@ The following operations can cause downtime or errors:
 - changing the type of a column
 - renaming a table
 - renaming a column
-- creating a table with the `force` option
 - adding an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
 
@@ -152,27 +151,6 @@ If you really have to:
 4. Move reads from the old table to the new table
 5. Stop writing to the old table
 6. Drop the old table
-
-### Creating a table
-
-When creating a table, avoid the `force` option. This can lead to accidentally overwriting an existing table.
-
-```ruby
-# BAD
-create_table :users, force: true do |t|
-  ...
-end
-```
-
-If this is what you intend to do, drop the existing table first.
-
-```ruby
-# good
-drop_table :users
-create_table :users do |t|
-  ...
-end
-```
 
 ### Adding an index (Postgres)
 
