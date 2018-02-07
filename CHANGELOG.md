@@ -1,6 +1,8 @@
 ## 0.2.1 [unreleased]
 
+- Suggest `jsonb` over `json` in Postgres 9.4+
 - Changing `varchar` to `text` is safe in Postgres 9.1+
+- Do not check number of columns for unique indexes
 
 ## 0.2.0
 
