@@ -173,7 +173,9 @@ If you’re on Postgres 9.4+, use `jsonb` instead.
 If you must use `json`, replace all calls to `uniq` with a custom scope.
 
 ```ruby
-scope :uniq_on_id, -> { select("DISTINCT ON (your_table.id) your_table.*") }
+class User < ApplicationRecord
+  scope :uniq_on_id, -> { select("DISTINCT ON (users.id) users.*") }
+end
 ```
 
 Then add the column:
