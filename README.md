@@ -61,7 +61,7 @@ Also checks for best practices:
 
 Adding a column with a non-null default causes the entire table to be rewritten.
 
-Instead, add the column without a default value, then add it.
+Instead, add the column without a default value, then change the default.
 
 ```ruby
 class AddSomeColumnToUsers < ActiveRecord::Migration[5.1]
