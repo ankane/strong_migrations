@@ -157,7 +157,7 @@ Creating a table with the `force` option can lead to accidentally overwriting an
 
 ```ruby
 # BAD
-create_table :users, force: true do
+create_table :users, force: true do |t|
   ...
 end
 ```
@@ -167,7 +167,7 @@ If this is what you intend to do, drop the existing table first.
 ```ruby
 # good
 drop_table :users
-create_table :users do
+create_table :users do |t|
   ...
 end
 ```
