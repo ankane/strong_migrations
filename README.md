@@ -47,7 +47,7 @@ The following operations can cause downtime or errors:
 - renaming a table
 - renaming a column
 - removing a column
-- creating a table with `force`
+- creating a table with the `force` option
 - adding an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
 
@@ -153,9 +153,9 @@ ActiveRecord caches database columns at runtime, so if you drop a column, it can
 
 4. Deploy and run migration
 
-### Creating a table with force
+### Creating a table
 
-Creating a table with the `force` option can lead to accidentally overwriting an existing table.
+When creating a table, avoid the `force` option. This can lead to accidentally overwriting an existing table.
 
 ```ruby
 # BAD
