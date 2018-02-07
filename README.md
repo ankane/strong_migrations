@@ -43,10 +43,10 @@ More info: https://github.com/ankane/strong_migrations#removing-a-column
 The following operations can cause downtime or errors:
 
 - adding a column with a non-null default value to an existing table
+- removing a column
 - changing the type of a column
 - renaming a table
 - renaming a column
-- removing a column
 - creating a table with the `force` option
 - adding an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
@@ -96,30 +96,6 @@ class BackfillSomeColumn < ActiveRecord::Migration[5.1]
 end
 ```
 
-### Renaming or changing the type of a column
-
-If you really have to:
-
-1. Create a new column
-2. Write to both columns
-3. Backfill data from the old column to the new column
-4. Move reads from the old column to the new column
-5. Stop writing to the old column
-6. Drop the old column
-
-One exception is changing a `varchar` column to `text`, which is safe in Postgres 9.1+.
-
-### Renaming a table
-
-If you really have to:
-
-1. Create a new table
-2. Write to both tables
-3. Backfill data from the old table to new table
-4. Move reads from the old table to the new table
-5. Stop writing to the old table
-6. Drop the old table
-
 ### Removing a column
 
 ActiveRecord caches database columns at runtime, so if you drop a column, it can cause exceptions until your app reboots. To prevent this:
@@ -152,6 +128,30 @@ ActiveRecord caches database columns at runtime, so if you drop a column, it can
   ```
 
 4. Deploy and run migration
+
+### Renaming or changing the type of a column
+
+If you really have to:
+
+1. Create a new column
+2. Write to both columns
+3. Backfill data from the old column to the new column
+4. Move reads from the old column to the new column
+5. Stop writing to the old column
+6. Drop the old column
+
+One exception is changing a `varchar` column to `text`, which is safe in Postgres 9.1+.
+
+### Renaming a table
+
+If you really have to:
+
+1. Create a new table
+2. Write to both tables
+3. Backfill data from the old table to new table
+4. Move reads from the old table to the new table
+5. Stop writing to the old table
+6. Drop the old table
 
 ### Creating a table
 
