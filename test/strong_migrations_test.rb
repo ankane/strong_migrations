@@ -196,6 +196,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_column_json
+    skip unless postgres?
     assert_unsafe AddColumnJson
   end
 
