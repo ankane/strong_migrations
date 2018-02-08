@@ -1,5 +1,6 @@
-## 0.2.1 [unreleased]
+## 0.2.1
 
+- Recommend `disable_ddl_transaction!` over `commit_db_transaction`
 - Suggest `jsonb` over `json` in Postgres 9.4+
 - Changing `varchar` to `text` is safe in Postgres 9.1+
 - Do not check number of columns for unique indexes
