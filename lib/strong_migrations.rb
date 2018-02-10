@@ -1,5 +1,6 @@
 require "active_record"
 require "strong_migrations/version"
+require "strong_migrations/database_tasks"
 require "strong_migrations/unsafe_migration"
 require "strong_migrations/migration"
 require "strong_migrations/railtie" if defined?(Rails)
@@ -141,4 +142,8 @@ you're doing is safe before proceeding, then wrap it in a safety_assured { ... }
   }
 end
 
-ActiveRecord::Migration.send(:prepend, StrongMigrations::Migration)
+ActiveRecord::Migration.prepend(StrongMigrations::Migration)
+
+if defined?(ActiveRecord::Tasks::DatabaseTasks)
+  ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)
+end

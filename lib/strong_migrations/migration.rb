@@ -102,7 +102,7 @@ module StrongMigrations
   \ \  /\  / /  \    | |    | |  | |
    \ \/  \/ / /\ \   | |    | |  | |
     \  /\  / ____ \ _| |_   | |  |_|
-     \/  \/_/    \_\_____|  |_|  (_)
+     \/  \/_/    \_\_____|  |_|  (_)  #strong_migrations
 
 '
       message = StrongMigrations.error_messages[message_key] || "Missing message"

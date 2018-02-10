@@ -1,3 +1,7 @@
+## 0.2.2 [unreleased]
+
+- Friendlier output
+
 ## 0.2.1
 
 - Recommend `disable_ddl_transaction!` over `commit_db_transaction`
