@@ -1,4 +1,4 @@
-require "active_record"
+require "active_support"
 require "strong_migrations/version"
 require "strong_migrations/database_tasks"
 require "strong_migrations/unsafe_migration"
@@ -54,9 +54,7 @@ If you really have to:
 5. Stop writing to the old column
 6. Drop the old column",
 
-    remove_column:
-      if ActiveRecord::VERSION::MAJOR >= 5
-"ActiveRecord caches attributes which causes problems
+    remove_column: "ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:
 
 class User < ApplicationRecord
@@ -65,21 +63,7 @@ end
 
 Once that's deployed, wrap this step in a safety_assured { ... } block.
 
-More info: https://github.com/ankane/strong_migrations#removing-a-column"
-      else
-"ActiveRecord caches attributes which causes problems
-when removing columns. Be sure to ignore the column:
-
-class User < ActiveRecord::Base
-  def self.columns
-    super.reject { |c| c.name == \"some_column\" }
-  end
-end
-
-Once that's deployed, wrap this step in a safety_assured { ... } block.
-
-More info: https://github.com/ankane/strong_migrations#removing-a-column"
-      end,
+More info: https://github.com/ankane/strong_migrations#removing-a-column",
 
     rename_column:
 "If you really have to:
@@ -142,8 +126,25 @@ you're doing is safe before proceeding, then wrap it in a safety_assured { ... }
   }
 end
 
-ActiveRecord::Migration.prepend(StrongMigrations::Migration)
+ActiveSupport.on_load(:active_record) do
+  ActiveRecord::Migration.prepend(StrongMigrations::Migration)
 
-if defined?(ActiveRecord::Tasks::DatabaseTasks)
-  ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)
+  if ActiveRecord::VERSION::MAJOR < 5
+    StrongMigrations.error_messages[:remove_column] = "ActiveRecord caches attributes which causes problems
+when removing columns. Be sure to ignore the column:
+
+class User < ActiveRecord::Base
+  def self.columns
+    super.reject { |c| c.name == \"some_column\" }
+  end
+end
+
+Once that's deployed, wrap this step in a safety_assured { ... } block.
+
+More info: https://github.com/ankane/strong_migrations#removing-a-column"
+  end
+
+  if defined?(ActiveRecord::Tasks::DatabaseTasks)
+    ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)
+  end
 end
