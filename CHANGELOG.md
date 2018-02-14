@@ -1,6 +1,7 @@
-## 0.2.2 [unreleased]
+## 0.2.2
 
 - Friendlier output
+- Better method of hooking into ActiveRecord
 
 ## 0.2.1
 

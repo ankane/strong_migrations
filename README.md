@@ -24,7 +24,7 @@ Strong Migrations detects potentially dangerous operations in migrations, preven
   \ \  /\  / /  \    | |    | |  | |
    \ \/  \/ / /\ \   | |    | |  | |
     \  /\  / ____ \ _| |_   | |  |_|
-     \/  \/_/    \_\_____|  |_|  (_)
+     \/  \/_/    \_\_____|  |_|  (_)  #strong_migrations
 
 ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:
