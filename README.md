@@ -76,7 +76,7 @@ class AddSomeColumnToUsers < ActiveRecord::Migration[5.1]
 end
 ```
 
-Do not backfill existing rows in this migration, as it can cause downtime. See the next section for how to do it safely.
+Don’t backfill existing rows in this migration, as it can cause downtime. See the next section for how to do it safely.
 
 ### Backfilling data
 
@@ -271,6 +271,8 @@ ALTER ROLE myuser SET lock_timeout = '10s';
 ```
 
 There’s also [a gem](https://github.com/gocardless/activerecord-safer_migrations) you can use for this.
+
+Here’s a great explanation of [how Postgres lock queues work](https://www.citusdata.com/blog/2018/02/15/when-postgresql-blocks/).
 
 ## Additional Reading
 
