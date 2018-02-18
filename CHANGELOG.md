@@ -1,3 +1,7 @@
+## 0.2.3 [unreleased]
+
+- Added check for `change_column_null`
+
 ## 0.2.2
 
 - Friendlier output
