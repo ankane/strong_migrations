@@ -65,6 +65,12 @@ module StrongMigrations
           end
         when :execute
           raise_error :execute
+        when :change_column_null
+          null = args[2]
+          default = args[3]
+          if !null && !default.nil?
+            raise_error :change_column_null
+          end
         end
       end
 

@@ -49,6 +49,7 @@ The following operations can cause downtime or errors:
 - renaming a table
 - adding an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
+- restricting column to have NULL values with setting a default in place
 
 Also checks for best practices:
 
