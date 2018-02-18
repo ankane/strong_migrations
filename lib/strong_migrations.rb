@@ -125,10 +125,11 @@ execute call, so cannot help you here. Please make really sure that what
 you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block.",
 
    change_column_null:
-"Default value provided in last attribute is set up using a single UPDATE query.
-This might cause downtime on huge tables lacking appropriate indexes. 
-Backfill NULL-values manually in batches instead or wrap this call in a safety_assured { .. } block
-if you're confident this is not your case."
+"The last argument replaces existing NULLs with another value.
+This runs a single UPDATE query, which can cause downtime.
+Backfill NULLs manually in batches instead.
+
+More info: https://github.com/ankane/strong_migrations#backfilling-data"
   }
 end
 
