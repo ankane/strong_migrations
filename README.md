@@ -264,7 +264,7 @@ StrongMigrations.auto_analyze = true
 
 ## Lock Timeout (Postgres)
 
-It’s a good idea to set a lock timeout for the database user that runs migrations. This way, if migrations can’t acquire a lock in a timely manner, other statements won’t be stuck behind it. Here’s a great explanation of [how Postgres lock queues work](https://www.citusdata.com/blog/2018/02/15/when-postgresql-blocks/).
+It’s a good idea to set a lock timeout for the database user that runs migrations. This way, if migrations can’t acquire a lock in a timely manner, other statements won’t be stuck behind it. Here’s a great explanation of [how lock queues work](https://www.citusdata.com/blog/2018/02/15/when-postgresql-blocks/).
 
 ```sql
 ALTER ROLE myuser SET lock_timeout = '10s';
