@@ -71,6 +71,12 @@ class ChangeColumnVarcharToText < TestMigration
   end
 end
 
+class ChangeColumnNull < TestMigration
+  def change
+    change_column_null :users, :name, false, "Andy"
+  end
+end
+
 class ExecuteArbitrarySQL < TestMigration
   def change
     execute 'SELECT CURRENT_TIMESTAMP'
@@ -263,6 +269,10 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_version_unsafe
     assert_unsafe VersionUnsafe
+  end
+
+  def test_change_column_null
+    assert_unsafe ChangeColumnNull
   end
 
   def test_down
