@@ -1,4 +1,4 @@
-Hi, :wave:
+Hi,
 
 Before creating an issue, please check out the Contributing Guide:
 
