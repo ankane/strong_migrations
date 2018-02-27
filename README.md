@@ -272,6 +272,10 @@ ALTER ROLE myuser SET lock_timeout = '10s';
 
 There’s also [a gem](https://github.com/gocardless/activerecord-safer_migrations) you can use for this.
 
+## Bigint Primary Keys (Postgres & MySQL)
+
+Rails 5.1+ uses `bigint` for primary keys to keep you from running out of ids. To get this in earlier versions of Rails, check out [this gem](https://github.com/Shopify/rails-bigint-primarykey).
+
 ## Additional Reading
 
 - [Rails Migrations with No Downtime](http://pedro.herokuapp.com/past/2011/7/13/rails_migrations_with_no_downtime/)
