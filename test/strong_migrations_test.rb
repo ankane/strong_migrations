@@ -247,20 +247,21 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_reference
-    skip unless postgres?
+    skip if activerecord3? || !postgres?
     assert_unsafe AddReference
   end
 
   def test_safe_add_reference
-    skip unless postgres?
+    skip if activerecord3? || !postgres?
     assert_safe SafeAddReference
   end
 
   def test_add_reference_default
     skip unless postgres?
-    if ActiveRecord::VERSION::MAJOR >= 5
+    if activerecord5?
       assert_unsafe AddReferenceDefault
     else
+      skip if activerecord3?
       assert_safe AddReferenceDefault
     end
   end

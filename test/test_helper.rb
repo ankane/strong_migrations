@@ -3,6 +3,7 @@ Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
 require "active_record"
+require "logger"
 
 Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
 
@@ -11,7 +12,7 @@ ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migration
 
 StrongMigrations.start_after = 20170101000000
 
-ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout) if ENV["VERBOSE"]
+ActiveRecord::Base.logger = Logger.new($stdout) if ENV["VERBOSE"]
 
 def migrate(migration, direction: :up)
   ActiveRecord::Migration.suppress_messages do
@@ -20,8 +21,12 @@ def migrate(migration, direction: :up)
   true
 end
 
+def activerecord3?
+  ActiveRecord::VERSION::MAJOR == 3
+end
+
 def activerecord5?
-  ActiveRecord::VERSION::MAJOR >= 5
+  ActiveRecord::VERSION::MAJOR == 5
 end
 
 def migration_version
