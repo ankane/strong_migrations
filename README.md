@@ -171,7 +171,7 @@ end
 
 If you forget `disable_ddl_transaction!`, the migration will fail. Also, note that indexes on new tables (those created in the same migration) don’t require this.
 
-Check out [this gem](https://github.com/ankane/gindex) so you don’t have to memorize the syntax.
+Check out [this gem](https://github.com/ankane/gindex) to quickly generate index migrations without memorizing the syntax.
 
 ### Adding a json column (Postgres)
 
