@@ -169,11 +169,9 @@ class AddSomeIndexToUsers < ActiveRecord::Migration[5.1]
 end
 ```
 
-If you forget `disable_ddl_transaction!`, the migration will fail.
+If you forget `disable_ddl_transaction!`, the migration will fail. Also, note that indexes on new tables (those created in the same migration) don’t require this.
 
-Also, note that indexes on new tables (those created in the same migration) don’t require this.
-
-Check out [this gem](https://github.com/ankane/gindex) to generate indexes quickly.
+Check out [this gem](https://github.com/ankane/gindex) so you don’t have to memorize the syntax.
 
 ### Adding a json column (Postgres)
 
