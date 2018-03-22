@@ -173,6 +173,8 @@ If you forget `disable_ddl_transaction!`, the migration will fail.
 
 Also, note that indexes on new tables (those created in the same migration) don’t require this.
 
+Check out [this gem](https://github.com/ankane/gindex) to generate indexes quickly.
+
 ### Adding a json column (Postgres)
 
 There’s no equality operator for the `json` column type, which causes issues for `SELECT DISTINCT` queries.
