@@ -30,6 +30,9 @@ then change the default.
 
 More info: https://github.com/ankane/strong_migrations#adding-a-column-with-a-default-value",
 
+    add_column_id:
+"Use bigint instead of integer for reference columns.",
+
     add_column_json:
 "Use jsonb instead.",
 

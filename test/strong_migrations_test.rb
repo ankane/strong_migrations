@@ -53,6 +53,12 @@ class AddColumnDefaultSafe < TestMigration
   end
 end
 
+class AddColumnId < TestMigration
+  def change
+    add_column :users, :city_id, :integer
+  end
+end
+
 class AddColumnJson < TestMigration
   def change
     add_column :users, :properties, :json
@@ -207,6 +213,14 @@ class StrongMigrationsTest < Minitest::Test
     assert_safe AddColumnDefaultSafe
   end
 
+  def test_add_column_id
+    if activerecord51?
+      assert_unsafe AddColumnId
+    else
+      assert_safe AddColumnId
+    end
+  end
+
   def test_add_column_json
     skip unless postgres?
     assert_unsafe AddColumnJson
@@ -258,7 +272,7 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_add_reference_default
     skip unless postgres?
-    if ActiveRecord::VERSION::MAJOR >= 5
+    if activerecord5?
       assert_unsafe AddReferenceDefault
     else
       assert_safe AddReferenceDefault

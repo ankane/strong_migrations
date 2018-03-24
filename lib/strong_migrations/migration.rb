@@ -36,15 +36,18 @@ module StrongMigrations
             raise_error :add_index
           end
         when :add_column
-          type = args[2]
+          column = args[1].to_s
+          type = args[2].to_s
           options = args[3] || {}
           raise_error :add_column_default unless options[:default].nil?
-          if type.to_s == "json" && postgresql?
+          if type == "json" && postgresql?
             if postgresql_version >= 90400
               raise_error :add_column_json
             else
               raise_error :add_column_json_legacy
             end
+          elsif type == "integer" && column.end_with?("_id") && (postgresql? || mysql?) && ActiveRecord.version.to_s.to_f >= 5.1
+            raise_error :add_column_id
           end
         when :change_column
           safe = false
@@ -59,7 +62,7 @@ module StrongMigrations
           raise_error :create_table if options[:force]
         when :add_reference
           options = args[2] || {}
-          index_value = options.fetch(:index, ActiveRecord::VERSION::MAJOR >= 5 ? true : false)
+          index_value = options.fetch(:index, ActiveRecord.version.to_s.to_f >= 5 ? true : false)
           if postgresql? && index_value
             raise_error :add_reference
           end
@@ -90,7 +93,11 @@ module StrongMigrations
     private
 
     def postgresql?
-      %w(PostgreSQL PostGIS).include?(connection.adapter_name)
+      connection.adapter_name =~ /postg/i
+    end
+
+    def mysql?
+      connection.adapter_name =~ /mysql/i
     end
 
     def postgresql_version

@@ -1,6 +1,7 @@
 ## 0.2.3 [unreleased]
 
 - Added check for `change_column_null`
+- Added check for `add_column` integer reference for Rails 5.1+
 
 ## 0.2.2
 

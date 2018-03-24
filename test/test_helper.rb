@@ -21,7 +21,11 @@ def migrate(migration, direction: :up)
 end
 
 def activerecord5?
-  ActiveRecord::VERSION::MAJOR >= 5
+  migration_version >= 5
+end
+
+def activerecord51?
+  migration_version >= 5.1
 end
 
 def migration_version
