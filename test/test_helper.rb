@@ -37,6 +37,7 @@ TestSchema = ActiveRecord::Schema
 
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users")
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS new_users")
+ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS cities")
 
 class CreateUsers < TestMigration
   def change
@@ -46,6 +47,15 @@ class CreateUsers < TestMigration
   end
 end
 migrate CreateUsers
+
+class CreateCities < TestMigration
+  def change
+    create_table "cities" do |t|
+      t.string :name
+    end
+  end
+end
+migrate CreateCities
 
 class Minitest::Test
   def postgres?

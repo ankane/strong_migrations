@@ -47,7 +47,11 @@ module StrongMigrations
               raise_error :add_column_json_legacy
             end
           elsif type == "integer" && column.end_with?("_id") && (postgresql? || mysql?) && ActiveRecord.version.to_s.to_f >= 5.1
-            raise_error :add_column_id
+            ref_table = column.sub(/_id\z/, "").tableize
+            # check if table it references has bigint primary key
+            if connection.table_exists?(ref_table) && connection.columns(ref_table).find { |c| c.name.to_s == "id" }.try(:sql_type) == "bigint"
+              raise_error :add_column_id
+            end
           end
         when :change_column
           safe = false
