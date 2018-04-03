@@ -1,10 +1,9 @@
 require "active_support"
-
+require "strong_migrations/version"
 require "strong_migrations/database_tasks"
+require "strong_migrations/unsafe_migration"
 require "strong_migrations/migration"
 require "strong_migrations/railtie" if defined?(Rails)
-require "strong_migrations/unsafe_migration"
-require "strong_migrations/version"
 
 module StrongMigrations
   class << self

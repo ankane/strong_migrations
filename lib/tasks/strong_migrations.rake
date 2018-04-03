@@ -24,3 +24,7 @@ namespace :strong_migrations do
     end
   end
 end
+
+["db:drop", "db:reset", "db:schema:load", "db:structure:load"].each do |t|
+  Rake::Task[t].enhance ["strong_migrations:safety_assured"]
+end
