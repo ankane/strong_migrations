@@ -92,7 +92,7 @@ class BackfillSomeColumn < ActiveRecord::Migration[5.1]
 
     # Rails < 5
     User.find_in_batches do |users|
-      User.where(id: users.map(&:id)).update_all some_column: "default_value"
+      User.where(id: users.ids).update_all some_column: "default_value"
     end
   end
 end
