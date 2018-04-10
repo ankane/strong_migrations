@@ -1,8 +1,9 @@
 language: ruby
 rvm:
-  - 2.4.1
+  - 2.5.1
 gemfile:
   - Gemfile
+  - test/gemfiles/activerecord51.gemfile
   - test/gemfiles/activerecord50.gemfile
   - test/gemfiles/activerecord42.gemfile
 script: bundle exec rake test
@@ -17,4 +18,4 @@ matrix:
   include:
     - gemfile: test/gemfiles/mysql2.gemfile
       env: ADAPTER=mysql2
-      rvm: 2.4.1
+      rvm: 2.5.1
