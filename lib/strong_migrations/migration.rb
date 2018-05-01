@@ -111,8 +111,9 @@ module StrongMigrations
      \/  \/_/    \_\_____|  |_|  (_)  #strong_migrations
 
 '
+      custom_header = StrongMigrations.error_messages[custom_header]
       message = StrongMigrations.error_messages[message_key] || "Missing message"
-      raise StrongMigrations::UnsafeMigration, "#{wait_message}#{message}\n"
+      raise StrongMigrations::UnsafeMigration, "#{wait_message}#{custom_header}\n\n#{message}\n"
     end
   end
 end
