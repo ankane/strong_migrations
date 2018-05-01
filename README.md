@@ -252,6 +252,12 @@ To customize specific messages, create an initializer with:
 StrongMigrations.error_messages[:add_column_default] = "Your custom instructions"
 ```
 
+To additionally prepend a custom message above all errors, define the `:custom_header` key:
+
+```ruby
+StrongMigrations.error_messages[:custom_header] = "Your custom header"
+```
+
 Check the [source code](https://github.com/ankane/strong_migrations/blob/master/lib/strong_migrations.rb) for the list of keys.
 
 ## Analyze Tables (Postgres)
