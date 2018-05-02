@@ -45,11 +45,11 @@ The following operations can cause downtime or errors:
 - adding a column with a non-null default value to an existing table
 - removing a column
 - changing the type of a column
+- setting a `NOT NULL` constraint with a default value [master]
 - renaming a column
 - renaming a table
 - adding an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
-- restricting column to have NULL values with setting a default in place
 
 Also checks for best practices:
 
