@@ -57,6 +57,7 @@ module StrongMigrations
         when :create_table
           options = args[1] || {}
           raise_error :create_table if options[:force]
+          (@new_tables ||= []) << args[0].to_s
         when :add_reference
           options = args[2] || {}
           index_value = options.fetch(:index, ActiveRecord::VERSION::MAJOR >= 5 ? true : false)
@@ -74,13 +75,9 @@ module StrongMigrations
         end
       end
 
-      if method == :create_table
-        (@new_tables ||= []) << args[0].to_s
-      end
-
       result = super
 
-      if StrongMigrations.auto_analyze && postgresql? && method == :add_index && @direction == :up
+      if StrongMigrations.auto_analyze && @direction == :up && postgresql? && method == :add_index
         connection.execute "ANALYZE VERBOSE #{connection.quote_table_name(args[0])}"
       end
 
