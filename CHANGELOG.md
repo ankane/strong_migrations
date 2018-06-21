@@ -1,6 +1,7 @@
 ## 0.2.3 [unreleased]
 
 - Added check for `change_column_null`
+- Fixed migration reversibility with `auto_analyze`
 
 ## 0.2.2
 

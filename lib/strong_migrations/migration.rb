@@ -80,7 +80,7 @@ module StrongMigrations
 
       result = super
 
-      if StrongMigrations.auto_analyze && postgresql? && method == :add_index
+      if StrongMigrations.auto_analyze && postgresql? && method == :add_index && @direction == :up
         connection.execute "ANALYZE VERBOSE #{connection.quote_table_name(args[0])}"
       end
 
