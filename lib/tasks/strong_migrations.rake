@@ -11,8 +11,7 @@ namespace :strong_migrations do
     ActiveRecord::Base.logger.level = Logger::INFO
 
     require "strong_migrations/alphabetize_columns"
-    class << ActiveRecord::Base.connection
-      prepend StrongMigrations::AlphabetizeColumns
-    end
+    ActiveRecord::Base.connection.class.prepend StrongMigrations::AlphabetizeColumns
+    ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend StrongMigrations::AlphabetizeColumns
   end
 end
