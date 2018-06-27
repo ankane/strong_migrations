@@ -10,17 +10,9 @@ namespace :strong_migrations do
     $stderr.puts "Dumping schema"
     ActiveRecord::Base.logger.level = Logger::INFO
 
+    require "strong_migrations/alphabetize_columns"
     class << ActiveRecord::Base.connection
-      alias_method :old_columns, :columns unless instance_methods.include?("old_columns")
-      alias_method :old_extensions, :extensions unless instance_methods.include?("old_extensions")
-
-      def columns(*args)
-        old_columns(*args).sort_by(&:name)
-      end
-
-      def extensions(*args)
-        old_extensions(*args).sort
-      end
+      prepend StrongMigrations::AlphabetizeColumns
     end
   end
 end
