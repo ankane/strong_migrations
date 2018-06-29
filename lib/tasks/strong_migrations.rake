@@ -12,6 +12,9 @@ namespace :strong_migrations do
 
     require "strong_migrations/alphabetize_columns"
     ActiveRecord::Base.connection.class.prepend StrongMigrations::AlphabetizeColumns
+    if ActiveRecord::ConnectionAdapters.const_defined?('PostGISAdapter')
+      ActiveRecord::ConnectionAdapters::PostGISAdapter.prepend StrongMigrations::AlphabetizeColumns
+    end
     ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend StrongMigrations::AlphabetizeColumns
   end
 end
