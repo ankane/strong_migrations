@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/ankane/strong_migrations"
   spec.license       = "MIT"
 
-  spec.authors       = ["Bob Remeika", "David Waller", "Andrew Kane"]
-  spec.email         = ["bob.remeika@gmail.com", "andrew@chartkick.com"]
+  spec.authors       = ["Andrew Kane", "Bob Remeika", "David Waller"]
+  spec.email         = ["andrew@chartkick.com", "bob.remeika@gmail.com"]
 
   spec.files         = Dir["*.{md,txt}", "{lib}/**/*"]
   spec.require_path  = "lib"
