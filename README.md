@@ -64,7 +64,7 @@ Adding a column with a non-null default causes the entire table to be rewritten.
 Instead, add the column without a default value, then change the default.
 
 ```ruby
-class AddSomeColumnToUsers < ActiveRecord::Migration[5.1]
+class AddSomeColumnToUsers < ActiveRecord::Migration[5.2]
   def up
     add_column :users, :some_column, :text
     change_column_default :users, :some_column, "default_value"
@@ -83,7 +83,7 @@ Don’t backfill existing rows in this migration, as it can cause downtime. See 
 To backfill data, use the Rails console or a separate migration with `disable_ddl_transaction!`. Avoid backfilling in a transaction, especially one that alters a table. See [this great article](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/) on why.
 
 ```ruby
-class BackfillSomeColumn < ActiveRecord::Migration[5.1]
+class BackfillSomeColumn < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def change
@@ -122,7 +122,7 @@ ActiveRecord caches database columns at runtime, so if you drop a column, it can
 3. Write a migration to remove the column (wrap in `safety_assured` block)
 
   ```ruby
-  class RemoveSomeColumnFromUsers < ActiveRecord::Migration[5.1]
+  class RemoveSomeColumnFromUsers < ActiveRecord::Migration[5.2]
     def change
       safety_assured { remove_column :users, :some_column }
     end
@@ -160,7 +160,7 @@ If you really have to:
 Add indexes concurrently.
 
 ```ruby
-class AddSomeIndexToUsers < ActiveRecord::Migration[5.1]
+class AddSomeIndexToUsers < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def change
@@ -190,7 +190,7 @@ end
 Then add the column:
 
 ```ruby
-class AddJsonColumnToUsers < ActiveRecord::Migration[5.1]
+class AddJsonColumnToUsers < ActiveRecord::Migration[5.2]
   def change
     safety_assured { add_column :users, :some_column, :json }
   end
@@ -202,7 +202,7 @@ end
 To mark a step in the migration as safe, despite using method that might otherwise be dangerous, wrap it in a `safety_assured` block.
 
 ```ruby
-class MySafeMigration < ActiveRecord::Migration[5.1]
+class MySafeMigration < ActiveRecord::Migration[5.2]
   def change
     safety_assured { remove_column :users, :some_column }
   end
