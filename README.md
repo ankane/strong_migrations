@@ -171,7 +171,7 @@ end
 
 If you forget `disable_ddl_transaction!`, the migration will fail. Also, note that indexes on new tables (those created in the same migration) don’t require this.
 
-Check out [this gem](https://github.com/ankane/gindex) to quickly generate index migrations without memorizing the syntax.
+Check out [gindex](https://github.com/ankane/gindex) to quickly generate index migrations without memorizing the syntax.
 
 ### Adding a json column (Postgres)
 
@@ -274,7 +274,7 @@ There’s also [a gem](https://github.com/gocardless/activerecord-safer_migratio
 
 ## Bigint Primary Keys (Postgres & MySQL)
 
-Rails 5.1+ uses `bigint` for primary keys to keep you from running out of ids. To get this in earlier versions of Rails, check out [this gem](https://github.com/Shopify/rails-bigint-primarykey).
+Rails 5.1+ uses `bigint` for primary keys to keep you from running out of ids. To get this in earlier versions of Rails, check out [rails-bigint-primarykey](https://github.com/Shopify/rails-bigint-primarykey).
 
 ## Additional Reading
 
