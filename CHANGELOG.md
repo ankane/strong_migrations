@@ -1,4 +1,4 @@
-## 0.2.3 [unreleased]
+## 0.2.3
 
 - Added check for `change_column_null`
 - Added support for alphabetize columns with Makara
