@@ -18,11 +18,19 @@ module StrongMigrations
 the entire table to be rewritten.
 
 Instead, add the column without a default value,
-then change the default.
+then change the default, then make sure to backfill
+the data of existing rows.
 
   def up
     add_column :users, :some_column, :text
     change_column_default :users, :some_column, \"default_value\"
+    # Make sure to backfill the data
+    safety_assured do
+      execute %{
+        UPDATE users
+        SET some_column = \"default_value\"
+      }
+    end
   end
 
   def down
