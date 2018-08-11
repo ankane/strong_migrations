@@ -19,23 +19,35 @@ the entire table to be rewritten.
 
 Instead, add the column without a default value,
 then change the default, then make sure to backfill
-the data of existing rows.
+the data of existing rows in another migration.
 
+# First migration
+class AddSomeColumnToUsers < ActiveRecord::Migration[5.2]
   def up
     add_column :users, :some_column, :text
     change_column_default :users, :some_column, \"default_value\"
-    # Make sure to backfill the data
-    safety_assured do
-      execute %{
-        UPDATE users
-        SET some_column = \"default_value\"
-      }
-    end
   end
 
   def down
     remove_column :users, :some_column
   end
+end
+
+# Second migration
+class BackfillSomeColumn < ActiveRecord::Migration[5.2]
+  disable_ddl_transaction!
+
+  def change
+    # Rails 5+
+    User.in_batches.update_all some_column: \"default_value\"
+
+    # Rails < 5
+    User.find_in_batches do |users|
+      User.where(id: users.map(&:id)).update_all some_column: \"default_value\"
+    end
+  end
+end
+
 
 More info: https://github.com/ankane/strong_migrations#adding-a-column-with-a-default-value",
 
