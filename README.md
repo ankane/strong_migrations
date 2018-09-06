@@ -48,6 +48,7 @@ The following operations can cause downtime or errors:
 - setting a `NOT NULL` constraint with a default value
 - renaming a column
 - renaming a table
+- creating a table with the `force` option
 - adding an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
 
