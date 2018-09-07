@@ -22,7 +22,9 @@ then change the default, then make sure to backfill
 the data of existing rows in another migration.
 
 # First migration
-class AddSomeColumnToUsers < ActiveRecord::Migration[5.2]
+class AddSomeColumnToUsers < #{
+  ActiveRecord::VERSION::MAJOR > 5 ? "ActiveRecord::Migration[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : "ActiveRecord::Base"
+}
   def up
     add_column :users, :some_column, :text
     change_column_default :users, :some_column, \"default_value\"
@@ -34,7 +36,9 @@ class AddSomeColumnToUsers < ActiveRecord::Migration[5.2]
 end
 
 # Second migration
-class BackfillSomeColumn < ActiveRecord::Migration[5.2]
+class BackfillSomeColumn < #{
+  ActiveRecord::VERSION::MAJOR > 5 ? "ActiveRecord::Migration[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : "ActiveRecord::Base"
+}
   disable_ddl_transaction!
 
   def change
