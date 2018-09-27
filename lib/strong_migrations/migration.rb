@@ -38,7 +38,11 @@ module StrongMigrations
         when :add_column
           type = args[2]
           options = args[3] || {}
-          raise_error :add_column_default unless options[:default].nil?
+
+          if !options[:default].nil? && !(postgresql? && postgresql_version >= 110000)
+            raise_error :add_column_default
+          end
+
           if type.to_s == "json" && postgresql?
             if postgresql_version >= 90400
               raise_error :add_column_json

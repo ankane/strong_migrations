@@ -1,3 +1,7 @@
+## 0.2.4 [unreleased]
+
+- Adding a column with a non-null default value is safe in Postgres 11+
+
 ## 0.2.3
 
 - Added check for `change_column_null`
