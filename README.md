@@ -16,16 +16,9 @@ gem 'strong_migrations'
 
 ## How It Works
 
-Strong Migrations detects potentially dangerous operations in migrations, prevents them from running by default, and provides instructions on safer ways to do what you want.
+Strong Migrations detects potentially dangerous operations in migrations, prevents them from running by default, and provides instructions on safer ways to do what you want. Here’s an example:
 
 ```
- __          __     _____ _______ _
- \ \        / /\   |_   _|__   __| |
-  \ \  /\  / /  \    | |    | |  | |
-   \ \/  \/ / /\ \   | |    | |  | |
-    \  /\  / ____ \ _| |_   | |  |_|
-     \/  \/_/    \_\_____|  |_|  (_)  #strong_migrations
-
 ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:
 
