@@ -52,10 +52,15 @@ module StrongMigrations
           end
         when :change_column
           safe = false
-          # assume Postgres 9.1+ since previous versions are EOL
-          if postgresql? && args[2].to_s == "text"
-            column = connection.columns(args[0]).find { |c| c.name.to_s == args[1].to_s }
-            safe = column && column.type == :string
+          # assume Postgres 9.3+ since previous versions are EOL
+          if postgresql?
+            if args[2].to_s == "text"
+              column = connection.columns(args[0]).find { |c| c.name.to_s == args[1].to_s }
+              safe = column && column.type == :string
+            elsif args[2].to_s == "integer" && !args[3][:limit].nil?
+              column = connection.columns(args[0]).find { |c| c.name.to_s == args[1].to_s }
+              safe = column && column.type == :integer
+            end
           end
           raise_error :change_column unless safe
         when :create_table
