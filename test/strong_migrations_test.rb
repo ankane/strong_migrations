@@ -65,6 +65,12 @@ class ChangeColumn < TestMigration
   end
 end
 
+class ChangeColumnIntegerLimit < TestMigration
+  def change
+    change_column :users, :device_id, :integer, limit: 8
+  end
+end
+
 class ChangeColumnVarcharToText < TestMigration
   def change
     change_column :users, :name, :text
@@ -214,6 +220,11 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_change_column
     assert_unsafe ChangeColumn
+  end
+
+  def test_change_column_integer_limit
+    skip unless postgres?
+    assert_safe ChangeColumnIntegerLimit
   end
 
   def test_change_column_varchar_to_text
