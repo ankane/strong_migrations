@@ -77,6 +77,10 @@ module StrongMigrations
             raise_error :change_column_null
           end
         end
+
+        StrongMigrations.checks.each do |check|
+          instance_exec(method, args, &check)
+        end
       end
 
       result = super
@@ -103,6 +107,11 @@ module StrongMigrations
     end
 
     def raise_error(message_key)
+      message = StrongMigrations.error_messages[message_key] || "Missing message"
+      unsafe!(message)
+    end
+
+    def unsafe!(message)
       wait_message = '
  __          __     _____ _______ _
  \ \        / /\   |_   _|__   __| |
@@ -112,7 +121,6 @@ module StrongMigrations
      \/  \/_/    \_\_____|  |_|  (_)  #strong_migrations
 
 '
-      message = StrongMigrations.error_messages[message_key] || "Missing message"
       raise StrongMigrations::UnsafeMigration, "#{wait_message}#{message}\n"
     end
   end

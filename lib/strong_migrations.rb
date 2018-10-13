@@ -8,10 +8,11 @@ require "strong_migrations/version"
 
 module StrongMigrations
   class << self
-    attr_accessor :auto_analyze, :start_after, :error_messages
+    attr_accessor :auto_analyze, :start_after, :checks, :error_messages
   end
   self.auto_analyze = false
   self.start_after = 0
+  self.checks = []
   self.error_messages = {
     add_column_default:
 "Adding a column with a non-null default causes
@@ -132,6 +133,10 @@ Backfill NULLs manually in batches instead.
 
 More info: https://github.com/ankane/strong_migrations#backfilling-data"
   }
+
+  def self.add_check(&block)
+    checks << block
+  end
 end
 
 ActiveSupport.on_load(:active_record) do

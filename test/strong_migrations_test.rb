@@ -171,6 +171,12 @@ class VersionUnsafe < TestMigration
   end
 end
 
+class Custom < TestMigration
+  def change
+    add_foreign_key :users, :other
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     skip unless postgres?
@@ -289,6 +295,12 @@ class StrongMigrationsTest < Minitest::Test
     assert_safe SafeUp
     assert_safe SafeUp, direction: :down
   end
+
+  def test_custom
+    assert_unsafe Custom, "No foreign keys"
+  end
+
+  private
 
   def assert_unsafe(migration, message = nil)
     error = assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration) }

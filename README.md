@@ -203,6 +203,20 @@ class MySafeMigration < ActiveRecord::Migration[5.2]
 end
 ```
 
+## Custom Checks [master]
+
+Add your own custom checks with:
+
+```ruby
+StrongMigrations.add_check do |method, args|
+  if method == :add_foreign_key
+    unsafe! "No foreign keys"
+  end
+end
+```
+
+Use the `unsafe!` method to raise errors.
+
 ## Existing Migrations
 
 To mark migrations as safe that were created before installing this gem, create an initializer with:

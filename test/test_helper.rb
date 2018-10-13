@@ -48,3 +48,9 @@ class Minitest::Test
     ENV["ADAPTER"].nil?
   end
 end
+
+StrongMigrations.add_check do |method, args|
+  if method == :add_foreign_key
+    unsafe! "No foreign keys"
+  end
+end
