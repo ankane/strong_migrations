@@ -108,10 +108,10 @@ module StrongMigrations
 
     def raise_error(message_key)
       message = StrongMigrations.error_messages[message_key] || "Missing message"
-      unsafe!(message)
+      stop!(message)
     end
 
-    def unsafe!(message)
+    def stop!(message)
       wait_message = '
  __          __     _____ _______ _
  \ \        / /\   |_   _|__   __| |

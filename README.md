@@ -210,12 +210,12 @@ Add your own custom checks with:
 ```ruby
 StrongMigrations.add_check do |method, args|
   if method == :add_index && args[0].to_s == "users"
-    unsafe! "No more indexes on the users table"
+    stop! "No more indexes on the users table"
   end
 end
 ```
 
-Use the `unsafe!` method to stop migrations.
+Use the `stop!` method to stop migrations.
 
 ## Existing Migrations
 
