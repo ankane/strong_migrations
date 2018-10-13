@@ -209,8 +209,8 @@ Add your own custom checks with:
 
 ```ruby
 StrongMigrations.add_check do |method, args|
-  if method == :add_foreign_key && args[0].to_s == "users"
-    unsafe! "No foreign keys on the users table"
+  if method == :add_index && args[0].to_s == "users"
+    unsafe! "No more indexes on the users table"
   end
 end
 ```
