@@ -215,7 +215,7 @@ StrongMigrations.add_check do |method, args|
 end
 ```
 
-Use the `unsafe!` method to raise errors.
+Use the `unsafe!` method to stop migrations.
 
 ## Existing Migrations
 
