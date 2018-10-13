@@ -297,7 +297,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_custom
-    assert_unsafe Custom, "No foreign keys"
+    assert_unsafe Custom, "No foreign keys on the users table"
   end
 
   private

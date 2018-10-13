@@ -50,7 +50,7 @@ class Minitest::Test
 end
 
 StrongMigrations.add_check do |method, args|
-  if method == :add_foreign_key
-    unsafe! "No foreign keys"
+  if method == :add_foreign_key && args[0].to_s == "users"
+    unsafe! "No foreign keys on the users table"
   end
 end
