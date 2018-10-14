@@ -23,7 +23,7 @@ ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:
 
 class User < ApplicationRecord
-  self.ignored_columns = %w(some_column)
+  self.ignored_columns = ["some_column"]
 end
 
 Once that's deployed, wrap this step in a safety_assured { ... } block.
@@ -101,7 +101,7 @@ ActiveRecord caches database columns at runtime, so if you drop a column, it can
   ```ruby
   # For Rails 5+
   class User < ApplicationRecord
-    self.ignored_columns = %w(some_column)
+    self.ignored_columns = ["some_column"]
   end
 
   # For Rails < 5

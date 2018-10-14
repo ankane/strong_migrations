@@ -22,12 +22,12 @@ Instead, add the column without a default value,
 then change the default.
 
   def up
-    add_column :users, :some_column, :text
-    change_column_default :users, :some_column, \"default_value\"
+    add_column %{table}, %{column}, %{type}%{options}
+    change_column_default %{table}, %{column}, %{default}
   end
 
   def down
-    remove_column :users, :some_column
+    remove_column %{table}, %{column}
   end
 
 More info: https://github.com/ankane/strong_migrations#adding-a-column-with-a-default-value",
@@ -39,7 +39,7 @@ More info: https://github.com/ankane/strong_migrations#adding-a-column-with-a-de
 "There's no equality operator for the json column type.
 Replace all calls to uniq with a custom scope.
 
-  scope :uniq_on_id, -> { select(\"DISTINCT ON (your_table.id) your_table.*\") }
+  scope :uniq_on_id, -> { select('DISTINCT ON (%{table}.id) %{table}.*') }
 
 Once it's deployed, wrap this step in a safety_assured { ... } block.",
 
@@ -60,7 +60,7 @@ If you really have to:
 when removing columns. Be sure to ignore the column:
 
 class User < ApplicationRecord
-  self.ignored_columns = %w(some_column)
+  self.ignored_columns = [%{column}]
 end
 
 Once that's deployed, wrap this step in a safety_assured { ... } block.
@@ -93,8 +93,8 @@ More info: https://github.com/ankane/strong_migrations#removing-a-column",
   disable_ddl_transaction!
 
   def change
-    add_reference :users, :reference, index: false
-    add_index :users, :reference_id, algorithm: :concurrently
+    %{command} %{table}, %{reference}, index: false%{options}
+    add_index %{table}, %{column}, algorithm: :concurrently
   end",
 
     add_index:
@@ -103,7 +103,7 @@ More info: https://github.com/ankane/strong_migrations#removing-a-column",
   disable_ddl_transaction!
 
   def change
-    add_index :users, :some_column, algorithm: :concurrently
+    add_index %{table}, %{column}, algorithm: :concurrently%{options}
   end",
 
     add_index_columns:
@@ -148,7 +148,7 @@ when removing columns. Be sure to ignore the column:
 
 class User < ActiveRecord::Base
   def self.columns
-    super.reject { |c| c.name == \"some_column\" }
+    super.reject { |c| c.name == %{column} }
   end
 end
 

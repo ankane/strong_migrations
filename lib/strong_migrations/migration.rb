@@ -17,7 +17,7 @@ module StrongMigrations
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
         case method
         when :remove_column
-          raise_error :remove_column
+          raise_error :remove_column, column: args[1].to_s.inspect
         when :remove_timestamps
           raise_error :remove_column
         when :change_table
@@ -33,21 +33,24 @@ module StrongMigrations
             raise_error :add_index_columns
           end
           if postgresql? && options[:algorithm] != :concurrently && !@new_tables.to_a.include?(args[0].to_s)
-            raise_error :add_index
+            error_columns = Array(columns).map(&:to_sym)
+            error_columns = error_columns.first if error_columns.size == 1
+            raise_error :add_index, table: sym_str(args[0]), column: error_columns.inspect, options: options_str(options)
           end
         when :add_column
           type = args[2]
           options = args[3] || {}
+          default = options[:default]
 
-          if !options[:default].nil? && !(postgresql? && postgresql_version >= 110000)
-            raise_error :add_column_default
+          if !default.nil? && !(postgresql? && postgresql_version >= 110000)
+            raise_error :add_column_default, table: sym_str(args[0]), column: sym_str(args[1]), type: sym_str(type), options: options_str(options.except(:default)), default: default.inspect
           end
 
           if type.to_s == "json" && postgresql?
             if postgresql_version >= 90400
               raise_error :add_column_json
             else
-              raise_error :add_column_json_legacy
+              raise_error :add_column_json_legacy, table: connection.quote_table_name(args[0])
             end
           end
         when :change_column
@@ -66,7 +69,8 @@ module StrongMigrations
           options = args[2] || {}
           index_value = options.fetch(:index, ActiveRecord::VERSION::MAJOR >= 5 ? true : false)
           if postgresql? && index_value
-            raise_error :add_reference
+            error_columns = options[:polymorphic] ? [:"#{args[1]}_type", :"#{args[1]}_id"].inspect : sym_str("#{args[1]}_id")
+            raise_error :add_reference, command: method, table: sym_str(args[0]), reference: sym_str(args[1]), column: error_columns, options: options_str(options.except(:index))
           end
         when :execute
           raise_error :execute
@@ -106,9 +110,22 @@ module StrongMigrations
       version && version <= StrongMigrations.start_after
     end
 
-    def raise_error(message_key)
+    def raise_error(message_key, vars = {})
       message = StrongMigrations.error_messages[message_key] || "Missing message"
-      stop!(message)
+      # escape % not followed by {
+      stop!(message.gsub(/%(?!{)/, "%%") % vars)
+    end
+
+    def sym_str(v)
+      v.to_sym.inspect
+    end
+
+    def options_str(options)
+      str = String.new("")
+      options.each do |k, v|
+        str << ", #{k}: #{v.inspect}"
+      end
+      str
     end
 
     def stop!(message)
