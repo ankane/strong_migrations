@@ -130,7 +130,7 @@ ActiveRecord caches database columns at runtime, so if you drop a column, it can
 
 ### Renaming or changing the type of a column
 
-If you really have to:
+A safer approach is to:
 
 1. Create a new column
 2. Write to both columns
@@ -143,7 +143,7 @@ One exception is changing a `varchar` column to `text`, which is safe in Postgre
 
 ### Renaming a table
 
-If you really have to:
+A safer approach is to:
 
 1. Create a new table
 2. Write to both tables

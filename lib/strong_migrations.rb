@@ -57,10 +57,8 @@ end
 Once it's deployed, wrap this step in a safety_assured { ... } block.",
 
     change_column:
-"Changing the type of an existing column requires
-the entire table and indexes to be rewritten.
-
-If you really have to:
+"Changing the type of an existing column requires the entire
+table and indexes to be rewritten. A safer approach is to:
 
 1. Create a new column
 2. Write to both columns
@@ -81,7 +79,7 @@ Once that's deployed, wrap this step in a safety_assured { ... } block.
 More info: https://github.com/ankane/strong_migrations#removing-a-column",
 
     rename_column:
-"If you really have to:
+"Renaming a column is dangerous. A safer approach is to:
 
 1. Create a new column
 2. Write to both columns
@@ -91,7 +89,7 @@ More info: https://github.com/ankane/strong_migrations#removing-a-column",
 6. Drop the old column",
 
     rename_table:
-"If you really have to:
+"Renaming a table is dangerous. A safer approach is to:
 
 1. Create a new table
 2. Write to both tables
@@ -144,7 +142,7 @@ execute call, so cannot help you here. Please make really sure that what
 you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block.",
 
    change_column_null:
-"The last argument replaces existing NULLs with another value.
+"The last argument in change_column_null replaces existing NULLs with another value.
 This runs a single UPDATE query, which can cause downtime.
 Backfill NULLs manually in batches instead.
 
