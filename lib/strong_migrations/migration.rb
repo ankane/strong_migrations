@@ -33,7 +33,7 @@ module StrongMigrations
             raise_error :add_index_columns
           end
           if postgresql? && options[:algorithm] != :concurrently && !@new_tables.to_a.include?(args[0].to_s)
-            raise_error :add_index, table: sym_str(args[0]), column: column_str(columns), options: options_str(options)
+            raise_error :add_index, table: sym_str(args[0]), column: column_str(columns), options: options_str(options.except(:algorithm))
           end
         when :add_column
           type = args[2]
