@@ -72,6 +72,8 @@ end
 
 Don’t backfill existing rows in this migration, as it can cause downtime. See the next section for how to do it safely.
 
+> This operation is safe in Postgres 11+
+
 ### Backfilling data
 
 To backfill data, use the Rails console or a separate migration with `disable_ddl_transaction!`. Avoid backfilling in a transaction, especially one that alters a table. See [this great article](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/) on why.
