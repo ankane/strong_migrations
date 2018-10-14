@@ -315,6 +315,7 @@ class StrongMigrationsTest < Minitest::Test
 
   def assert_unsafe(migration, message = nil)
     error = assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration) }
+    puts error.message if ENV["VERBOSE"]
     assert_match message, error.message if message
   end
 
