@@ -254,18 +254,22 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_index_columns_unique
+    skip unless postgres?
     assert_safe AddIndexColumnsUnique
   end
 
   def test_add_reference
+    skip unless postgres?
     assert_unsafe AddReference
   end
 
   def test_safe_add_reference
+    skip unless postgres?
     assert_safe SafeAddReference
   end
 
   def test_add_reference_default
+    skip unless postgres?
     if ActiveRecord::VERSION::MAJOR >= 5
       assert_unsafe AddReferenceDefault
     else
@@ -274,6 +278,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_belongs_to
+    skip unless postgres?
     assert_unsafe AddBelongsTo
   end
 
