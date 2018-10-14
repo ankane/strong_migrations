@@ -17,7 +17,7 @@ module StrongMigrations
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
         case method
         when :remove_column
-          raise_error :remove_column, column: args[1].to_s.inspect
+          raise_error :remove_column, model: args[0].to_s.classify, column: args[1].to_s.inspect
         when :remove_timestamps
           raise_error :remove_column
         when :change_table

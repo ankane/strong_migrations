@@ -59,7 +59,7 @@ If you really have to:
     remove_column: "ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:
 
-class User < ApplicationRecord
+class %{model} < ApplicationRecord
   self.ignored_columns = [%{column}]
 end
 
@@ -146,7 +146,7 @@ ActiveSupport.on_load(:active_record) do
     StrongMigrations.error_messages[:remove_column] = "ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:
 
-class User < ActiveRecord::Base
+class %{model} < ActiveRecord::Base
   def self.columns
     super.reject { |c| c.name == %{column} }
   end
