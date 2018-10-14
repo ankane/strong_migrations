@@ -33,9 +33,7 @@ module StrongMigrations
             raise_error :add_index_columns
           end
           if postgresql? && options[:algorithm] != :concurrently && !@new_tables.to_a.include?(args[0].to_s)
-            error_columns = Array(columns).map(&:to_sym)
-            error_columns = error_columns.first if error_columns.size == 1
-            raise_error :add_index, table: sym_str(args[0]), column: error_columns.inspect, options: options_str(options)
+            raise_error :add_index, table: sym_str(args[0]), column: column_str(columns), options: options_str(options)
           end
         when :add_column
           type = args[2]
@@ -69,8 +67,11 @@ module StrongMigrations
           options = args[2] || {}
           index_value = options.fetch(:index, ActiveRecord::VERSION::MAJOR >= 5 ? true : false)
           if postgresql? && index_value
-            error_columns = options[:polymorphic] ? [:"#{args[1]}_type", :"#{args[1]}_id"].inspect : sym_str("#{args[1]}_id")
-            raise_error :add_reference, command: method, table: sym_str(args[0]), reference: sym_str(args[1]), column: error_columns, options: options_str(options.except(:index))
+            reference = args[1]
+            columns = []
+            columns << "#{reference}_type" if options[:polymorphic]
+            columns << "#{reference}_id"
+            raise_error :add_reference, command: method, table: sym_str(args[0]), reference: sym_str(reference), column: column_str(columns), options: options_str(options.except(:index))
           end
         when :execute
           raise_error :execute
@@ -118,6 +119,12 @@ module StrongMigrations
 
     def sym_str(v)
       v.to_sym.inspect
+    end
+
+    def column_str(columns)
+      columns = Array(columns).map(&:to_sym)
+      columns = columns.first if columns.size == 1
+      columns.inspect
     end
 
     def options_str(options)
