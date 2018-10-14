@@ -134,7 +134,7 @@ you're doing is safe before proceeding, then wrap it in a safety_assured { ... }
     create_table:
 "The force option will destroy existing tables.
 If this is intended, drop the existing table first.
-Otherwise, remove the option.",
+Otherwise, remove the force option.",
 
     execute:
 "Strong Migrations does not support inspecting what happens inside an
