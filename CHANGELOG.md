@@ -2,6 +2,7 @@
 
 - Added support for custom checks
 - Adding a column with a non-null default value is safe in Postgres 11+
+- Added check for `add_belongs_to`
 
 ## 0.2.3
 

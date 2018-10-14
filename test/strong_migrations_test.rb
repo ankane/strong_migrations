@@ -143,6 +143,12 @@ class AddReferenceDefault < TestMigration
   end
 end
 
+class AddBelongsTo < TestMigration
+  def change
+    add_belongs_to :users, :device, index: true
+  end
+end
+
 class CreateTableForce < TestMigration
   def change
     create_table "users", force: :cascade do |t|
@@ -269,6 +275,11 @@ class StrongMigrationsTest < Minitest::Test
     else
       assert_safe AddReferenceDefault
     end
+  end
+
+  def test_add_belongs_to
+    skip unless postgres?
+    assert_unsafe AddBelongsTo
   end
 
   def test_create_table_force
