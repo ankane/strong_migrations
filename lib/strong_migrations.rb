@@ -103,21 +103,25 @@ More info: https://github.com/ankane/strong_migrations#removing-a-column",
     add_reference:
 "Adding a non-concurrent index locks the table. Instead, use:
 
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   disable_ddl_transaction!
 
   def change
     %{command} %{table}, %{reference}, index: false%{options}
     add_index %{table}, %{column}, algorithm: :concurrently
-  end",
+  end
+end",
 
     add_index:
 "Adding a non-concurrent index locks the table. Instead, use:
 
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   disable_ddl_transaction!
 
   def change
     add_index %{table}, %{column}, algorithm: :concurrently%{options}
-  end",
+  end
+end",
 
     add_index_columns:
 "Adding an index with more than three columns only helps on extremely large tables.

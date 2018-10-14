@@ -15,9 +15,10 @@ module StrongMigrations
 
     def method_missing(method, *args, &block)
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
+        ar5 = ActiveRecord::VERSION::MAJOR >= 5
+
         case method
         when :remove_column, :remove_timestamps
-          ar5 = ActiveRecord::VERSION::MAJOR >= 5
           base_model = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
           columns = method == :remove_timestamps ? ["created_at", "updated_at"] : [args[1].to_s]
           code = ar5 ? "self.ignored_columns = #{columns.inspect}" : "def self.columns\n    super.reject { |c| #{columns.inspect}.include?(c.name) }\n  end"
@@ -35,7 +36,13 @@ module StrongMigrations
             raise_error :add_index_columns
           end
           if postgresql? && options[:algorithm] != :concurrently && !@new_tables.to_a.include?(args[0].to_s)
-            raise_error :add_index, table: sym_str(args[0]), column: column_str(columns), options: options_str(options.except(:algorithm))
+            raise_error :add_index, {
+              table: sym_str(args[0]),
+              column: column_str(columns),
+              options: options_str(options.except(:algorithm)),
+              migration_name: self.class.name,
+              migration_suffix: ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : ""
+            }
           end
         when :add_column
           type = args[2]
@@ -43,7 +50,6 @@ module StrongMigrations
           default = options[:default]
 
           if !default.nil? && !(postgresql? && postgresql_version >= 110000)
-            ar5 = ActiveRecord::VERSION::MAJOR >= 5
             model = args[0].to_s.classify
             code = ar5 ? "#{model}.in_batches.update_all #{args[1]}: #{default.inspect}" : "#{model}.find_in_batches do |records|\n      #{model}.where(id: records.map(&:id)).update_all #{args[1]}: #{default.inspect}\n    end"
             raise_error :add_column_default, {
@@ -62,9 +68,12 @@ module StrongMigrations
             if postgresql_version >= 90400
               raise_error :add_column_json
             else
-              rails5 = ActiveRecord::VERSION::MAJOR >= 5
-              base_model = rails5 ? "ApplicationRecord" : "ActiveRecord::Base"
-              raise_error :add_column_json_legacy, model: args[0].to_s.classify, table: connection.quote_table_name(args[0]), base_model: base_model
+              base_model = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
+              raise_error :add_column_json_legacy, {
+                model: args[0].to_s.classify,
+                table: connection.quote_table_name(args[0]),
+                base_model: base_model
+              }
             end
           end
         when :change_column
@@ -87,7 +96,15 @@ module StrongMigrations
             columns = []
             columns << "#{reference}_type" if options[:polymorphic]
             columns << "#{reference}_id"
-            raise_error :add_reference, command: method, table: sym_str(args[0]), reference: sym_str(reference), column: column_str(columns), options: options_str(options.except(:index))
+            raise_error :add_reference, {
+              command: method,
+              table: sym_str(args[0]),
+              reference: sym_str(reference),
+              column: column_str(columns),
+              options: options_str(options.except(:index)),
+              migration_name: self.class.name,
+              migration_suffix: ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : ""
+            }
           end
         when :execute
           raise_error :execute
