@@ -41,7 +41,9 @@ causes issues for SELECT DISTINCT queries. Use jsonb instead.",
 causes issues for SELECT DISTINCT queries.
 Replace all calls to uniq with a custom scope.
 
+class %{model} < ApplicationRecord
   scope :uniq_on_id, -> { select('DISTINCT ON (%{table}.id) %{table}.*') }
+end
 
 Once it's deployed, wrap this step in a safety_assured { ... } block.",
 

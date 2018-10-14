@@ -48,7 +48,7 @@ module StrongMigrations
             if postgresql_version >= 90400
               raise_error :add_column_json
             else
-              raise_error :add_column_json_legacy, table: connection.quote_table_name(args[0])
+              raise_error :add_column_json_legacy, model: args[0].to_s.classify, table: connection.quote_table_name(args[0])
             end
           end
         when :change_column
