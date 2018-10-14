@@ -41,7 +41,7 @@ causes issues for SELECT DISTINCT queries. Use jsonb instead.",
 causes issues for SELECT DISTINCT queries.
 Replace all calls to uniq with a custom scope.
 
-class %{model} < ApplicationRecord
+class %{model} < %{base_model}
   scope :uniq_on_id, -> { select('DISTINCT ON (%{table}.id) %{table}.*') }
 end
 
@@ -63,8 +63,8 @@ If you really have to:
     remove_column: "ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:
 
-class %{model} < ApplicationRecord
-  self.ignored_columns = [%{column}]
+class %{model} < %{base_model}
+  %{code}
 end
 
 Once that's deployed, wrap this step in a safety_assured { ... } block.
@@ -145,21 +145,6 @@ end
 
 ActiveSupport.on_load(:active_record) do
   ActiveRecord::Migration.prepend(StrongMigrations::Migration)
-
-  if ActiveRecord::VERSION::MAJOR < 5
-    StrongMigrations.error_messages[:remove_column] = "ActiveRecord caches attributes which causes problems
-when removing columns. Be sure to ignore the column:
-
-class %{model} < ActiveRecord::Base
-  def self.columns
-    super.reject { |c| c.name == %{column} }
-  end
-end
-
-Once that's deployed, wrap this step in a safety_assured { ... } block.
-
-More info: https://github.com/ankane/strong_migrations#removing-a-column"
-  end
 
   if defined?(ActiveRecord::Tasks::DatabaseTasks)
     ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)

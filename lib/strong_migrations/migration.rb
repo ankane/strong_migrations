@@ -17,7 +17,11 @@ module StrongMigrations
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
         case method
         when :remove_column
-          raise_error :remove_column, model: args[0].to_s.classify, column: args[1].to_s.inspect
+          rails5 = ActiveRecord::VERSION::MAJOR >= 5
+          base_model = rails5 ? "ApplicationRecord" : "ActiveRecord::Base"
+          column = args[1].to_s.inspect
+          code = rails5 ? "self.ignored_columns = [#{column}]" : "def self.columns\n    super.reject { |c| c.name == #{column} }\n  end"
+          raise_error :remove_column, model: args[0].to_s.classify, base_model: base_model, code: code
         when :remove_timestamps
           raise_error :remove_column
         when :change_table
@@ -48,7 +52,9 @@ module StrongMigrations
             if postgresql_version >= 90400
               raise_error :add_column_json
             else
-              raise_error :add_column_json_legacy, model: args[0].to_s.classify, table: connection.quote_table_name(args[0])
+              rails5 = ActiveRecord::VERSION::MAJOR >= 5
+              base_model = rails5 ? "ApplicationRecord" : "ActiveRecord::Base"
+              raise_error :add_column_json_legacy, model: args[0].to_s.classify, table: connection.quote_table_name(args[0]), base_model: base_model
             end
           end
         when :change_column
