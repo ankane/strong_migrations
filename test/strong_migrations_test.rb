@@ -254,7 +254,6 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_index_columns_unique
-    skip unless postgres?
     assert_safe AddIndexColumnsUnique
   end
 
