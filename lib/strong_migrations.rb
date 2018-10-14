@@ -15,12 +15,10 @@ module StrongMigrations
   self.checks = []
   self.error_messages = {
     add_column_default:
-"Adding a column with a non-null default causes
-the entire table to be rewritten.
+"Adding a column with a non-null default causes the entire table to be rewritten.
+Instead, add the column without a default value, then change the default.
 
-Instead, add the column without a default value,
-then change the default.
-
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def up
     add_column %{table}, %{column}, %{type}%{options}
     change_column_default %{table}, %{column}, %{default}
@@ -29,6 +27,17 @@ then change the default.
   def down
     remove_column %{table}, %{column}
   end
+end
+
+Then backfill the existing rows in the Rails console or a separate migration with disable_ddl_transaction!.
+
+class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  disable_ddl_transaction!
+
+  def change
+    %{code}
+  end
+end
 
 More info: https://github.com/ankane/strong_migrations#adding-a-column-with-a-default-value",
 

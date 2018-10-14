@@ -17,10 +17,10 @@ module StrongMigrations
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
         case method
         when :remove_column
-          rails5 = ActiveRecord::VERSION::MAJOR >= 5
-          base_model = rails5 ? "ApplicationRecord" : "ActiveRecord::Base"
+          ar5 = ActiveRecord::VERSION::MAJOR >= 5
+          base_model = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
           column = args[1].to_s.inspect
-          code = rails5 ? "self.ignored_columns = [#{column}]" : "def self.columns\n    super.reject { |c| c.name == #{column} }\n  end"
+          code = ar5 ? "self.ignored_columns = [#{column}]" : "def self.columns\n    super.reject { |c| c.name == #{column} }\n  end"
           raise_error :remove_column, model: args[0].to_s.classify, base_model: base_model, code: code
         when :remove_timestamps
           raise_error :remove_column
@@ -45,7 +45,19 @@ module StrongMigrations
           default = options[:default]
 
           if !default.nil? && !(postgresql? && postgresql_version >= 110000)
-            raise_error :add_column_default, table: sym_str(args[0]), column: sym_str(args[1]), type: sym_str(type), options: options_str(options.except(:default)), default: default.inspect
+            ar5 = ActiveRecord::VERSION::MAJOR >= 5
+            model = args[0].to_s.classify
+            code = ar5 ? "#{model}.in_batches.update_all #{args[1]}: #{default.inspect}" : "#{model}.find_in_batches do |records|\n      #{model}.where(id: records.map(&:id)).update_all #{args[1]}: #{default.inspect}\n    end"
+            raise_error :add_column_default, {
+              table: sym_str(args[0]),
+              column: sym_str(args[1]),
+              type: sym_str(type),
+              options: options_str(options.except(:default)),
+              default: default.inspect,
+              migration_name: self.class.name,
+              migration_suffix: ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : "",
+              code: code
+            }
           end
 
           if type.to_s == "json" && postgresql?
