@@ -33,10 +33,12 @@ then change the default.
 More info: https://github.com/ankane/strong_migrations#adding-a-column-with-a-default-value",
 
     add_column_json:
-"Use jsonb instead.",
+"There's no equality operator for the json column type, which
+causes issues for SELECT DISTINCT queries. Use jsonb instead.",
 
     add_column_json_legacy:
-"There's no equality operator for the json column type.
+"There's no equality operator for the json column type, which.
+causes issues for SELECT DISTINCT queries.
 Replace all calls to uniq with a custom scope.
 
   scope :uniq_on_id, -> { select('DISTINCT ON (%{table}.id) %{table}.*') }
