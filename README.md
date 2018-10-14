@@ -172,7 +172,7 @@ Check out [gindex](https://github.com/ankane/gindex) to quickly generate index m
 
 ### Adding a reference (Postgres)
 
-Rails 5+ adds an index to references by default. To make this happens concurrently, use:
+Rails 5+ adds an index to references by default. To make sure this happens concurrently, use:
 
 ```ruby
 class AddSomeReferenceToUsers < ActiveRecord::Migration[5.2]
