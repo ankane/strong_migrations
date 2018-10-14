@@ -72,7 +72,7 @@ end
 
 Don’t backfill existing rows in this migration, as it can cause downtime. See the next section for how to do it safely.
 
-> This operation is safe in Postgres 11+
+> With Postgres, this operation is safe as of Postgres 11
 
 ### Backfilling data
 
