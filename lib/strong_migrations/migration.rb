@@ -16,14 +16,12 @@ module StrongMigrations
     def method_missing(method, *args, &block)
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
         case method
-        when :remove_column
+        when :remove_column, :remove_timestamps
           ar5 = ActiveRecord::VERSION::MAJOR >= 5
           base_model = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
-          column = args[1].to_s.inspect
-          code = ar5 ? "self.ignored_columns = [#{column}]" : "def self.columns\n    super.reject { |c| c.name == #{column} }\n  end"
+          columns = method == :remove_timestamps ? ["created_at", "updated_at"] : [args[1].to_s]
+          code = ar5 ? "self.ignored_columns = #{columns.inspect}" : "def self.columns\n    super.reject { |c| #{columns.inspect}.include?(c.name) }\n  end"
           raise_error :remove_column, model: args[0].to_s.classify, base_model: base_model, code: code
-        when :remove_timestamps
-          raise_error :remove_column
         when :change_table
           raise_error :change_table
         when :rename_table
