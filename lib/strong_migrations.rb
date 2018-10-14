@@ -37,9 +37,7 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
     %{code}
   end
-end
-
-More info: https://github.com/ankane/strong_migrations#adding-a-column-with-a-default-value",
+end",
 
     add_column_json:
 "There's no equality operator for the json column type, which
@@ -74,9 +72,7 @@ class %{model} < %{base_model}
   %{code}
 end
 
-Once that's deployed, wrap this step in a safety_assured { ... } block.
-
-More info: https://github.com/ankane/strong_migrations#removing-a-column",
+Once that's deployed, wrap this step in a safety_assured { ... } block.",
 
     rename_column:
 "Renaming a column is dangerous. A safer approach is to:
@@ -144,9 +140,7 @@ you're doing is safe before proceeding, then wrap it in a safety_assured { ... }
    change_column_null:
 "The last argument in change_column_null replaces existing NULLs with another value.
 This runs a single UPDATE query, which can cause downtime.
-Backfill NULLs manually in batches instead.
-
-More info: https://github.com/ankane/strong_migrations#backfilling-data"
+Backfill NULLs manually in batches instead."
   }
 
   def self.add_check(&block)
