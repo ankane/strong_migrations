@@ -147,7 +147,7 @@ module StrongMigrations
     def raise_error(message_key, vars = {})
       message = StrongMigrations.error_messages[message_key] || "Missing message"
       # escape % not followed by {
-      stop!(message.gsub(/%(?!{)/, "%%") % vars)
+      stop!(message.gsub(/%(?!{)/, "%%") % vars, dangerous: true)
     end
 
     def sym_str(v)
@@ -168,17 +168,9 @@ module StrongMigrations
       str
     end
 
-    def stop!(message)
-      wait_message = '
- __          __     _____ _______ _
- \ \        / /\   |_   _|__   __| |
-  \ \  /\  / /  \    | |    | |  | |
-   \ \/  \/ / /\ \   | |    | |  | |
-    \  /\  / ____ \ _| |_   | |  |_|
-     \/  \/_/    \_\_____|  |_|  (_)  #strong_migrations
-
-'
-      raise StrongMigrations::UnsafeMigration, "#{wait_message}#{message}\n"
+    def stop!(message, dangerous: false)
+      header = dangerous ? "Dangerous operation detected!" : "Custom check"
+      raise StrongMigrations::UnsafeMigration, "\n=== #{header} #strong_migrations ===\n\n#{message}\n"
     end
   end
 end
