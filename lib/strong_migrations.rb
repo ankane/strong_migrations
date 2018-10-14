@@ -114,7 +114,7 @@ More info: https://github.com/ankane/strong_migrations#removing-a-column",
 If you're sure this is what you want, wrap it in a safety_assured { ... } block.",
 
     change_table:
-"The strong_migrations gem does not support inspecting what happens inside a
+"Strong Migrations does not support inspecting what happens inside a
 change_table block, so cannot help you here. Please make really sure that what
 you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block.",
 
@@ -124,7 +124,7 @@ If this is intended, drop the existing table first.
 Otherwise, remove the option.",
 
     execute:
-"The strong_migrations gem does not support inspecting what happens inside an
+"Strong Migrations does not support inspecting what happens inside an
 execute call, so cannot help you here. Please make really sure that what
 you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block.",
 
