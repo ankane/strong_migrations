@@ -72,7 +72,13 @@ class %{model} < %{base_model}
   %{code}
 end
 
-Once that's deployed, wrap this step in a safety_assured { ... } block.",
+Once that's deployed, wrap this step in a safety_assured { ... } block.
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    safety_assured { %{command} }
+  end
+end",
 
     rename_column:
 "Renaming a column is dangerous. A safer approach is to:

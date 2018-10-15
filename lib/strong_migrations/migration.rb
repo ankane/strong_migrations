@@ -22,7 +22,21 @@ module StrongMigrations
           base_model = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
           columns = method == :remove_timestamps ? ["created_at", "updated_at"] : [args[1].to_s]
           code = ar5 ? "self.ignored_columns = #{columns.inspect}" : "def self.columns\n    super.reject { |c| #{columns.inspect}.include?(c.name) }\n  end"
-          raise_error :remove_column, model: args[0].to_s.classify, base_model: base_model, code: code
+          command =
+            if method == :remove_timestamps
+              "#{method} #{sym_str(args[0])}"
+            else
+              "#{method} #{sym_str(args[0])}, #{sym_str(args[1])}#{options_str(args[2] || {})}"
+            end
+
+          raise_error :remove_column, {
+            model: args[0].to_s.classify,
+            base_model: base_model,
+            code: code,
+            migration_name: self.class.name,
+            migration_suffix: ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : "",
+            command: command
+          }
         when :change_table
           raise_error :change_table
         when :rename_table
