@@ -51,12 +51,11 @@ module StrongMigrations
             end
           end
 
-          raise_error :remove_column, {
+          raise_error :remove_column,
             model: model,
             code: code,
             command: command,
             column_suffix: columns.size > 1 ? "s" : ""
-          }
         when :change_table
           raise_error :change_table, header: "Possibly dangerous operation"
         when :rename_table
@@ -70,11 +69,10 @@ module StrongMigrations
             raise_error :add_index_columns, header: "Best practice"
           end
           if postgresql? && options[:algorithm] != :concurrently && !@new_tables.to_a.include?(table)
-            raise_error :add_index, {
+            raise_error :add_index,
               table: sym_str(table),
               column: column_str(columns),
               options: options_str(options.except(:algorithm))
-            }
           end
         when :add_column
           column = args[1]
@@ -83,24 +81,22 @@ module StrongMigrations
           default = options[:default]
 
           if !default.nil? && !(postgresql? && postgresql_version >= 110000)
-            raise_error :add_column_default, {
+            raise_error :add_column_default,
               table: sym_str(table),
               column: sym_str(column),
               type: sym_str(type),
               options: options_str(options.except(:default)),
               default: default.inspect,
               code: backfill_code(model, column, default)
-            }
           end
 
           if type.to_s == "json" && postgresql?
             if postgresql_version >= 90400
               raise_error :add_column_json
             else
-              raise_error :add_column_json_legacy, {
+              raise_error :add_column_json_legacy,
                 model: model,
                 table: connection.quote_table_name(table)
-              }
             end
           end
         when :change_column
@@ -123,22 +119,20 @@ module StrongMigrations
             columns = []
             columns << "#{reference}_type" if options[:polymorphic]
             columns << "#{reference}_id"
-            raise_error :add_reference, {
+            raise_error :add_reference,
               command: method,
               table: sym_str(table),
               reference: sym_str(reference),
               column: column_str(columns),
               options: options_str(options.except(:index))
-            }
           end
         when :execute
           raise_error :execute, header: "Possibly dangerous operation"
         when :change_column_null
           _, column, null, default = args
           if !null && !default.nil?
-            raise_error :change_column_null, {
+            raise_error :change_column_null,
               code: backfill_code(model, column, default)
-            }
           end
         end
 
