@@ -19,6 +19,8 @@ gem 'strong_migrations'
 Strong Migrations detects potentially dangerous operations in migrations, prevents them from running by default, and provides instructions on safer ways to do what you want. Here’s an example:
 
 ```
+=== Dangerous operation detected! #strong_migrations ===
+
 ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:
 
@@ -26,9 +28,13 @@ class User < ApplicationRecord
   self.ignored_columns = ["some_column"]
 end
 
-Once that's deployed, wrap this step in a safety_assured { ... } block.
+Deploy the code, then wrap this step in a safety_assured { ... } block.
 
-More info: https://github.com/ankane/strong_migrations#removing-a-column
+class RemoveColumn < ActiveRecord::Migration[5.2]
+  def change
+    safety_assured { remove_column :users, :some_column }
+  end
+end
 ```
 
 ## Dangerous Operations
