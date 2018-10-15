@@ -1,4 +1,4 @@
-## 0.2.4 [unreleased]
+## 0.3.0
 
 - Added support for custom checks
 - Adding a column with a non-null default value is safe in Postgres 11+

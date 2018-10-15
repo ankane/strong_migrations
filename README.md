@@ -224,7 +224,7 @@ class MySafeMigration < ActiveRecord::Migration[5.2]
 end
 ```
 
-## Custom Checks [master]
+## Custom Checks
 
 Add your own custom checks with:
 
