@@ -49,7 +49,6 @@ The following operations can cause downtime or errors:
 - renaming a table
 - creating a table with the `force` option
 - adding an index non-concurrently (Postgres only)
-- adding a reference (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
 
 Also checks for best practices:
@@ -172,11 +171,7 @@ class AddSomeIndexToUsers < ActiveRecord::Migration[5.2]
 end
 ```
 
-If you forget `disable_ddl_transaction!`, the migration will fail. Also, note that indexes on new tables (those created in the same migration) don’t require this.
-
-Check out [gindex](https://github.com/ankane/gindex) to quickly generate index migrations without memorizing the syntax.
-
-### Adding a reference (Postgres)
+If you forget `disable_ddl_transaction!`, the migration will fail. Also, note that indexes on new tables (those created in the same migration) don’t require this. Check out [gindex](https://github.com/ankane/gindex) to quickly generate index migrations without memorizing the syntax.
 
 Rails 5+ adds an index to references by default. To make sure this happens concurrently, use:
 
