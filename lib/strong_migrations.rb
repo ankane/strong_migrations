@@ -66,7 +66,7 @@ table and indexes to be rewritten. A safer approach is to:
 6. Drop the old column",
 
     remove_column: "ActiveRecord caches attributes which causes problems
-when removing columns. Be sure to ignore the column:
+when removing columns. Be sure to ignore the column%{column_suffix}:
 
 class %{model} < %{base_model}
   %{code}

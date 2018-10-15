@@ -55,10 +55,11 @@ module StrongMigrations
             code: code,
             migration_name: self.class.name,
             migration_suffix: ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : "",
-            command: command
+            command: command,
+            column_suffix: columns.size > 1 ? "s" : ""
           }
         when :change_table
-          raise_error :change_table
+          raise_error :change_table, header: "Possibly dangerous operation"
         when :rename_table
           raise_error :rename_table
         when :rename_column
@@ -141,7 +142,7 @@ module StrongMigrations
             }
           end
         when :execute
-          raise_error :execute
+          raise_error :execute, header: "Possibly dangerous operation"
         when :change_column_null
           null = args[2]
           default = args[3]
