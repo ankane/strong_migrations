@@ -19,7 +19,6 @@ module StrongMigrations
 
         case method
         when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
-          base_model = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
           columns =
             case method
             when :remove_timestamps
@@ -51,10 +50,7 @@ module StrongMigrations
 
           raise_error :remove_column, {
             model: args[0].to_s.classify,
-            base_model: base_model,
             code: code,
-            migration_name: self.class.name,
-            migration_suffix: ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : "",
             command: command,
             column_suffix: columns.size > 1 ? "s" : ""
           }
@@ -74,9 +70,7 @@ module StrongMigrations
             raise_error :add_index, {
               table: sym_str(args[0]),
               column: column_str(columns),
-              options: options_str(options.except(:algorithm)),
-              migration_name: self.class.name,
-              migration_suffix: ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : ""
+              options: options_str(options.except(:algorithm))
             }
           end
         when :add_column
@@ -93,8 +87,6 @@ module StrongMigrations
               type: sym_str(type),
               options: options_str(options.except(:default)),
               default: default.inspect,
-              migration_name: self.class.name,
-              migration_suffix: ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : "",
               code: code
             }
           end
@@ -103,11 +95,9 @@ module StrongMigrations
             if postgresql_version >= 90400
               raise_error :add_column_json
             else
-              base_model = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
               raise_error :add_column_json_legacy, {
                 model: args[0].to_s.classify,
-                table: connection.quote_table_name(args[0]),
-                base_model: base_model
+                table: connection.quote_table_name(args[0])
               }
             end
           end
@@ -125,7 +115,7 @@ module StrongMigrations
           (@new_tables ||= []) << args[0].to_s
         when :add_reference, :add_belongs_to
           options = args[2] || {}
-          index_value = options.fetch(:index, ActiveRecord::VERSION::MAJOR >= 5 ? true : false)
+          index_value = options.fetch(:index, ar5)
           if postgresql? && index_value
             reference = args[1]
             columns = []
@@ -136,9 +126,7 @@ module StrongMigrations
               table: sym_str(args[0]),
               reference: sym_str(reference),
               column: column_str(columns),
-              options: options_str(options.except(:index)),
-              migration_name: self.class.name,
-              migration_suffix: ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : ""
+              options: options_str(options.except(:index))
             }
           end
         when :execute
@@ -150,8 +138,6 @@ module StrongMigrations
             model = args[0].to_s.classify
             code = ar5 ? "#{model}.in_batches.update_all #{args[1]}: #{default.inspect}" : "#{model}.find_in_batches do |records|\n      #{model}.where(id: records.map(&:id)).update_all #{args[1]}: #{default.inspect}\n    end"
             raise_error :change_column_null, {
-              migration_name: self.class.name,
-              migration_suffix: ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : "",
               code: code
             }
           end
@@ -187,6 +173,12 @@ module StrongMigrations
 
     def raise_error(message_key, header: nil, **vars)
       message = StrongMigrations.error_messages[message_key] || "Missing message"
+
+      ar5 = ActiveRecord::VERSION::MAJOR >= 5
+      vars[:migration_name] = self.class.name
+      vars[:migration_suffix] = ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : ""
+      vars[:base_model] = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
+
       # escape % not followed by {
       stop!(message.gsub(/%(?!{)/, "%%") % vars, header: header || "Dangerous operation detected")
     end
