@@ -107,6 +107,12 @@ class RemoveColumn < TestMigration
   end
 end
 
+class RemoveColumns < TestMigration
+  def change
+    remove_columns :users, :name, :other
+  end
+end
+
 class RemoveTimestamps < TestMigration
   def change
     remove_timestamps :users
@@ -253,6 +259,10 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_remove_column
     assert_unsafe RemoveColumn
+  end
+
+  def test_remove_columns
+    assert_unsafe RemoveColumns
   end
 
   def test_remove_timestamps

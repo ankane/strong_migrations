@@ -18,16 +18,27 @@ module StrongMigrations
         ar5 = ActiveRecord::VERSION::MAJOR >= 5
 
         case method
-        when :remove_column, :remove_timestamps
+        when :remove_column, :remove_columns, :remove_timestamps
           base_model = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
-          columns = method == :remove_timestamps ? ["created_at", "updated_at"] : [args[1].to_s]
-          code = ar5 ? "self.ignored_columns = #{columns.inspect}" : "def self.columns\n    super.reject { |c| #{columns.inspect}.include?(c.name) }\n  end"
-          command =
+          columns =
             if method == :remove_timestamps
-              "#{method} #{sym_str(args[0])}"
+              ["created_at", "updated_at"]
+            elsif method == :remove_column
+              [args[1].to_s]
             else
-              "#{method} #{sym_str(args[0])}, #{sym_str(args[1])}#{options_str(args[2] || {})}"
+              args[1..-1].map(&:to_s)
             end
+
+          code = ar5 ? "self.ignored_columns = #{columns.inspect}" : "def self.columns\n    super.reject { |c| #{columns.inspect}.include?(c.name) }\n  end"
+
+          command = String.new("#{method} #{sym_str(args[0])}")
+          if method == :remove_column
+            command << ", #{sym_str(args[1])}#{options_str(args[2] || {})}"
+          elsif method == :remove_columns
+            columns.each do |c|
+              command << ", #{sym_str(c)}"
+            end
+          end
 
           raise_error :remove_column, {
             model: args[0].to_s.classify,
