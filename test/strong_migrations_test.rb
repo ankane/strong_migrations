@@ -119,6 +119,18 @@ class RemoveTimestamps < TestMigration
   end
 end
 
+class RemoveReference < TestMigration
+  def change
+    remove_reference :users, :device
+  end
+end
+
+class RemoveReferencePolymorphic < TestMigration
+  def change
+    remove_reference :users, :device, polymorphic: true
+  end
+end
+
 class SafeUp < TestMigration
   def change
     add_column :users, :email, :string
@@ -140,6 +152,12 @@ end
 class AddReference < TestMigration
   def change
     add_reference :users, :device, index: true
+  end
+end
+
+class AddReferencePolymorphic < TestMigration
+  def change
+    add_reference :users, :device, polymorphic: true, index: true
   end
 end
 
@@ -269,6 +287,14 @@ class StrongMigrationsTest < Minitest::Test
     assert_unsafe RemoveTimestamps
   end
 
+  def test_remove_reference
+    assert_unsafe RemoveReference
+  end
+
+  def test_remove_reference_polymorphic
+    assert_unsafe RemoveReferencePolymorphic
+  end
+
   def test_add_index_columns
     assert_unsafe AddIndexColumns, /more than three columns/
   end
@@ -281,6 +307,11 @@ class StrongMigrationsTest < Minitest::Test
   def test_add_reference
     skip unless postgres?
     assert_unsafe AddReference
+  end
+
+  def test_add_reference_polymorphic
+    skip unless postgres?
+    assert_unsafe AddReferencePolymorphic
   end
 
   def test_safe_add_reference

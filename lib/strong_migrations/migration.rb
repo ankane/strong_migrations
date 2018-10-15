@@ -18,21 +18,28 @@ module StrongMigrations
         ar5 = ActiveRecord::VERSION::MAJOR >= 5
 
         case method
-        when :remove_column, :remove_columns, :remove_timestamps
+        when :remove_column, :remove_columns, :remove_timestamps, :remove_reference
           base_model = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
           columns =
             if method == :remove_timestamps
               ["created_at", "updated_at"]
             elsif method == :remove_column
               [args[1].to_s]
-            else
+            elsif method == :remove_columns
               args[1..-1].map(&:to_s)
+            else
+              options = args[2] || {}
+              reference = args[1]
+              c = []
+              c << "#{reference}_type" if options[:polymorphic]
+              c << "#{reference}_id"
+              c
             end
 
           code = ar5 ? "self.ignored_columns = #{columns.inspect}" : "def self.columns\n    super.reject { |c| #{columns.inspect}.include?(c.name) }\n  end"
 
           command = String.new("#{method} #{sym_str(args[0])}")
-          if method == :remove_column
+          if method == :remove_column || method == :remove_reference
             command << ", #{sym_str(args[1])}#{options_str(args[2] || {})}"
           elsif method == :remove_columns
             columns.each do |c|

@@ -72,7 +72,7 @@ class %{model} < %{base_model}
   %{code}
 end
 
-Once that's deployed, wrap this step in a safety_assured { ... } block.
+Deploy the code, then wrap this step in a safety_assured { ... } block.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
