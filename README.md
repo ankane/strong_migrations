@@ -19,7 +19,7 @@ gem 'strong_migrations'
 Strong Migrations detects potentially dangerous operations in migrations, prevents them from running by default, and provides instructions on safer ways to do what you want. Here’s an example:
 
 ```
-=== Dangerous operation detected! #strong_migrations ===
+=== Dangerous operation detected #strong_migrations ===
 
 ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column:

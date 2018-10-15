@@ -188,7 +188,7 @@ module StrongMigrations
     def raise_error(message_key, header: nil, **vars)
       message = StrongMigrations.error_messages[message_key] || "Missing message"
       # escape % not followed by {
-      stop!(message.gsub(/%(?!{)/, "%%") % vars, header: header || "Dangerous operation detected!")
+      stop!(message.gsub(/%(?!{)/, "%%") % vars, header: header || "Dangerous operation detected")
     end
 
     def sym_str(v)
