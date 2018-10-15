@@ -112,7 +112,13 @@ module StrongMigrations
           null = args[2]
           default = args[3]
           if !null && !default.nil?
-            raise_error :change_column_null
+            model = args[0].to_s.classify
+            code = ar5 ? "#{model}.in_batches.update_all #{args[1]}: #{default.inspect}" : "#{model}.find_in_batches do |records|\n      #{model}.where(id: records.map(&:id)).update_all #{args[1]}: #{default.inspect}\n    end"
+            raise_error :change_column_null, {
+              migration_name: self.class.name,
+              migration_suffix: ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : "",
+              code: code
+            }
           end
         end
 

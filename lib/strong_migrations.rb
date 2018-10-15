@@ -138,9 +138,17 @@ execute call, so cannot help you here. Please make really sure that what
 you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block.",
 
    change_column_null:
-"The last argument in change_column_null replaces existing NULLs with another value.
-This runs a single UPDATE query, which can cause downtime.
-Backfill NULLs manually in batches instead."
+"Passing a default value to change_column_null runs a single UPDATE query,
+which can cause downtime. Instead, backfill the existing rows in the
+Rails console or a separate migration with disable_ddl_transaction!.
+
+class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  disable_ddl_transaction!
+
+  def change
+    %{code}
+  end
+end"
   }
 
   def self.add_check(&block)
