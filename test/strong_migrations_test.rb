@@ -131,6 +131,12 @@ class RemoveReferencePolymorphic < TestMigration
   end
 end
 
+class RemoveBelongsTo < TestMigration
+  def change
+    remove_belongs_to :users, :device
+  end
+end
+
 class SafeUp < TestMigration
   def change
     add_column :users, :email, :string
@@ -293,6 +299,10 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_remove_reference_polymorphic
     assert_unsafe RemoveReferencePolymorphic
+  end
+
+  def test_remove_belongs_to
+    assert_unsafe RemoveBelongsTo
   end
 
   def test_add_index_columns

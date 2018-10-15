@@ -2,9 +2,7 @@
 
 - Added support for custom checks
 - Adding a column with a non-null default value is safe in Postgres 11+
-- Added check for `add_belongs_to`
-- Added check for `remove_columns`
-- Added check for `remove_reference`
+- Added checks for `add_belongs_to`, `remove_belongs_to`, `remove_columns`, and `remove_reference`
 - Customized messages
 
 ## 0.2.3
