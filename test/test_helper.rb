@@ -54,3 +54,5 @@ StrongMigrations.add_check do |method, args|
     stop! "No foreign keys on the users table"
   end
 end
+
+StrongMigrations.auto_analyze = true
