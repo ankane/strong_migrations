@@ -67,7 +67,7 @@ module StrongMigrations
           columns = args[1]
           options = args[2] || {}
           if columns.is_a?(Array) && columns.size > 3 && !options[:unique]
-            raise_error :add_index_columns
+            raise_error :add_index_columns, header: "Best practice"
           end
           if postgresql? && options[:algorithm] != :concurrently && !@new_tables.to_a.include?(args[0].to_s)
             raise_error :add_index, {
@@ -184,10 +184,10 @@ module StrongMigrations
       version && version <= StrongMigrations.start_after
     end
 
-    def raise_error(message_key, vars = {})
+    def raise_error(message_key, header: nil, **vars)
       message = StrongMigrations.error_messages[message_key] || "Missing message"
       # escape % not followed by {
-      stop!(message.gsub(/%(?!{)/, "%%") % vars, dangerous: true)
+      stop!(message.gsub(/%(?!{)/, "%%") % vars, header: header || "Dangerous operation detected!")
     end
 
     def sym_str(v)
@@ -208,8 +208,7 @@ module StrongMigrations
       str
     end
 
-    def stop!(message, dangerous: false)
-      header = dangerous ? "Dangerous operation detected!" : "Custom check"
+    def stop!(message, header: "Custom check")
       raise StrongMigrations::UnsafeMigration, "\n=== #{header} #strong_migrations ===\n\n#{message}\n"
     end
   end
