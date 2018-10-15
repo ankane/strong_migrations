@@ -33,10 +33,10 @@ module StrongMigrations
             else
               options = args[2] || {}
               reference = args[1]
-              c = []
-              c << "#{reference}_type" if options[:polymorphic]
-              c << "#{reference}_id"
-              c
+              cols = []
+              cols << "#{reference}_type" if options[:polymorphic]
+              cols << "#{reference}_id"
+              cols
             end
 
           code = ar5 ? "self.ignored_columns = #{columns.inspect}" : "def self.columns\n    super.reject { |c| #{columns.inspect}.include?(c.name) }\n  end"
