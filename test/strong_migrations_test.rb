@@ -103,7 +103,7 @@ end
 
 class RemoveColumn < TestMigration
   def change
-    remove_column :users, :name
+    remove_column :users, :name, :string
   end
 end
 
