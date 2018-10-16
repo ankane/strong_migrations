@@ -1,3 +1,7 @@
+## 0.3.1 [unreleased]
+
+- Fixed error with `remove_column` and `type` argument
+
 ## 0.3.0
 
 - Added support for custom checks

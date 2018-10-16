@@ -43,8 +43,12 @@ module StrongMigrations
 
           command = String.new("#{method} #{sym_str(table)}")
           case method
-          when :remove_column, :remove_reference, :remove_belongs_to
-            command << ", #{sym_str(args[1])}#{options_str(args[2] || {})}"
+          when :remove_column
+            command << ", #{sym_str(args[1])}"
+            command << ", #{sym_str(args[2])}" if args[2]
+            command << options_str(args[3])
+          when :remove_reference, :remove_belongs_to
+            command << ", #{sym_str(args[1])}#{options_str(args[2])}"
           when :remove_columns
             columns.each do |c|
               command << ", #{sym_str(c)}"
@@ -188,8 +192,10 @@ module StrongMigrations
 
     def options_str(options)
       str = String.new("")
-      options.each do |k, v|
-        str << ", #{k}: #{v.inspect}"
+      if options.is_a?(Hash)
+        options.each do |k, v|
+          str << ", #{k}: #{v.inspect}"
+        end
       end
       str
     end
