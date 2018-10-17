@@ -16,7 +16,6 @@ module StrongMigrations
     def method_missing(method, *args, &block)
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
         ar5 = ActiveRecord::VERSION::MAJOR >= 5
-        model = model_str(args[0])
 
         case method
         when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
@@ -40,7 +39,7 @@ module StrongMigrations
           code = ar5 ? "self.ignored_columns = #{columns.inspect}" : "def self.columns\n    super.reject { |c| #{columns.inspect}.include?(c.name) }\n  end"
 
           raise_error :remove_column,
-            model: model,
+            model: model_str(args[0]),
             code: code,
             command: command_str(method, args),
             column_suffix: columns.size > 1 ? "s" : ""
