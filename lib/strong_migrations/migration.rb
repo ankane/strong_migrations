@@ -181,12 +181,17 @@ module StrongMigrations
     end
 
     def sym_str(v)
-      v.to_sym.inspect
+      v = v.to_sym if v.respond_to?(:to_sym)
+      v.inspect
     end
 
     def column_str(columns)
-      columns = Array(columns).map(&:to_sym)
-      columns = columns.first if columns.size == 1
+      begin
+        columns = Array(columns).map(&:to_sym)
+        columns = columns.first if columns.size == 1
+      rescue
+        # do nothing
+      end
       columns.inspect
     end
 
