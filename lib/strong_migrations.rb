@@ -20,12 +20,12 @@ Instead, add the column without a default value, then change the default.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def up
-    add_column %{table}, %{column}, %{type}%{options}
-    change_column_default %{table}, %{column}, %{default}
+    %{add_command}
+    %{change_command}
   end
 
   def down
-    remove_column %{table}, %{column}
+    %{remove_command}
   end
 end
 
@@ -107,8 +107,8 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   disable_ddl_transaction!
 
   def change
-    %{command} %{table}, %{reference}, index: false%{options}
-    add_index %{table}, %{column}, algorithm: :concurrently
+    %{add_command}
+    %{index_command}
   end
 end",
 
@@ -119,7 +119,7 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   disable_ddl_transaction!
 
   def change
-    add_index %{table}, %{column}, algorithm: :concurrently%{options}
+    %{command}
   end
 end",
 

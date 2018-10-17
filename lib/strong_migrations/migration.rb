@@ -39,24 +39,10 @@ module StrongMigrations
 
           code = ar5 ? "self.ignored_columns = #{columns.inspect}" : "def self.columns\n    super.reject { |c| #{columns.inspect}.include?(c.name) }\n  end"
 
-          command = String.new("#{method} #{sym_str(args[0])}")
-          case method
-          when :remove_column
-            command << ", #{sym_str(args[1])}"
-            command << ", #{sym_str(args[2])}" if args[2]
-            command << options_str(args[3])
-          when :remove_reference, :remove_belongs_to
-            command << ", #{sym_str(args[1])}#{options_str(args[2])}"
-          when :remove_columns
-            columns.each do |c|
-              command << ", #{sym_str(c)}"
-            end
-          end
-
           raise_error :remove_column,
             model: model,
             code: code,
-            command: command,
+            command: command_str(method, args),
             column_suffix: columns.size > 1 ? "s" : ""
         when :change_table
           raise_error :change_table, header: "Possibly dangerous operation"
@@ -72,10 +58,7 @@ module StrongMigrations
             raise_error :add_index_columns, header: "Best practice"
           end
           if postgresql? && options[:algorithm] != :concurrently && !@new_tables.to_a.include?(table.to_s)
-            raise_error :add_index,
-              table: sym_str(table),
-              column: column_str(columns),
-              options: options_str(options.except(:algorithm))
+            raise_error :add_index, command: command_str("add_index", [table, columns, options.merge(algorithm: :concurrently)])
           end
         when :add_column
           table, column, type, options = args
@@ -84,11 +67,9 @@ module StrongMigrations
 
           if !default.nil? && !(postgresql? && postgresql_version >= 110000)
             raise_error :add_column_default,
-              table: sym_str(table),
-              column: sym_str(column),
-              type: sym_str(type),
-              options: options_str(options.except(:default)),
-              default: default.inspect,
+              add_command: command_str("add_column", [table, column, type, options.except(:default)]),
+              change_command: command_str("change_column_default", [table, column, default]),
+              remove_command: command_str("remove_column", [table, column]),
               code: backfill_code(table, column, default)
           end
 
@@ -98,7 +79,7 @@ module StrongMigrations
             else
               raise_error :add_column_json_legacy,
                 model: model,
-                table: connection.quote_table_name(table)
+                table: connection.quote_table_name(table.to_s)
             end
           end
         when :change_column
@@ -122,15 +103,11 @@ module StrongMigrations
 
           index_value = options.fetch(:index, ar5)
           if postgresql? && index_value
-            columns = []
-            columns << "#{reference}_type" if options[:polymorphic]
-            columns << "#{reference}_id"
+            columns = options[:polymorphic] ? [:"#{reference}_type", :"#{reference}_id"] : :"#{reference}_id"
+
             raise_error :add_reference,
-              command: method,
-              table: sym_str(table),
-              reference: sym_str(reference),
-              column: column_str(columns),
-              options: options_str(options.except(:index))
+              add_command: command_str(method, [table, reference, options.merge(index: false)]),
+              index_command: command_str("add_index", [table, columns])
           end
         when :execute
           raise_error :execute, header: "Possibly dangerous operation"
@@ -182,32 +159,24 @@ module StrongMigrations
       stop!(message.gsub(/%(?!{)/, "%%") % vars, header: header || "Dangerous operation detected")
     end
 
-    def sym_str(v)
-      v.inspect
-    end
-
     def model_str(v)
       v.to_s.classify
     end
 
-    def column_str(columns)
-      begin
-        columns = Array(columns).map(&:to_sym)
-        columns = columns.first if columns.size == 1
-      rescue
-        # do nothing
-      end
-      columns.inspect
-    end
+    def command_str(command, args)
+      str_args = args[0..-2].map { |a| a.inspect }
 
-    def options_str(options)
-      str = String.new("")
-      if options.is_a?(Hash)
-        options.each do |k, v|
-          str << ", #{k}: #{v.inspect}"
+      # prettier last arg
+      last_arg = args[-1]
+      if last_arg.is_a?(Hash)
+        if last_arg.any?
+          str_args << last_arg.map { |k, v| "#{k}: #{v.inspect}" }.join(", ")
         end
+      else
+        str_args << last_arg.inspect
       end
-      str
+
+      "#{command} #{str_args.join(", ")}"
     end
 
     def backfill_code(table, column, default)
