@@ -105,7 +105,7 @@ module StrongMigrations
             columns = options[:polymorphic] ? [:"#{reference}_type", :"#{reference}_id"] : :"#{reference}_id"
 
             raise_error :add_reference,
-              add_command: command_str(method, [table, reference, options.merge(index: false)]),
+              reference_command: command_str(method, [table, reference, options.merge(index: false)]),
               index_command: command_str("add_index", [table, columns, {algorithm: :concurrently}])
           end
         when :execute
