@@ -14,11 +14,9 @@ module StrongMigrations
     end
 
     def method_missing(method, *args, &block)
-      table = args[0].to_s
-
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
         ar5 = ActiveRecord::VERSION::MAJOR >= 5
-        model = table.classify
+        model = model_str(args[0])
 
         case method
         when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
@@ -41,7 +39,7 @@ module StrongMigrations
 
           code = ar5 ? "self.ignored_columns = #{columns.inspect}" : "def self.columns\n    super.reject { |c| #{columns.inspect}.include?(c.name) }\n  end"
 
-          command = String.new("#{method} #{sym_str(table)}")
+          command = String.new("#{method} #{sym_str(args[0])}")
           case method
           when :remove_column
             command << ", #{sym_str(args[1])}"
@@ -67,21 +65,21 @@ module StrongMigrations
         when :rename_column
           raise_error :rename_column
         when :add_index
-          columns = args[1]
-          options = args[2] || {}
+          table, columns, options = args
+          options ||= {}
+
           if columns.is_a?(Array) && columns.size > 3 && !options[:unique]
             raise_error :add_index_columns, header: "Best practice"
           end
-          if postgresql? && options[:algorithm] != :concurrently && !@new_tables.to_a.include?(table)
+          if postgresql? && options[:algorithm] != :concurrently && !@new_tables.to_a.include?(table.to_s)
             raise_error :add_index,
               table: sym_str(table),
               column: column_str(columns),
               options: options_str(options.except(:algorithm))
           end
         when :add_column
-          column = args[1]
-          type = args[2]
-          options = args[3] || {}
+          table, column, type, options = args
+          options ||= {}
           default = options[:default]
 
           if !default.nil? && !(postgresql? && postgresql_version >= 110000)
@@ -91,7 +89,7 @@ module StrongMigrations
               type: sym_str(type),
               options: options_str(options.except(:default)),
               default: default.inspect,
-              code: backfill_code(model, column, default)
+              code: backfill_code(table, column, default)
           end
 
           if type.to_s == "json" && postgresql?
@@ -104,22 +102,26 @@ module StrongMigrations
             end
           end
         when :change_column
+          table, column, type = args
+
           safe = false
           # assume Postgres 9.1+ since previous versions are EOL
-          if postgresql? && args[2].to_s == "text"
-            column = connection.columns(table).find { |c| c.name.to_s == args[1].to_s }
-            safe = column && column.type == :string
+          if postgresql? && type.to_s == "text"
+            found_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
+            safe = found_column && found_column.type == :string
           end
           raise_error :change_column unless safe
         when :create_table
-          options = args[1] || {}
+          table, options = args
+          options ||= {}
           raise_error :create_table if options[:force]
-          (@new_tables ||= []) << table
+          (@new_tables ||= []) << table.to_s
         when :add_reference, :add_belongs_to
-          options = args[2] || {}
+          table, reference, options = args
+          options ||= {}
+
           index_value = options.fetch(:index, ar5)
           if postgresql? && index_value
-            reference = args[1]
             columns = []
             columns << "#{reference}_type" if options[:polymorphic]
             columns << "#{reference}_id"
@@ -133,10 +135,10 @@ module StrongMigrations
         when :execute
           raise_error :execute, header: "Possibly dangerous operation"
         when :change_column_null
-          _, column, null, default = args
+          table, column, null, default = args
           if !null && !default.nil?
             raise_error :change_column_null,
-              code: backfill_code(model, column, default)
+              code: backfill_code(table, column, default)
           end
         end
 
@@ -148,7 +150,7 @@ module StrongMigrations
       result = super
 
       if StrongMigrations.auto_analyze && @direction == :up && postgresql? && method == :add_index
-        connection.execute "ANALYZE VERBOSE #{connection.quote_table_name(table)}"
+        connection.execute "ANALYZE VERBOSE #{connection.quote_table_name(args[0].to_s)}"
       end
 
       result
@@ -181,8 +183,11 @@ module StrongMigrations
     end
 
     def sym_str(v)
-      v = v.to_sym if v.respond_to?(:to_sym)
       v.inspect
+    end
+
+    def model_str(v)
+      v.to_s.classify
     end
 
     def column_str(columns)
@@ -205,7 +210,8 @@ module StrongMigrations
       str
     end
 
-    def backfill_code(model, column, default)
+    def backfill_code(table, column, default)
+      model = model_str(table)
       if ActiveRecord::VERSION::MAJOR >= 5
         "#{model}.in_batches.update_all #{column}: #{default.inspect}"
       else
