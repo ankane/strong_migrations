@@ -39,7 +39,7 @@ module StrongMigrations
           code = ar5 ? "self.ignored_columns = #{columns.inspect}" : "def self.columns\n    super.reject { |c| #{columns.inspect}.include?(c.name) }\n  end"
 
           raise_error :remove_column,
-            model: model_str(args[0]),
+            model: args[0].to_s.classify,
             code: code,
             command: command_str(method, args),
             column_suffix: columns.size > 1 ? "s" : ""
@@ -94,7 +94,10 @@ module StrongMigrations
         when :create_table
           table, options = args
           options ||= {}
+
           raise_error :create_table if options[:force]
+
+          # keep track of new tables of add_index check
           (@new_tables ||= []) << table.to_s
         when :add_reference, :add_belongs_to
           table, reference, options = args
@@ -158,10 +161,6 @@ module StrongMigrations
       stop!(message.gsub(/%(?!{)/, "%%") % vars, header: header || "Dangerous operation detected")
     end
 
-    def model_str(v)
-      v.to_s.classify
-    end
-
     def command_str(command, args)
       str_args = args[0..-2].map { |a| a.inspect }
 
@@ -179,7 +178,7 @@ module StrongMigrations
     end
 
     def backfill_code(table, column, default)
-      model = model_str(table)
+      model = table.to_s.classify
       if ActiveRecord::VERSION::MAJOR >= 5
         "#{model}.in_batches.update_all #{column}: #{default.inspect}"
       else
