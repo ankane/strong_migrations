@@ -77,7 +77,7 @@ module StrongMigrations
               raise_error :add_column_json
             else
               raise_error :add_column_json_legacy,
-                model: model,
+                model: table.to_s.classify,
                 table: connection.quote_table_name(table.to_s)
             end
           end
