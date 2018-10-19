@@ -1,6 +1,7 @@
-## 0.3.1 [unreleased]
+## 0.3.1
 
 - Fixed error with `remove_column` and `type` argument
+- Improved message customization
 
 ## 0.3.0
 
