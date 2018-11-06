@@ -16,26 +16,9 @@ gem 'strong_migrations'
 
 ## How It Works
 
-Strong Migrations detects potentially dangerous operations in migrations, prevents them from running by default, and provides instructions on safer ways to do what you want. Here’s an example:
+Strong Migrations detects potentially dangerous operations in migrations, prevents them from running by default, and provides instructions on safer ways to do what you want.
 
-```
-=== Dangerous operation detected #strong_migrations ===
-
-ActiveRecord caches attributes which causes problems
-when removing columns. Be sure to ignore the column:
-
-class User < ApplicationRecord
-  self.ignored_columns = ["some_column"]
-end
-
-Deploy the code, then wrap this step in a safety_assured { ... } block.
-
-class RemoveColumn < ActiveRecord::Migration[5.2]
-  def change
-    safety_assured { remove_column :users, :some_column }
-  end
-end
-```
+![Screenshot](https://ankane.org/images/strong-migrations.png)
 
 ## Dangerous Operations
 
