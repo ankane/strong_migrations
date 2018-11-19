@@ -180,9 +180,9 @@ module StrongMigrations
     def backfill_code(table, column, default)
       model = table.to_s.classify
       if ActiveRecord::VERSION::MAJOR >= 5
-        "#{model}.in_batches.update_all #{column}: #{default.inspect}"
+        "#{model}.in_batches.update_all(#{column}: #{default.inspect})"
       else
-        "#{model}.find_in_batches do |records|\n      #{model}.where(id: records.map(&:id)).update_all #{column}: #{default.inspect}\n    end"
+        "#{model}.find_in_batches do |records|\n      #{model}.where(id: records.map(&:id)).update_all(#{column}: #{default.inspect})\n    end"
       end
     end
 

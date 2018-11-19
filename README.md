@@ -73,11 +73,11 @@ class BackfillSomeColumn < ActiveRecord::Migration[5.2]
 
   def change
     # Rails 5+
-    User.in_batches.update_all some_column: "default_value"
+    User.in_batches.update_all(some_column: "default_value")
 
     # Rails < 5
     User.find_in_batches do |records|
-      User.where(id: records.map(&:id)).update_all some_column: "default_value"
+      User.where(id: records.map(&:id)).update_all(some_column: "default_value")
     end
   end
 end
