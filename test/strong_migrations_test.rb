@@ -83,6 +83,18 @@ class ChangeColumnNullNoDefault < TestMigration
   end
 end
 
+class ChangeColumnAddComment < TestMigration
+  def change
+    change_column :users, :name, :string, comment: "Some Comment"
+  end
+end
+
+class ChangeColumnAddCommentUnsafe < TestMigration
+  def change
+    change_column :users, :name, :text, comment: "Some Comment"
+  end
+end
+
 class ExecuteArbitrarySQL < TestMigration
   def change
     execute 'SELECT CURRENT_TIMESTAMP'
@@ -219,7 +231,11 @@ class Custom < TestMigration
   end
 end
 
-class StrongMigrationsTest < Minitest::Test
+class StrongMigrationsTest < Minitest::Spec
+  before do
+    clean_db
+  end
+
   def test_add_index
     skip unless postgres?
     assert_unsafe AddIndex
@@ -370,6 +386,14 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_custom
     assert_unsafe Custom, "No foreign keys on the users table"
+  end
+
+  def test_add_comment_safe
+    assert_safe ChangeColumnAddComment
+  end
+
+  def test_add_comment_unsafe
+    assert_unsafe ChangeColumnAddCommentUnsafe
   end
 
   private

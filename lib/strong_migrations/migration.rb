@@ -63,7 +63,6 @@ module StrongMigrations
           table, column, type, options = args
           options ||= {}
           default = options[:default]
-
           if !default.nil? && !(postgresql? && postgresql_version >= 110000)
             raise_error :add_column_default,
               add_command: command_str("add_column", [table, column, type, options.except(:default)]),
@@ -82,14 +81,16 @@ module StrongMigrations
             end
           end
         when :change_column
-          table, column, type = args
+          table, column, type, comment = args
 
           safe = false
           # assume Postgres 9.1+ since previous versions are EOL
-          if postgresql? && type.to_s == "text"
+          if postgresql?
             found_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
-            safe = found_column && found_column.type == :string
+            safe = found_column && found_column.type == :string if type.to_s == "text"
+            safe = type == found_column.type if comment.present?
           end
+
           raise_error :change_column unless safe
         when :create_table
           table, options = args
