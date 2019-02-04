@@ -389,6 +389,7 @@ class StrongMigrationsTest < Minitest::Spec
   end
 
   def test_add_comment_safe
+    skip unless postgres?
     assert_safe ChangeColumnAddComment
   end
 
