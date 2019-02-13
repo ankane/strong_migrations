@@ -93,7 +93,7 @@ end",
     rename_table:
 "Renaming a table is dangerous. A safer approach is to:
 
-1. Create a new table
+1. Create a new table. Don't forget to recreate indexes from the old table
 2. Write to both tables
 3. Backfill data from the old table to new table
 4. Move reads from the old table to the new table
