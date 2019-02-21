@@ -154,7 +154,7 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
     %{code}
   end
-end"
+end",
   }
 
   def self.add_check(&block)
