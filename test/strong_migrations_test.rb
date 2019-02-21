@@ -219,7 +219,7 @@ end
 
 class Custom < TestMigration
   def change
-    add_foreign_key :users, :other
+    add_foreign_key :users, :other, validate: false
   end
 end
 
