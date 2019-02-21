@@ -217,6 +217,12 @@ class VersionUnsafe < TestMigration
   end
 end
 
+class AddForeignKey < TestMigration
+  def change
+    add_foreign_key :users, :other
+  end
+end
+
 class Custom < TestMigration
   def change
     add_foreign_key :users, :other, validate: false
@@ -370,6 +376,10 @@ class StrongMigrationsTest < Minitest::Test
   def test_down
     assert_safe SafeUp
     assert_safe SafeUp, direction: :down
+  end
+
+  def test_add_foreign_key
+    assert_unsafe AddForeignKey
   end
 
   def test_custom

@@ -134,6 +134,14 @@ end"
             raise_error :change_column_null,
               code: backfill_code(table, column, default)
           end
+        when :add_foreign_key
+          from_table, to_table, options = args
+          options ||= Hash.new
+          validated = options.fetch(:validate) { true }
+
+          if validated
+            raise_error :add_foreign_key
+          end
         end
 
         StrongMigrations.checks.each do |check|
