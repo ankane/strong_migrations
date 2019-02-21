@@ -157,10 +157,10 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
   add_foreign_key:
-"A new foreign key is validated by default. This aquires an AccessExclusiveLock
+"A new foreign key is validated by default. This acquires an AccessExclusiveLock
 which is expensive on large tables resulting in downtime. Instead, create an
 \"invalid\" foreign key constraint which may be explicitly validated later if
-necessary. The separate validation aquires a more agreeable RowShareLock.
+necessary. The separate validation acquires a more agreeable RowShareLock.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
