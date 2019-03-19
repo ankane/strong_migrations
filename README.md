@@ -197,7 +197,7 @@ end
 
 ## Assuring Safety
 
-To mark a step in the migration as safe, despite using method that might otherwise be dangerous, wrap it in a `safety_assured` block.
+To mark a step in the migration as safe, despite using a method that might otherwise be dangerous, wrap it in a `safety_assured` block.
 
 ```ruby
 class MySafeMigration < ActiveRecord::Migration[5.2]
@@ -206,6 +206,8 @@ class MySafeMigration < ActiveRecord::Migration[5.2]
   end
 end
 ```
+
+Certain methods like `execute` and `change_table` cannot be inspected and are prevented from running by default. Make sure what you’re doing is really safe and use this pattern.
 
 ## Custom Checks
 
