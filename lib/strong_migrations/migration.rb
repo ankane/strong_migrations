@@ -139,6 +139,13 @@ end"
           options ||= {}
           validated = options.fetch(:validate) { true }
 
+          five_point_two = Gem::Version.new("5.2")
+          if postgresql? && ActiveRecord.version < five_point_two
+            raise_error :add_foreign_key,
+              add_foreign_key_code: manual_add_foreign_key_code(from_table, to_table),
+              validate_foreign_key_code: manual_validate_foreign_key_code(from_table, to_table)
+          end
+
           if postgresql? && validated
             raise_error :add_foreign_key,
               add_foreign_key_code: foreign_key_code(from_table, to_table),
@@ -214,6 +221,18 @@ end"
       else
         "#{model}.find_in_batches do |records|\n      #{model}.where(id: records.map(&:id)).update_all #{column}: #{default.inspect}\n    end"
       end
+    end
+
+    def manual_add_foreign_key_code(from_table, to_table)
+      <<~CODE.strip
+        ALTER TABLE #{from_table} ADD CONSTRAINT fk_#{from_table}_#{to_table} FOREIGN KEY (#{to_table.to_s.singularize}_id) REFERENCES #{to_table} (id) NOT VALID;
+      CODE
+    end
+
+    def manual_validate_foreign_key_code(from_table, to_table)
+      <<~CODE.strip
+        ALTER TABLE #{from_table} VALIDATE CONSTRAINT fk_#{from_table}_#{to_table};
+      CODE
     end
 
     def foreign_key_code(from_table, to_table)
