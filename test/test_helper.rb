@@ -51,8 +51,8 @@ class Minitest::Test
 end
 
 StrongMigrations.add_check do |method, args|
-  if method == :add_foreign_key && args[0].to_s == "users"
-    stop! "No foreign keys on the users table"
+  if method == :add_column && args[1].to_s == "forbidden"
+    stop! "Cannot add forbidden column"
   end
 end
 

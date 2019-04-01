@@ -225,7 +225,7 @@ end
 
 class Custom < TestMigration
   def change
-    add_foreign_key :users, :other, validate: false
+    add_column :users, :forbidden, :string
   end
 end
 
@@ -383,7 +383,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_custom
-    assert_unsafe Custom, "No foreign keys on the users table"
+    assert_unsafe Custom, "Cannot add forbidden column"
   end
 
   private
