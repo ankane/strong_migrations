@@ -139,7 +139,7 @@ end"
           options ||= {}
           validated = options.fetch(:validate) { true }
 
-          if validated
+          if postgresql? && validated
             raise_error :add_foreign_key,
               code: foreign_key_code(from_table, to_table)
           end
