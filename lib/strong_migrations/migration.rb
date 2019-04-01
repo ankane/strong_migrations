@@ -216,21 +216,10 @@ end"
     end
 
     def foreign_key_code(from_table, to_table)
-      if ActiveRecord::VERSION::MAJOR > 5 || ActiveRecord::VERSION::MAJOR == 5 && ActiveRecord::VERSION::MINOR >= 2
-        <<~CODE.strip
-          #{command_str(:add_foreign_key, [from_table, to_table, validate: false])}
-              #{command_str(:validate_foreign_key, [from_table, to_table])}
-        CODE
-      else
-        <<~CODE.strip
-          safety_assured {
-                execute <<~SQL
-                  ALTER TABLE #{from_table} ADD CONSTRAINT fk_#{from_table}_#{to_table} FOREIGN KEY (#{to_table.to_s.singularize}_id) REFERENCES #{to_table} (id) NOT VALID;
-                  ALTER TABLE #{from_table} VALIDATE CONSTRAINT fk_#{from_table}_#{to_table};
-                SQL
-              }
-        CODE
-      end
+      <<~CODE.strip
+        #{command_str(:add_foreign_key, [from_table, to_table, validate: false])}
+            #{command_str(:validate_foreign_key, [from_table, to_table])}
+      CODE
     end
 
     def stop!(message, header: "Custom check")
