@@ -136,7 +136,7 @@ end"
           end
         when :add_foreign_key
           from_table, to_table, options = args
-          options ||= Hash.new
+          options ||= {}
           validated = options.fetch(:validate) { true }
 
           if validated
