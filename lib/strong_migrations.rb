@@ -164,7 +164,13 @@ necessary. The separate validation acquires a more agreeable RowShareLock.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
-    %{code}
+    %{add_foreign_key_code}
+  end
+end
+
+class ValidateForeignKey < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{validate_foreign_key_code}
   end
 end",
   }

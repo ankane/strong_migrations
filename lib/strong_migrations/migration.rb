@@ -141,7 +141,8 @@ end"
 
           if postgresql? && validated
             raise_error :add_foreign_key,
-              code: foreign_key_code(from_table, to_table)
+              add_foreign_key_code: foreign_key_code(from_table, to_table),
+              validate_foreign_key_code: validation_code(from_table, to_table)
           end
         end
 
@@ -218,7 +219,12 @@ end"
     def foreign_key_code(from_table, to_table)
       <<~CODE.strip
         #{command_str(:add_foreign_key, [from_table, to_table, validate: false])}
-            #{command_str(:validate_foreign_key, [from_table, to_table])}
+      CODE
+    end
+
+    def validation_code(from_table, to_table)
+      <<~CODE.strip
+        #{command_str(:validate_foreign_key, [from_table, to_table])}
       CODE
     end
 
