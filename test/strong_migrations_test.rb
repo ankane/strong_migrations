@@ -379,6 +379,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_foreign_key
+    skip unless postgres?
     assert_unsafe AddForeignKey
   end
 
