@@ -22,7 +22,7 @@ Strong Migrations detects potentially dangerous operations in migrations, preven
 
 ## Dangerous Operations
 
-The following operations can cause downtime or errors:
+The following operations can cause downtime or errors<sup>[1](#1-Different-Databases-Different-Problems)</sup>:
 
 - adding a column with a non-null default value to an existing table
 - removing a column
@@ -33,6 +33,7 @@ The following operations can cause downtime or errors:
 - creating a table with the `force` option
 - adding an index non-concurrently (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
+
 
 Also checks for best practices:
 
@@ -316,3 +317,8 @@ cd strong_migrations
 bundle install
 bundle exec rake test
 ```
+
+---
+
+#### 1. Different Databases? Different Problems
+The dangers listed here are mostly applicable for Postgres. Check the [_MySQL Online DDL_ documentation](https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html) to learn more about mysql dangerous operations. [↩](#dangerous-operations)
