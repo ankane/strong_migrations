@@ -11,7 +11,7 @@ Catch unsafe migrations at dev time
 Add this line to your application’s Gemfile:
 
 ```ruby
-gem 'strong_migrations'
+gem "strong_migrations", group: :development
 ```
 
 ## How It Works
