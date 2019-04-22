@@ -37,7 +37,7 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
     %{code}
   end
-end",
+end%{append}",
 
     add_column_json:
 "There's no equality operator for the json column type, which

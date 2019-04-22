@@ -65,11 +65,26 @@ module StrongMigrations
           default = options[:default]
 
           if !default.nil? && !(postgresql? && postgresql_version >= 110000)
+
+            if options[:null] == false
+              options = options.except(:null)
+              append = "
+
+Then add the NOT NULL constraint.
+
+class %{migration_name}NotNull < ActiveRecord::Migration%{migration_suffix}
+  def change
+    #{command_str("change_column_null", [table, column, false])}
+  end
+end"
+            end
+
             raise_error :add_column_default,
               add_command: command_str("add_column", [table, column, type, options.except(:default)]),
               change_command: command_str("change_column_default", [table, column, default]),
               remove_command: command_str("remove_column", [table, column]),
-              code: backfill_code(table, column, default)
+              code: backfill_code(table, column, default),
+              append: append
           end
 
           if type.to_s == "json" && postgresql?
@@ -156,6 +171,11 @@ module StrongMigrations
       vars[:migration_name] = self.class.name
       vars[:migration_suffix] = ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : ""
       vars[:base_model] = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
+
+      # interpolate variables in appended code
+      if vars[:append]
+        vars[:append] = vars[:append].gsub(/%(?!{)/, "%%") % vars
+      end
 
       # escape % not followed by {
       stop!(message.gsub(/%(?!{)/, "%%") % vars, header: header || "Dangerous operation detected")
