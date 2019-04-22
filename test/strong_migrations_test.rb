@@ -44,6 +44,10 @@ class AddColumnDefault < TestMigration
   def change
     add_column :users, :nice, :boolean, default: true
   end
+
+  def postgresql_version
+    100000
+  end
 end
 
 class AddColumnDefaultSafe < TestMigration
@@ -195,7 +199,7 @@ end
 
 class VersionSafe < TestMigration
   def change
-    add_column :users, :nice2, :boolean, default: true
+    change_column_null :users, :city, false, "San Francisco"
   end
 
   def version
@@ -205,7 +209,7 @@ end
 
 class VersionUnsafe < TestMigration
   def change
-    add_column :users, :nice2, :boolean, default: true
+    change_column_null :users, :city, false, "San Francisco"
   end
 
   def version
