@@ -223,6 +223,8 @@ end
 
 Use the `stop!` method to stop migrations.
 
+> Since `remove_column` always requires a `safety_assured` block, it’s not possible to add a custom check for `remove_column` operations
+
 ## Existing Migrations
 
 To mark migrations as safe that were created before installing this gem, create an initializer with:
