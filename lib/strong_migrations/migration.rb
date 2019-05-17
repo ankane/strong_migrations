@@ -15,8 +15,6 @@ module StrongMigrations
 
     def method_missing(method, *args, &block)
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
-        ar5 = ActiveRecord.version >= Gem::Version.new("5.0")
-
         case method
         when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
           columns =
@@ -152,6 +150,10 @@ end"
 
     private
 
+    def ar5
+      ActiveRecord.version >= Gem::Version.new("5.0")
+    end
+
     def postgresql?
       %w(PostgreSQL PostGIS).include?(connection.adapter_name)
     end
@@ -167,7 +169,6 @@ end"
     def raise_error(message_key, header: nil, **vars)
       message = StrongMigrations.error_messages[message_key] || "Missing message"
 
-      ar5 = ActiveRecord.version >= Gem::Version.new("5.0")
       vars[:migration_name] = self.class.name
       vars[:migration_suffix] = ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : ""
       vars[:base_model] = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
