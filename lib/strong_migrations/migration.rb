@@ -139,8 +139,7 @@ end"
           options ||= {}
           validated = options.fetch(:validate) { true }
 
-          five_point_two = Gem::Version.new("5.2")
-          if postgresql? && ActiveRecord.version < five_point_two
+          if postgresql? && ActiveRecord::VERSION::MAJOR > 5 || (ActiveRecord::VERSION::MAJOR == 5 && ActiveRecord::VERSION::MINOR >= 2)
             raise_error :add_foreign_key,
               add_foreign_key_code: manual_add_foreign_key_code(from_table, to_table),
               validate_foreign_key_code: manual_validate_foreign_key_code(from_table, to_table)
