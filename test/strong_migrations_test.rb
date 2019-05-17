@@ -335,7 +335,7 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_add_reference_default
     skip unless postgres?
-    if ActiveRecord::VERSION::MAJOR >= 5
+    if ActiveRecord.version >= Gem::Version.new("5.0")
       assert_unsafe AddReferenceDefault
     else
       assert_safe AddReferenceDefault

@@ -21,7 +21,7 @@ def migrate(migration, direction: :up)
 end
 
 def activerecord5?
-  ActiveRecord::VERSION::MAJOR >= 5
+  ActiveRecord.version >= Gem::Version.new("5.0")
 end
 
 def migration_version

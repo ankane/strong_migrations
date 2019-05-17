@@ -15,7 +15,7 @@ module StrongMigrations
 
     def method_missing(method, *args, &block)
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
-        ar5 = ActiveRecord::VERSION::MAJOR >= 5
+        ar5 = ActiveRecord.version >= Gem::Version.new("5.0")
 
         case method
         when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
@@ -167,7 +167,7 @@ end"
     def raise_error(message_key, header: nil, **vars)
       message = StrongMigrations.error_messages[message_key] || "Missing message"
 
-      ar5 = ActiveRecord::VERSION::MAJOR >= 5
+      ar5 = ActiveRecord.version >= Gem::Version.new("5.0")
       vars[:migration_name] = self.class.name
       vars[:migration_suffix] = ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : ""
       vars[:base_model] = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
@@ -199,7 +199,7 @@ end"
 
     def backfill_code(table, column, default)
       model = table.to_s.classify
-      if ActiveRecord::VERSION::MAJOR >= 5
+      if ActiveRecord.version >= Gem::Version.new("5.0")
         "#{model}.in_batches.update_all #{column}: #{default.inspect}"
       else
         "#{model}.find_in_batches do |records|\n      #{model}.where(id: records.map(&:id)).update_all #{column}: #{default.inspect}\n    end"
