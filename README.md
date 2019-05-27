@@ -224,24 +224,12 @@ end
 
 ### Adding a json column (Postgres)
 
-There’s no equality operator for the `json` column type, which causes issues for `SELECT DISTINCT` queries.
-
-If you’re on Postgres 9.4+, use `jsonb` instead.
-
-If you must use `json`, replace all calls to `uniq` with a custom scope.
+There’s no equality operator for the `json` column type, which causes issues for `SELECT DISTINCT` queries. Use `jsonb` instead.
 
 ```ruby
-class User < ApplicationRecord
-  scope :uniq_on_id, -> { select("DISTINCT ON (users.id) users.*") }
-end
-```
-
-Then add the column:
-
-```ruby
-class AddJsonColumnToUsers < ActiveRecord::Migration[5.2]
+class AddJsonColumn < ActiveRecord::Migration[5.2]
   def change
-    safety_assured { add_column :users, :some_column, :json }
+    add_column :users, :properties, :jsonb
   end
 end
 ```
