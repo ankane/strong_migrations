@@ -202,8 +202,9 @@ end"
       stop!(message.gsub(/%(?!{)/, "%%") % vars, header: header || "Dangerous operation detected")
     end
 
-    def foreign_key_str(statement, idents)
-      code = statement % idents.map { |v| connection.quote_table_name(v) }
+    def foreign_key_str(statement, identifiers)
+      # not all identifiers are tables, but this method of quoting should be fine
+      code = statement % identifiers.map { |v| connection.quote_table_name(v) }
       "safety_assured do\n      execute '#{code}' \n    end"
     end
 
