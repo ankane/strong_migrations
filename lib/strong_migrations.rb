@@ -143,7 +143,7 @@ Otherwise, remove the force option.",
 execute call, so cannot help you here. Please make really sure that what
 you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block.",
 
-   change_column_null:
+    change_column_null:
 "Passing a default value to change_column_null runs a single UPDATE query,
 which can cause downtime. Instead, backfill the existing rows in the
 Rails console or a separate migration with disable_ddl_transaction!.
@@ -156,7 +156,7 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
-  add_foreign_key:
+    add_foreign_key:
 "New foreign keys are validated by default. This acquires an AccessExclusiveLock,
 which is expensive on large tables. Instead, validate it in a separate migration
 with a more agreeable RowShareLock.
