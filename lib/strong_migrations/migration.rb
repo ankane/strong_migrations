@@ -148,10 +148,15 @@ end"
               end
             else
               # always validated before 5.2
-              # fk_name is not the same as rails default, but that's okay
-              fk_name = "fk_#{from_table}_#{to_table}"
+
+              # fk name logic from rails
+              primary_key = options[:primary_key] || "id"
+              column = options[:column] || "#{to_table.to_s.singularize}_id"
+              hashed_identifier = Digest::SHA256.hexdigest("#{from_table}_#{column}_fk").first(10)
+              fk_name = options[:name] || "fk_rails_#{hashed_identifier}"
+
               raise_error :add_foreign_key,
-                add_foreign_key_code: foreign_key_str("ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s) NOT VALID", [from_table, "fk_#{from_table}_#{to_table}", "#{to_table.to_s.singularize}_id", to_table, "id"]),
+                add_foreign_key_code: foreign_key_str("ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s) NOT VALID", [from_table, fk_name, column, to_table, primary_key]),
                 validate_foreign_key_code: foreign_key_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [from_table, fk_name])
             end
           end
