@@ -20,15 +20,11 @@ def migrate(migration, direction: :up)
   true
 end
 
-def activerecord5?
-  ActiveRecord::VERSION::MAJOR >= 5
-end
-
 def migration_version
   ActiveRecord.version.to_s.to_f
 end
 
-TestMigration = activerecord5? ? ActiveRecord::Migration[migration_version] : ActiveRecord::Migration
+TestMigration = ActiveRecord::Migration[migration_version]
 TestSchema = ActiveRecord::Schema
 
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users")

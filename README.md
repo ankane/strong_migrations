@@ -73,13 +73,7 @@ class BackfillSomeColumn < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def change
-    # Rails 5+
     User.in_batches.update_all some_column: "default_value"
-
-    # Rails < 5
-    User.find_in_batches do |records|
-      User.where(id: records.map(&:id)).update_all some_column: "default_value"
-    end
   end
 end
 ```
@@ -91,16 +85,8 @@ ActiveRecord caches database columns at runtime, so if you drop a column, it can
 1. Tell ActiveRecord to ignore the column from its cache
 
   ```ruby
-  # For Rails 5+
   class User < ApplicationRecord
     self.ignored_columns = ["some_column"]
-  end
-
-  # For Rails < 5
-  class User < ActiveRecord::Base
-    def self.columns
-      super.reject { |c| c.name == "some_column" }
-    end
   end
   ```
 
@@ -157,7 +143,7 @@ end
 
 If you forget `disable_ddl_transaction!`, the migration will fail. Also, note that indexes on new tables (those created in the same migration) don’t require this. Check out [gindex](https://github.com/ankane/gindex) to quickly generate index migrations without memorizing the syntax.
 
-Rails 5+ adds an index to references by default. To make sure this happens concurrently, use:
+Rails adds an index to references by default. To make sure this happens concurrently, use:
 
 ```ruby
 class AddSomeReferenceToUsers < ActiveRecord::Migration[5.2]

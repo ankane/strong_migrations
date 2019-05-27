@@ -15,8 +15,6 @@ module StrongMigrations
 
     def method_missing(method, *args, &block)
       unless @safe || ENV["SAFETY_ASSURED"] || is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
-        ar5 = ActiveRecord::VERSION::MAJOR >= 5
-
         case method
         when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
           columns =
@@ -36,7 +34,7 @@ module StrongMigrations
               cols
             end
 
-          code = ar5 ? "self.ignored_columns = #{columns.inspect}" : "def self.columns\n    super.reject { |c| #{columns.inspect}.include?(c.name) }\n  end"
+          code = "self.ignored_columns = #{columns.inspect}"
 
           raise_error :remove_column,
             model: args[0].to_s.classify,
@@ -88,13 +86,7 @@ end"
           end
 
           if type.to_s == "json" && postgresql?
-            if postgresql_version >= 90400
-              raise_error :add_column_json
-            else
-              raise_error :add_column_json_legacy,
-                model: table.to_s.classify,
-                table: connection.quote_table_name(table.to_s)
-            end
+            raise_error :add_column_json
           end
         when :change_column
           table, column, type = args
@@ -118,7 +110,7 @@ end"
           table, reference, options = args
           options ||= {}
 
-          index_value = options.fetch(:index, ar5)
+          index_value = options.fetch(:index, true)
           if postgresql? && index_value
             columns = options[:polymorphic] ? [:"#{reference}_type", :"#{reference}_id"] : :"#{reference}_id"
 
@@ -193,10 +185,9 @@ end"
     def raise_error(message_key, header: nil, **vars)
       message = StrongMigrations.error_messages[message_key] || "Missing message"
 
-      ar5 = ActiveRecord::VERSION::MAJOR >= 5
       vars[:migration_name] = self.class.name
-      vars[:migration_suffix] = ar5 ? "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]" : ""
-      vars[:base_model] = ar5 ? "ApplicationRecord" : "ActiveRecord::Base"
+      vars[:migration_suffix] = "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]"
+      vars[:base_model] = "ApplicationRecord"
 
       # interpolate variables in appended code
       if vars[:append]
@@ -231,11 +222,7 @@ end"
 
     def backfill_code(table, column, default)
       model = table.to_s.classify
-      if ActiveRecord::VERSION::MAJOR >= 5
-        "#{model}.in_batches.update_all #{column}: #{default.inspect}"
-      else
-        "#{model}.find_in_batches do |records|\n      #{model}.where(id: records.map(&:id)).update_all #{column}: #{default.inspect}\n    end"
-      end
+      "#{model}.in_batches.update_all #{column}: #{default.inspect}"
     end
 
     def stop!(message, header: "Custom check")

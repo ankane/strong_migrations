@@ -43,17 +43,6 @@ end%{append}",
 "There's no equality operator for the json column type, which
 causes issues for SELECT DISTINCT queries. Use jsonb instead.",
 
-    add_column_json_legacy:
-"There's no equality operator for the json column type, which.
-causes issues for SELECT DISTINCT queries.
-Replace all calls to uniq with a custom scope.
-
-class %{model} < %{base_model}
-  scope :uniq_on_id, -> { select('DISTINCT ON (%{table}.id) %{table}.*') }
-end
-
-Once it's deployed, wrap this step in a safety_assured { ... } block.",
-
     change_column:
 "Changing the type of an existing column requires the entire
 table and indexes to be rewritten. A safer approach is to:

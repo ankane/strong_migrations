@@ -1,7 +1,8 @@
-## 0.3.2 [unreleased]
+## 0.4.0 [unreleased]
 
 - Added check for `add_foreign_key`
 - Fixed instructions for adding default value with NOT NULL constraint
+- Removed support for Rails 4.2
 
 ## 0.3.1
 
