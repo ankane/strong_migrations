@@ -25,7 +25,7 @@ Strong Migrations detects potentially dangerous operations in migrations, preven
 The following operations can cause downtime or errors:
 
 - [[+]](#removing-a-column) removing a column
-- [[+]](#adding-a-column-with-a-default-value) adding a column with a non-null default value to an existing table
+- [[+]](#adding-a-column-with-a-default-value) adding a column with a non-null default value
 - [[+]](#backfilling-data) backfilling data
 - [[+]](#adding-an-index) adding an index non-concurrently
 - [[+]](#adding-a-reference) adding a reference
@@ -84,7 +84,7 @@ end
 
 #### Bad
 
-Adding a column with a non-null default causes the entire table to be rewritten.
+Adding a column with a non-null default to an existing table causes the entire table to be rewritten.
 
 ```ruby
 class AddSomeColumnToUsers < ActiveRecord::Migration[5.2]
