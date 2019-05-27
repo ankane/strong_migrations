@@ -3,6 +3,7 @@ language: ruby
 rvm: 2.6.3
 gemfile:
   - Gemfile
+  - test/gemfiles/activerecord52.gemfile
   - test/gemfiles/activerecord51.gemfile
   - test/gemfiles/activerecord50.gemfile
 script: bundle exec rake test
