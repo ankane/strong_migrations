@@ -174,7 +174,9 @@ For polymorphic references, add a compound index on type and id.
 
 ### Adding a foreign key (Postgres) [master]
 
-New foreign keys are validated by default. This acquires an `AccessExclusiveLock`, which is [expensive on large tables](https://travisofthenorth.com/blog/2017/2/2/postgres-adding-foreign-keys-with-zero-downtime). Instead, validate it in a separate migration with a more agreeable `RowShareLock`.
+New foreign keys are validated by default. This acquires an `AccessExclusiveLock`, which can be [expensive on large tables](https://travisofthenorth.com/blog/2017/2/2/postgres-adding-foreign-keys-with-zero-downtime). Instead, validate it in a separate migration with a more agreeable `RowShareLock`.
+
+This approach is documented by Postgres to have “[the least impact on other work](https://www.postgresql.org/docs/current/sql-altertable.html).”
 
 For Rails 5.2+, use:
 
