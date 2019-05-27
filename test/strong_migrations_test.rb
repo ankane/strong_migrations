@@ -217,9 +217,15 @@ class VersionUnsafe < TestMigration
   end
 end
 
-class Custom < TestMigration
+class AddForeignKey < TestMigration
   def change
     add_foreign_key :users, :other
+  end
+end
+
+class Custom < TestMigration
+  def change
+    add_column :users, :forbidden, :string
   end
 end
 
@@ -372,8 +378,13 @@ class StrongMigrationsTest < Minitest::Test
     assert_safe SafeUp, direction: :down
   end
 
+  def test_add_foreign_key
+    skip unless postgres?
+    assert_unsafe AddForeignKey
+  end
+
   def test_custom
-    assert_unsafe Custom, "No foreign keys on the users table"
+    assert_unsafe Custom, "Cannot add forbidden column"
   end
 
   private

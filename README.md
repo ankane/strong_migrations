@@ -32,6 +32,7 @@ The following operations can cause downtime or errors:
 - renaming a table
 - creating a table with the `force` option
 - adding an index non-concurrently (Postgres only)
+- adding a foreign key (Postgres only)
 - adding a `json` column to an existing table (Postgres only)
 
 Also checks for best practices:
@@ -170,6 +171,54 @@ end
 ```
 
 For polymorphic references, add a compound index on type and id.
+
+### Adding a foreign key (Postgres) [master]
+
+New foreign keys are validated by default. This acquires an `AccessExclusiveLock`, which is [expensive on large tables](https://travisofthenorth.com/blog/2017/2/2/postgres-adding-foreign-keys-with-zero-downtime). Instead, validate it in a separate migration with a more agreeable `RowShareLock`.
+
+For Rails 5.2+, use:
+
+```ruby
+class AddForeignKeyOnUsers < ActiveRecord::Migration[5.2]
+  def change
+    add_foreign_key :users, :orders, validate: false
+  end
+end
+```
+
+Then validate it in a separate migration.
+
+```ruby
+class ValidateForeignKeyOnUsers < ActiveRecord::Migration[5.2]
+  def change
+    validate_foreign_key :users, :orders
+  end
+end
+```
+
+For Rails < 5.2, use:
+
+```ruby
+class AddForeignKeyOnUsers < ActiveRecord::Migration[5.2]
+  def change
+    safety_assured do
+      execute 'ALTER TABLE "users" ADD CONSTRAINT "fk_users_orders" FOREIGN KEY ("order_id") REFERENCES "orders" ("id") NOT VALID'
+    end
+  end
+end
+```
+
+Then validate it in a separate migration.
+
+```ruby
+class ValidateForeignKeyOnUsers < ActiveRecord::Migration[5.2]
+  def change
+    safety_assured do
+      execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "fk_users_orders"'
+    end
+  end
+end
+```
 
 ### Adding a json column (Postgres)
 

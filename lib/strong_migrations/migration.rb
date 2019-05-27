@@ -134,6 +134,27 @@ end"
             raise_error :change_column_null,
               code: backfill_code(table, column, default)
           end
+        when :add_foreign_key
+          from_table, to_table, options = args
+          options ||= {}
+          validate = options.fetch(:validate, true)
+
+          if postgresql?
+            if ActiveRecord::VERSION::STRING >= "5.2"
+              if validate
+                raise_error :add_foreign_key,
+                  add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options.merge(validate: false)]),
+                  validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
+              end
+            else
+              # always validated before 5.2
+              # fk_name is not the same as rails default, but that's okay
+              fk_name = "fk_#{from_table}_#{to_table}"
+              raise_error :add_foreign_key,
+                add_foreign_key_code: foreign_key_str("ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s) NOT VALID", [from_table, "fk_#{from_table}_#{to_table}", "#{to_table.to_s.singularize}_id", to_table, "id"]),
+                validate_foreign_key_code: foreign_key_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [from_table, fk_name])
+            end
+          end
         end
 
         StrongMigrations.checks.each do |check|
@@ -179,6 +200,11 @@ end"
 
       # escape % not followed by {
       stop!(message.gsub(/%(?!{)/, "%%") % vars, header: header || "Dangerous operation detected")
+    end
+
+    def foreign_key_str(statement, idents)
+      code = statement % idents.map { |v| connection.quote_table_name(v) }
+      "safety_assured do\n      execute '#{code}' \n    end"
     end
 
     def command_str(command, args)

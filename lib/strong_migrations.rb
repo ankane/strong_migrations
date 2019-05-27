@@ -154,7 +154,24 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
     %{code}
   end
-end"
+end",
+
+  add_foreign_key:
+"New foreign keys are validated by default. This acquires an AccessExclusiveLock,
+which is expensive on large tables. Instead, validate it in a separate migration
+with a more agreeable RowShareLock.
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{add_foreign_key_code}
+  end
+end
+
+class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{validate_foreign_key_code}
+  end
+end",
   }
 
   def self.add_check(&block)
