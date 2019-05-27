@@ -39,7 +39,7 @@ The following operations can cause downtime or errors:
 
 Also checks for best practices:
 
-- [[+]](#) keeping non-unique indexes to three columns or less
+- [[+]](#keeping-non-unique-indexes-to-three-columns-or-less) keeping non-unique indexes to three columns or less
 
 ## The Zero Downtime Way
 
