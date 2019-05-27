@@ -330,7 +330,7 @@ A safer approach is to:
 5. Stop writing to the old table
 6. Drop the old table
 
-### Creating a table with the `force` option
+### Creating a table with the force option
 
 #### Bad
 
@@ -360,7 +360,7 @@ class CreateUsers < ActiveRecord::Migration[5.2]
 end
 ```
 
-### Using `change_column_null` with a default value
+### Using change_column_null with a default value
 
 #### Bad
 
