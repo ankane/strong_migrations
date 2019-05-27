@@ -201,7 +201,7 @@ end
 For Rails < 5.2, use:
 
 ```ruby
-class AddForeignKeyOnUsers < ActiveRecord::Migration[5.2]
+class AddForeignKeyOnUsers < ActiveRecord::Migration[5.1]
   def change
     safety_assured do
       execute 'ALTER TABLE "users" ADD CONSTRAINT "fk_users_orders" FOREIGN KEY ("order_id") REFERENCES "orders" ("id") NOT VALID'
@@ -213,7 +213,7 @@ end
 Then validate it in a separate migration.
 
 ```ruby
-class ValidateForeignKeyOnUsers < ActiveRecord::Migration[5.2]
+class ValidateForeignKeyOnUsers < ActiveRecord::Migration[5.1]
   def change
     safety_assured do
       execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "fk_users_orders"'
