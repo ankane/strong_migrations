@@ -219,7 +219,15 @@ end
 
 class AddForeignKey < TestMigration
   def change
-    add_foreign_key :users, :other
+    add_foreign_key :users, :orders
+    remove_foreign_key :users, :orders
+  end
+end
+
+class AddForeignKeySafe < TestMigration
+  def change
+    add_foreign_key :users, :orders, validate: false
+    remove_foreign_key :users, :orders
   end
 end
 
@@ -379,8 +387,19 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_foreign_key
-    skip unless postgres?
-    assert_unsafe AddForeignKey
+    if postgres?
+      assert_unsafe AddForeignKey
+    else
+      assert_safe AddForeignKey
+    end
+  end
+
+  def test_add_foreign_key_safe
+    if postgres? && ActiveRecord::VERSION::STRING <= "5.2"
+      assert_unsafe AddForeignKeySafe
+    else
+      assert_safe AddForeignKeySafe
+    end
   end
 
   def test_custom

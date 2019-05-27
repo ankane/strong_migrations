@@ -33,12 +33,17 @@ TestSchema = ActiveRecord::Schema
 
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users")
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS new_users")
+ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS orders")
 
 class CreateUsers < TestMigration
   def change
     create_table "users" do |t|
       t.string :name
       t.string :city
+      t.references :order
+    end
+
+    create_table "orders" do |t|
     end
   end
 end
