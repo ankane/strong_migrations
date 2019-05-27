@@ -540,7 +540,7 @@ Rails 5.1+ uses `bigint` for primary keys to keep you from running out of ids. T
 ## Additional Reading
 
 - [Rails Migrations with No Downtime](https://pedro.herokuapp.com/past/2011/7/13/rails_migrations_with_no_downtime/)
-- [Safe Operations For High Volume PostgreSQL](https://www.braintreepayments.com/blog/safe-operations-for-high-volume-postgresql/)
+- [PostgreSQL at Scale: Database Schema Changes Without Downtime](https://medium.com/braintree-product-technology/postgresql-at-scale-database-schema-changes-without-downtime-20d3749ed680)
 
 ## Credits
 
