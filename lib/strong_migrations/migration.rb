@@ -222,7 +222,7 @@ end"
 
     def backfill_code(table, column, default)
       model = table.to_s.classify
-      "#{model}.in_batches.update_all #{column}: #{default.inspect}"
+      "#{model}.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.1)\n    end"
     end
 
     def stop!(message, header: "Custom check")
