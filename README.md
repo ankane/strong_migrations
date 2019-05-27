@@ -334,7 +334,7 @@ A safer approach is to:
 
 #### Bad
 
-The `force` option destroys existing tables.
+The `force` option can drop an existing table.
 
 ```ruby
 class CreateUsers < ActiveRecord::Migration[5.2]
