@@ -1,4 +1,4 @@
-## 0.4.0 [unreleased]
+## 0.4.0
 
 - Added check for `add_foreign_key`
 - Fixed instructions for adding default value with NOT NULL constraint
