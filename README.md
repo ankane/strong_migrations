@@ -153,7 +153,7 @@ end
 
 #### Bad
 
-In Postgres, adding a non-concurrent indexes lock the table.
+In Postgres, adding a non-concurrent index locks the table.
 
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration[5.2]
