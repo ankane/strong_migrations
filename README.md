@@ -376,7 +376,7 @@ end
 
 #### Good
 
-Backfill the column as [documented above](#backfilling-data). Then use:
+Backfill the column [safely](#backfilling-data). Then use:
 
 ```ruby
 class ChangeSomeColumnNull < ActiveRecord::Migration[5.2]
