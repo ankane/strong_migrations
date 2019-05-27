@@ -6,7 +6,7 @@ require "strong_migrations/version"
 Gem::Specification.new do |spec|
   spec.name          = "strong_migrations"
   spec.version       = StrongMigrations::VERSION
-  spec.summary       = "Catch unsafe migrations at dev time"
+  spec.summary       = "Zero downtime migrations for Rails"
   spec.homepage      = "https://github.com/ankane/strong_migrations"
   spec.license       = "MIT"
 
