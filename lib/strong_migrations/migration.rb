@@ -10,15 +10,15 @@ module StrongMigrations
       super
     end
 
-    def safety_assured
-      @checker.safety_assured do
-        yield
-      end
-    end
-
     def method_missing(method, *args)
       @checker.perform(method, *args) do
         super
+      end
+    end
+
+    def safety_assured
+      @checker.safety_assured do
+        yield
       end
     end
 
