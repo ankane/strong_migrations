@@ -4,10 +4,21 @@ module StrongMigrations
       @migration = migration
       @direction = direction
       @new_tables = []
+      @safe = false
     end
 
-    def perform(safe, method, *args)
-      unless safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
+    def safety_assured
+      previous_value = @safe
+      begin
+        @safe = true
+        yield
+      ensure
+        @safe = previous_value
+      end
+    end
+
+    def perform(method, *args)
+      unless @safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
         case method
         when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
           columns =
