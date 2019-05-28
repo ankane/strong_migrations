@@ -1,5 +1,6 @@
 require "active_support"
 
+require "strong_migrations/checker"
 require "strong_migrations/database_tasks"
 require "strong_migrations/migration"
 require "strong_migrations/railtie" if defined?(Rails)
