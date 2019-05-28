@@ -1,8 +1,9 @@
 module StrongMigrations
   class Checker
-    def initialize(migration, direction:)
+    attr_accessor :direction
+
+    def initialize(migration)
       @migration = migration
-      @direction = direction
       @new_tables = []
       @safe = false
     end
@@ -18,7 +19,7 @@ module StrongMigrations
     end
 
     def perform(method, *args)
-      unless @safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) || @direction == :down || version_safe?
+      unless @safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) || direction == :down || version_safe?
         case method
         when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
           columns =
@@ -165,7 +166,7 @@ end"
 
       result = yield
 
-      if StrongMigrations.auto_analyze && @direction == :up && postgresql? && method == :add_index
+      if StrongMigrations.auto_analyze && direction == :up && postgresql? && method == :add_index
         connection.execute "ANALYZE VERBOSE #{connection.quote_table_name(args[0].to_s)}"
       end
 

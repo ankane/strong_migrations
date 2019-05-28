@@ -1,7 +1,12 @@
 module StrongMigrations
   module Migration
+    def initialize(*args)
+      super
+      @checker = StrongMigrations::Checker.new(self)
+    end
+
     def migrate(direction)
-      @checker = StrongMigrations::Checker.new(self, direction: direction)
+      @checker.direction = direction
       super
     end
 
