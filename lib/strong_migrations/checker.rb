@@ -19,7 +19,7 @@ module StrongMigrations
     end
 
     def perform(method, *args)
-      unless @safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) || direction == :down || version_safe?
+      unless safe?
         case method
         when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
           columns =
@@ -174,6 +174,10 @@ end"
     end
 
     private
+
+    def safe?
+      @safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) || direction == :down || version_safe?
+    end
 
     def connection
       @migration.connection
