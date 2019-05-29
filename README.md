@@ -482,10 +482,10 @@ Use the version from your latest migration.
 
 ## Dangerous Tasks
 
-For safety, dangerous rake tasks are disabled in production - `db:drop`, `db:reset`, `db:schema:load`, and `db:structure:load`. To get around this, use:
+For safety, dangerous database tasks are disabled in production - `db:drop`, `db:reset`, `db:schema:load`, and `db:structure:load`. To get around this, use:
 
 ```sh
-SAFETY_ASSURED=1 rake db:drop
+SAFETY_ASSURED=1 rails db:drop
 ```
 
 ## Faster Migrations
