@@ -9,7 +9,7 @@ require "strong_migrations/version"
 
 module StrongMigrations
   class << self
-    attr_accessor :auto_analyze, :start_after, :checks, :error_messages
+    attr_accessor :auto_analyze, :start_after, :checks, :error_messages, :target_postgresql_version
   end
   self.auto_analyze = false
   self.start_after = 0

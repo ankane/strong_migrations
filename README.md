@@ -533,6 +533,14 @@ ALTER ROLE myuser SET lock_timeout = '10s';
 
 There’s also [a gem](https://github.com/gocardless/activerecord-safer_migrations) you can use for this.
 
+## Set Target Version (Postgres)
+
+If your staging/production database version is different from your development version, you can override your local settings to test against the production version. For example, adding a column with a default value is unsafe in PostgreSQL < v11. If you're running PostgreSQL 11 locally, but an earlier version in production, your migrations will run without issue in your development environment but fail in production. You can override your local version with the `target_postgresql_version` configuration option in your initializer. Provide the major version number only.
+
+```ruby
+  StrongMigrations.target_postgresql_version = 10
+```
+
 ## Bigint Primary Keys (Postgres & MySQL)
 
 Rails 5.1+ uses `bigint` for primary keys to keep you from running out of ids. To get this in earlier versions of Rails, check out [rails-bigint-primarykey](https://github.com/Shopify/rails-bigint-primarykey).

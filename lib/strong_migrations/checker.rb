@@ -192,7 +192,21 @@ end"
     end
 
     def postgresql_version
-      @postgresql_version ||= connection.execute("SHOW server_version_num").first["server_version_num"].to_i
+      @postgresql_version ||= target_version || connection.execute("SHOW server_version_num").first["server_version_num"].to_i
+    end
+
+    def rails_test_or_development?
+      if defined?(Rails)
+        Rails.env.test? || Rails.env.development?
+      else
+        false
+      end
+    end
+
+    def target_version
+      return unless StrongMigrations.target_postgresql_version && rails_test_or_development?
+
+      StrongMigrations.target_postgresql_version.to_i * 10000
     end
 
     def version_safe?
