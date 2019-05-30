@@ -515,7 +515,9 @@ StrongMigrations.error_messages[:add_column_default] = "Your custom instructions
 
 Check the [source code](https://github.com/ankane/strong_migrations/blob/master/lib/strong_migrations.rb) for the list of keys.
 
-## Analyze Tables (Postgres)
+## Postgres-Specific Features
+
+### Analyze Tables
 
 Analyze tables automatically (to update planner statistics) after an index is added. Create an initializer with:
 
@@ -523,7 +525,7 @@ Analyze tables automatically (to update planner statistics) after an index is ad
 StrongMigrations.auto_analyze = true
 ```
 
-## Lock Timeout (Postgres)
+### Lock Timeout
 
 It’s a good idea to set a lock timeout for the database user that runs migrations. This way, if migrations can’t acquire a lock in a timely manner, other statements won’t be stuck behind it. Here’s a great explanation of [how lock queues work](https://www.citusdata.com/blog/2018/02/15/when-postgresql-blocks/).
 
@@ -533,7 +535,7 @@ ALTER ROLE myuser SET lock_timeout = '10s';
 
 There’s also [a gem](https://github.com/gocardless/activerecord-safer_migrations) you can use for this.
 
-## Set Target Version (Postgres) [master]
+### Set Target Version [master]
 
 If your development database version is different from production, you can specify the production version so the right checks are run in development.
 
@@ -542,10 +544,6 @@ StrongMigrations.target_postgresql_version = 10
 ```
 
 For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
-
-## Bigint Primary Keys (Postgres & MySQL)
-
-Rails 5.1+ uses `bigint` for primary keys to keep you from running out of ids. To get this in earlier versions of Rails, check out [rails-bigint-primarykey](https://github.com/Shopify/rails-bigint-primarykey).
 
 ## Additional Reading
 
