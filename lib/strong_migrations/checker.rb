@@ -175,16 +175,20 @@ end"
 
     private
 
-    def safe?
-      @safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) || direction == :down || version_safe?
-    end
-
     def connection
       @migration.connection
     end
 
     def version
       @migration.version
+    end
+
+    def safe?
+      @safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) || direction == :down || version_safe?
+    end
+
+    def version_safe?
+      version && version <= StrongMigrations.start_after
     end
 
     def postgresql?
@@ -201,10 +205,6 @@ end"
           connection.execute("SHOW server_version_num").first["server_version_num"].to_i
         end
       end
-    end
-
-    def version_safe?
-      version && version <= StrongMigrations.start_after
     end
 
     def raise_error(message_key, header: nil, **vars)
