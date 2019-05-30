@@ -61,22 +61,22 @@ end
 
 1. Tell ActiveRecord to ignore the column from its cache
 
-  ```ruby
-  class User < ApplicationRecord
-    self.ignored_columns = ["some_column"]
-  end
-  ```
+```ruby
+class User < ApplicationRecord
+  self.ignored_columns = ["some_column"]
+end
+```
 
 2. Deploy code
 3. Write a migration to remove the column (wrap in `safety_assured` block)
 
-  ```ruby
-  class RemoveSomeColumnFromUsers < ActiveRecord::Migration[5.2]
-    def change
-      safety_assured { remove_column :users, :some_column }
-    end
+```ruby
+class RemoveSomeColumnFromUsers < ActiveRecord::Migration[5.2]
+  def change
+    safety_assured { remove_column :users, :some_column }
   end
-  ```
+end
+```
 
 4. Deploy and run migration
 
@@ -532,6 +532,14 @@ ALTER ROLE myuser SET lock_timeout = '10s';
 ```
 
 There’s also [a gem](https://github.com/gocardless/activerecord-safer_migrations) you can use for this.
+
+## Set Target Version (Postgres)
+
+If your staging/production database version is different from your development version, you can override your local settings to test against the production version. For example, adding a column with a default value is unsafe in PostgreSQL < v11. If you're running PostgreSQL 11 locally, but an earlier version in production, your migrations will run without issue in your development environment, only to fail in production. You can override your local version with the `target_postgresql_version` configuration option.
+
+```ruby
+  StrongMigrations.target_postgresql_version = 10.7
+```
 
 ## Bigint Primary Keys (Postgres & MySQL)
 

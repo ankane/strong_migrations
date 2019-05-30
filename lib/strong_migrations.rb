@@ -9,11 +9,12 @@ require "strong_migrations/version"
 
 module StrongMigrations
   class << self
-    attr_accessor :auto_analyze, :start_after, :checks, :error_messages
+    attr_accessor :auto_analyze, :start_after, :checks, :error_messages, :target_postgresql_version
   end
   self.auto_analyze = false
   self.start_after = 0
   self.checks = []
+  self.target_postgresql_version = nil
   self.error_messages = {
     add_column_default:
 "Adding a column with a non-null default causes the entire table to be rewritten.
@@ -162,6 +163,9 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
     %{validate_foreign_key_code}
   end
 end",
+
+    target_postgresql_version_format:
+'Wrong format for target_postgresql_version (%{target_postgresql_version}). Use major.minor, major.minor.patch (e.g. "10.8", "9.6.13") versioning or a server_version_num integer (SHOW server_version_num; # => "100008")'
   }
 
   def self.add_check(&block)
