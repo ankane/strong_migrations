@@ -533,13 +533,15 @@ ALTER ROLE myuser SET lock_timeout = '10s';
 
 There’s also [a gem](https://github.com/gocardless/activerecord-safer_migrations) you can use for this.
 
-## Set Target Version (Postgres)
+## Set Target Version (Postgres) [master]
 
-If your staging/production database version is different from your development version, you can override your local settings to test against the production version. For example, adding a column with a default value is unsafe in PostgreSQL < v11. If you're running PostgreSQL 11 locally, but an earlier version in production, your migrations will run without issue in your development environment but fail in production. You can override your local version with the `target_postgresql_version` configuration option in your initializer. Provide the major version number only.
+If your development database version is different from production, you can specify the production version so the right checks are run in development.
 
 ```ruby
-  StrongMigrations.target_postgresql_version = 10
+StrongMigrations.target_postgresql_version = 10
 ```
+
+For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
 
 ## Bigint Primary Keys (Postgres & MySQL)
 
