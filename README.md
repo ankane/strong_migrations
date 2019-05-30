@@ -141,7 +141,7 @@ class BackfillSomeColumn < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def change
-    User.in_batches do |relation|
+    User.unscoped.in_batches do |relation|
       relation.update_all some_column: "default_value"
       sleep(0.1) # throttle
     end

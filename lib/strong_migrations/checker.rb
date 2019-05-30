@@ -247,7 +247,7 @@ end"
 
     def backfill_code(table, column, default)
       model = table.to_s.classify
-      "#{model}.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.1)\n    end"
+      "#{model}.unscoped.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.1)\n    end"
     end
   end
 end
