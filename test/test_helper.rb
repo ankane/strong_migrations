@@ -4,6 +4,7 @@ require "minitest/autorun"
 require "minitest/pride"
 require "active_record"
 
+# needed for target_postgresql_version
 module Rails
   def self.env
     ActiveSupport::StringInquirer.new("test")
