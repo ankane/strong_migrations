@@ -1,3 +1,7 @@
+## 0.4.1 [unreleased]
+
+- Added `target_postgresql_version`
+
 ## 0.4.0
 
 - Added check for `add_foreign_key`

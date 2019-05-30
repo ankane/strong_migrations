@@ -4,7 +4,13 @@ require "minitest/autorun"
 require "minitest/pride"
 require "active_record"
 
-Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
+module Rails
+  def self.env
+    ActiveSupport::StringInquirer.new("test")
+  end
+end
+
+StrongMigrations.target_postgresql_version = 10
 
 adapter = ENV["ADAPTER"] || "postgres"
 ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migrations_test")
