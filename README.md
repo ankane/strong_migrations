@@ -540,7 +540,7 @@ There’s also [a gem](https://github.com/gocardless/activerecord-safer_migratio
 If your development database version is different from production, you can specify the production version so the right checks are run in development.
 
 ```ruby
-StrongMigrations.target_postgresql_version = 10
+StrongMigrations.target_postgresql_version = 10 # or 9.6, etc
 ```
 
 For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
