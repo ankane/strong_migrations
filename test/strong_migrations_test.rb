@@ -262,7 +262,10 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_column_default
+    StrongMigrations.target_postgresql_version = 10
     assert_unsafe AddColumnDefault
+  ensure
+    StrongMigrations.target_postgresql_version = nil
   end
 
   def test_add_column_default_safe

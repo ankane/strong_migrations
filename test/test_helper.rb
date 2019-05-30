@@ -10,8 +10,6 @@ module Rails
   end
 end
 
-StrongMigrations.target_postgresql_version = 10
-
 adapter = ENV["ADAPTER"] || "postgres"
 ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migrations_test")
 
