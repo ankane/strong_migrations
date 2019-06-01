@@ -1,6 +1,6 @@
 # Strong Migrations
 
-Zero downtime migrations for Rails
+Catch unsafe migrations in development
 
 :tangerine: Battle-tested at [Instacart](https://www.instacart.com/opensource)
 
