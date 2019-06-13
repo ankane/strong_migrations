@@ -1,4 +1,4 @@
-# http://nithinbekal.com/posts/safe-rake-tasks
+# https://nithinbekal.com/posts/safe-rake-tasks
 
 namespace :strong_migrations do
   task safety_assured: :environment do
