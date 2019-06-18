@@ -119,7 +119,7 @@ See the next section for how to backfill.
 
 #### Bad
 
-Backfilling in the same transaction that alters a table locks the table for the [duration of the backfill](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/).
+Backfilling in the same transaction that alters a table locks the table for the [duration of the backfill](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/). Reffering to a model that may be changed (e.g. renamed) later is also a possible point of failure.
 
 ```ruby
 class AddSomeColumnToUsers < ActiveRecord::Migration[5.2]
@@ -134,14 +134,18 @@ Also, running a single query to update data can cause issues for large tables.
 
 #### Good
 
-There are three keys: batching, throttling, and running it outside a transaction. Use the Rails console or a separate migration with `disable_ddl_transaction!`.
+There are three keys: batching, throttling, and running it outside a transaction. Use the Rails console or a separate migration with `disable_ddl_transaction!` and temporary model. 
 
 ```ruby
 class BackfillSomeColumn < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
+  
+  class TmpUser < ActiveRecord::Base
+    self.table_name = 'users'
+  end
 
   def change
-    User.unscoped.in_batches do |relation|
+    TmpUser.unscoped.in_batches do |relation|
       relation.update_all some_column: "default_value"
       sleep(0.1) # throttle
     end
