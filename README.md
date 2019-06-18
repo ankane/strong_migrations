@@ -418,7 +418,8 @@ end
 
 #### Bad
 
-Adding an index with more than three columns only helps on extremely large tables.
+Adding an index with more than three columns
+[only helps on extremely large tables](https://github.com/ankane/strong_migrations/issues/79).
 
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration[5.2]
