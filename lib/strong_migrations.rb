@@ -114,9 +114,8 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     add_index_columns:
-"Adding an index with more than three columns only helps on extremely large tables.
-
-If you're sure this is what you want, wrap it in a safety_assured { ... } block.",
+"Adding a non-unique index with more than three columns rarely improves performance.
+Instead, start an index with columns that narrow down the results the most.",
 
     change_table:
 "Strong Migrations does not support inspecting what happens inside a

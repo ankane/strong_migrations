@@ -418,7 +418,7 @@ end
 
 #### Bad
 
-Adding an index with more than three columns only helps on extremely large tables.
+Adding a non-unique index with more than three columns rarely improves performance.
 
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration[5.2]
@@ -430,10 +430,12 @@ end
 
 #### Good
 
+Instead, start an index with columns that narrow down the results the most.
+
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration[5.2]
   def change
-    add_index :users, [:a, :b, :c]
+    add_index :users, [:b, :d]
   end
 end
 ```
