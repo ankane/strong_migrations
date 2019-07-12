@@ -1,4 +1,4 @@
-## 0.4.1 [unreleased]
+## 0.4.1
 
 - Added `target_postgresql_version`
 - Added `unscoped` to backfill instructions

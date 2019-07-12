@@ -537,7 +537,7 @@ ALTER ROLE myuser SET lock_timeout = '10s';
 
 There’s also [a gem](https://github.com/gocardless/activerecord-safer_migrations) you can use for this.
 
-### Target Version [master]
+### Target Version
 
 If your development database version is different from production, you can specify the production version so the right checks are run in development.
 
