@@ -348,7 +348,7 @@ end
 
 #### Good
 
-Create tables without the `force` option:
+Create tables without the `force` option.
 
 ```ruby
 class CreateUsers < ActiveRecord::Migration[5.2]
