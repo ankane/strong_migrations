@@ -348,7 +348,7 @@ end
 
 #### Good
 
-If you intend to drop a table, do it explicitly. Then create the new table without the `force` option:
+Create tables without the `force` option:
 
 ```ruby
 class CreateUsers < ActiveRecord::Migration[5.2]
