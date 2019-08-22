@@ -233,6 +233,12 @@ class Custom < TestMigration
   end
 end
 
+class RemoveIndex < TestMigration
+  def change
+    remove_index :new_users, :name
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     skip unless postgres?
@@ -304,6 +310,11 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_remove_columns
     assert_unsafe RemoveColumns
+  end
+
+  def test_remove_index
+    skip unless postgres?
+    assert_unsafe RemoveIndex
   end
 
   def test_remove_timestamps

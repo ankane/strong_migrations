@@ -62,6 +62,13 @@ module StrongMigrations
           if postgresql? && options[:algorithm] != :concurrently && !@new_tables.include?(table.to_s)
             raise_error :add_index, command: command_str("add_index", [table, columns, options.merge(algorithm: :concurrently)])
           end
+        when :remove_index
+          table, _columns, options = args
+          options ||= {}
+
+          if postgresql? && options[:algorithm] != :concurrently && !@new_tables.include?(table.to_s)
+            raise_error :remove_index, command: command_str("remove_index", [table, columns, options.merge(algorithm: :concurrently)])
+          end
         when :add_column
           table, column, type, options = args
           options ||= {}

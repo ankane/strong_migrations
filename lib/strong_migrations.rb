@@ -117,6 +117,17 @@ end",
 "Adding a non-unique index with more than three columns rarely improves performance.
 Instead, start an index with columns that narrow down the results the most.",
 
+    remove_index:
+"Removing a non-concurrent index locks the table. Instead, use:
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  disable_ddl_transaction!
+
+  def change
+    %{command}
+  end
+end",
+
     change_table:
 "Strong Migrations does not support inspecting what happens inside a
 change_table block, so cannot help you here. Please make really sure that what
