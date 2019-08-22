@@ -28,6 +28,7 @@ The following operations can cause downtime or errors:
 - [[+]](#adding-a-column-with-a-default-value) adding a column with a default value
 - [[+]](#backfilling-data) backfilling data
 - [[+]](#adding-an-index) adding an index non-concurrently
+- [[+]](#removing-an-index) removing an index non-concurrently
 - [[+]](#adding-a-reference) adding a reference
 - [[+]](#adding-a-foreign-key) adding a foreign key
 - [[+]](#renaming-or-changing-the-type-of-a-column) changing the type of a column
@@ -178,6 +179,36 @@ end
 ```
 
 If you forget `disable_ddl_transaction!`, the migration will fail. Also, note that indexes on new tables (those created in the same migration) don’t require this. Check out [gindex](https://github.com/ankane/gindex) to quickly generate index migrations without memorizing the syntax.
+
+### Removing an index
+
+#### Bad
+
+In Postgres, removing a non-concurrent index locks the table.
+
+```ruby
+class AddSomeIndexToUsers < ActiveRecord::Migration[5.2]
+  def change
+    remove_index :users, :some_column
+  end
+end
+```
+
+#### Good
+
+Remove indexes concurrently.
+
+```ruby
+class AddSomeIndexToUsers < ActiveRecord::Migration[5.2]
+  disable_ddl_transaction!
+
+  def change
+    remove_index :users, :some_column, algorithm: :concurrently
+  end
+end
+```
+
+If you forget `disable_ddl_transaction!`, the migration will fail.
 
 ### Adding a reference
 
