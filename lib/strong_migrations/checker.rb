@@ -242,7 +242,14 @@ end"
       last_arg = args[-1]
       if last_arg.is_a?(Hash)
         if last_arg.any?
-          str_args << last_arg.map { |k, v| "#{k}: #{v.inspect}" }.join(", ")
+          str_args << last_arg.map do |k, v|
+            if v.is_a?(Hash)
+              # pretty index: {algorithm: :concurrently}
+              "#{k}: {#{v.map { |k2, v2| "#{k2}: #{v2.inspect}" }.join(", ")}}"
+            else
+              "#{k}: #{v.inspect}"
+            end
+          end.join(", ")
         end
       else
         str_args << last_arg.inspect
