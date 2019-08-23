@@ -50,7 +50,7 @@ Also checks for best practices:
 ActiveRecord caches database columns at runtime, so if you drop a column, it can cause exceptions until your app reboots.
 
 ```ruby
-class RemoveSomeColumnFromUsers < ActiveRecord::Migration[5.2]
+class RemoveSomeColumnFromUsers < ActiveRecord::Migration[6.0]
   def change
     remove_column :users, :some_column
   end
@@ -71,7 +71,7 @@ end
 3. Write a migration to remove the column (wrap in `safety_assured` block)
 
   ```ruby
-  class RemoveSomeColumnFromUsers < ActiveRecord::Migration[5.2]
+  class RemoveSomeColumnFromUsers < ActiveRecord::Migration[6.0]
     def change
       safety_assured { remove_column :users, :some_column }
     end
@@ -87,7 +87,7 @@ end
 Adding a column with a default value to an existing table causes the entire table to be rewritten.
 
 ```ruby
-class AddSomeColumnToUsers < ActiveRecord::Migration[5.2]
+class AddSomeColumnToUsers < ActiveRecord::Migration[6.0]
   def change
     add_column :users, :some_column, :text, default: "default_value"
   end
@@ -101,7 +101,7 @@ end
 Instead, add the column without a default value, then change the default.
 
 ```ruby
-class AddSomeColumnToUsers < ActiveRecord::Migration[5.2]
+class AddSomeColumnToUsers < ActiveRecord::Migration[6.0]
   def up
     add_column :users, :some_column, :text
     change_column_default :users, :some_column, "default_value"
@@ -122,7 +122,7 @@ See the next section for how to backfill.
 Backfilling in the same transaction that alters a table locks the table for the [duration of the backfill](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/).
 
 ```ruby
-class AddSomeColumnToUsers < ActiveRecord::Migration[5.2]
+class AddSomeColumnToUsers < ActiveRecord::Migration[6.0]
   def change
     add_column :users, :some_column, :text
     User.update_all some_column: "default_value"
@@ -137,7 +137,7 @@ Also, running a single query to update data can cause issues for large tables.
 There are three keys: batching, throttling, and running it outside a transaction. Use the Rails console or a separate migration with `disable_ddl_transaction!`.
 
 ```ruby
-class BackfillSomeColumn < ActiveRecord::Migration[5.2]
+class BackfillSomeColumn < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def change
@@ -156,7 +156,7 @@ end
 In Postgres, adding a non-concurrent index locks the table.
 
 ```ruby
-class AddSomeIndexToUsers < ActiveRecord::Migration[5.2]
+class AddSomeIndexToUsers < ActiveRecord::Migration[6.0]
   def change
     add_index :users, :some_column
   end
@@ -168,7 +168,7 @@ end
 Add indexes concurrently.
 
 ```ruby
-class AddSomeIndexToUsers < ActiveRecord::Migration[5.2]
+class AddSomeIndexToUsers < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def change
@@ -186,7 +186,7 @@ If you forget `disable_ddl_transaction!`, the migration will fail. Also, note th
 Rails adds a non-concurrent index to references by default, which is problematic for Postgres.
 
 ```ruby
-class AddReferenceToUsers < ActiveRecord::Migration[5.2]
+class AddReferenceToUsers < ActiveRecord::Migration[6.0]
   def change
     add_reference :users, :city
   end
@@ -198,7 +198,7 @@ end
 Make sure the index is added concurrently.
 
 ```ruby
-class AddReferenceToUsers < ActiveRecord::Migration[5.2]
+class AddReferenceToUsers < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def change
@@ -217,7 +217,7 @@ For polymorphic references, add a compound index on type and id.
 In Postgres, new foreign keys are validated by default, which acquires an `AccessExclusiveLock` that can be [expensive on large tables](https://travisofthenorth.com/blog/2017/2/2/postgres-adding-foreign-keys-with-zero-downtime).
 
 ```ruby
-class AddForeignKeyOnUsers < ActiveRecord::Migration[5.2]
+class AddForeignKeyOnUsers < ActiveRecord::Migration[6.0]
   def change
     add_foreign_key :users, :orders
   end
@@ -231,7 +231,7 @@ Instead, validate it in a separate migration with a more agreeable `RowShareLock
 For Rails 5.2+, use:
 
 ```ruby
-class AddForeignKeyOnUsers < ActiveRecord::Migration[5.2]
+class AddForeignKeyOnUsers < ActiveRecord::Migration[6.0]
   def change
     add_foreign_key :users, :orders, validate: false
   end
@@ -241,7 +241,7 @@ end
 Then validate it in a separate migration.
 
 ```ruby
-class ValidateForeignKeyOnUsers < ActiveRecord::Migration[5.2]
+class ValidateForeignKeyOnUsers < ActiveRecord::Migration[6.0]
   def change
     validate_foreign_key :users, :orders
   end
@@ -277,7 +277,7 @@ end
 #### Bad
 
 ```ruby
-class RenameSomeColumn < ActiveRecord::Migration[5.2]
+class RenameSomeColumn < ActiveRecord::Migration[6.0]
   def change
     rename_column :users, :some_column, :new_name
   end
@@ -287,7 +287,7 @@ end
 or
 
 ```ruby
-class ChangeSomeColumnType < ActiveRecord::Migration[5.2]
+class ChangeSomeColumnType < ActiveRecord::Migration[6.0]
   def change
     change_column :users, :some_column, :new_type
   end
@@ -312,7 +312,7 @@ A safer approach is to:
 #### Bad
 
 ```ruby
-class RenameUsersToCustomers < ActiveRecord::Migration[5.2]
+class RenameUsersToCustomers < ActiveRecord::Migration[6.0]
   def change
     rename_table :users, :customers
   end
@@ -337,7 +337,7 @@ A safer approach is to:
 The `force` option can drop an existing table.
 
 ```ruby
-class CreateUsers < ActiveRecord::Migration[5.2]
+class CreateUsers < ActiveRecord::Migration[6.0]
   def change
     create_table :users, force: true do |t|
       # ...
@@ -351,7 +351,7 @@ end
 Create tables without the `force` option.
 
 ```ruby
-class CreateUsers < ActiveRecord::Migration[5.2]
+class CreateUsers < ActiveRecord::Migration[6.0]
   def change
     create_table :users do |t|
       # ...
@@ -367,7 +367,7 @@ end
 This generates a single `UPDATE` statement to set the default value.
 
 ```ruby
-class ChangeSomeColumnNull < ActiveRecord::Migration[5.2]
+class ChangeSomeColumnNull < ActiveRecord::Migration[6.0]
   def change
     change_column_null :users, :some_column, false, "default_value"
   end
@@ -379,7 +379,7 @@ end
 Backfill the column [safely](#backfilling-data). Then use:
 
 ```ruby
-class ChangeSomeColumnNull < ActiveRecord::Migration[5.2]
+class ChangeSomeColumnNull < ActiveRecord::Migration[6.0]
   def change
     change_column_null :users, :some_column, false
   end
@@ -393,7 +393,7 @@ end
 In Postgres, there’s no equality operator for the `json` column type, which causes issues for `SELECT DISTINCT` queries.
 
 ```ruby
-class AddPropertiesToUsers < ActiveRecord::Migration[5.2]
+class AddPropertiesToUsers < ActiveRecord::Migration[6.0]
   def change
     add_column :users, :properties, :json
   end
@@ -405,7 +405,7 @@ end
 Use `jsonb` instead.
 
 ```ruby
-class AddPropertiesToUsers < ActiveRecord::Migration[5.2]
+class AddPropertiesToUsers < ActiveRecord::Migration[6.0]
   def change
     add_column :users, :properties, :jsonb
   end
@@ -421,7 +421,7 @@ end
 Adding a non-unique index with more than three columns rarely improves performance.
 
 ```ruby
-class AddSomeIndexToUsers < ActiveRecord::Migration[5.2]
+class AddSomeIndexToUsers < ActiveRecord::Migration[6.0]
   def change
     add_index :users, [:a, :b, :c, :d]
   end
@@ -433,7 +433,7 @@ end
 Instead, start an index with columns that narrow down the results the most.
 
 ```ruby
-class AddSomeIndexToUsers < ActiveRecord::Migration[5.2]
+class AddSomeIndexToUsers < ActiveRecord::Migration[6.0]
   def change
     add_index :users, [:b, :d]
   end
@@ -447,7 +447,7 @@ end
 To mark a step in the migration as safe, despite using a method that might otherwise be dangerous, wrap it in a `safety_assured` block.
 
 ```ruby
-class MySafeMigration < ActiveRecord::Migration[5.2]
+class MySafeMigration < ActiveRecord::Migration[6.0]
   def change
     safety_assured { remove_column :users, :some_column }
   end
