@@ -1,3 +1,7 @@
+## 0.4.2 [unreleased]
+
+- Allow `add_reference` with concurrent indexes
+
 ## 0.4.1
 
 - Added `target_postgresql_version`

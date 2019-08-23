@@ -116,16 +116,15 @@ end"
           options ||= {}
 
           index_value = options.fetch(:index, true)
-
           concurrently_set = index_value.is_a?(Hash) && index_value[:algorithm] == :concurrently
 
           if postgresql? && index_value && !concurrently_set
             columns = options[:polymorphic] ? [:"#{reference}_type", :"#{reference}_id"] : :"#{reference}_id"
 
             if index_value.is_a?(Hash)
-              options[:index].merge!(algorithm: :concurrently)
+              options[:index] = options[:index].merge(algorithm: :concurrently)
             else
-              options.merge!(index: { algorithm: :concurrently })
+              options = options.merge(index: {algorithm: :concurrently})
             end
 
             raise_error :add_reference, command: command_str(method, [table, reference, options])

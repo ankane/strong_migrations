@@ -181,7 +181,7 @@ end
 
 class AddReferenceConcurrently < TestMigration
   def change
-    add_reference :users, :ip, index: { algorithm: :concurrently }
+    add_reference :users, :ip, index: {algorithm: :concurrently}
   end
 end
 
