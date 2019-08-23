@@ -116,12 +116,19 @@ end"
           options ||= {}
 
           index_value = options.fetch(:index, true)
-          if postgresql? && index_value
+
+          concurrently_set = index_value.is_a?(Hash) && index_value[:algorithm] == :concurrently
+
+          if postgresql? && index_value && !concurrently_set
             columns = options[:polymorphic] ? [:"#{reference}_type", :"#{reference}_id"] : :"#{reference}_id"
 
-            raise_error :add_reference,
-              reference_command: command_str(method, [table, reference, options.merge(index: false)]),
-              index_command: command_str("add_index", [table, columns, {algorithm: :concurrently}])
+            if index_value.is_a?(Hash)
+              options[:index].merge!(algorithm: :concurrently)
+            else
+              options.merge!(index: { algorithm: :concurrently })
+            end
+
+            raise_error :add_reference, command: command_str(method, [table, reference, options])
           end
         when :execute
           raise_error :execute, header: "Possibly dangerous operation"

@@ -179,6 +179,12 @@ class AddReferenceDefault < TestMigration
   end
 end
 
+class AddReferenceConcurrently < TestMigration
+  def change
+    add_reference :users, :ip, index: { algorithm: :concurrently }
+  end
+end
+
 class AddBelongsTo < TestMigration
   def change
     add_belongs_to :users, :device, index: true
@@ -349,6 +355,11 @@ class StrongMigrationsTest < Minitest::Test
   def test_add_reference_default
     skip unless postgres?
     assert_unsafe AddReferenceDefault
+  end
+
+  def test_add_reference_concurrently
+    skip unless postgres?
+    assert_safe AddReferenceConcurrently
   end
 
   def test_add_belongs_to

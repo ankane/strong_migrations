@@ -202,8 +202,7 @@ class AddReferenceToUsers < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def change
-    add_reference :users, :city, index: false
-    add_index :users, :city_id, algorithm: :concurrently
+    add_reference :users, :city, index: { algorithm: :concurrently }
   end
 end
 ```

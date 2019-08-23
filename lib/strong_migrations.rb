@@ -97,8 +97,7 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   disable_ddl_transaction!
 
   def change
-    %{reference_command}
-    %{index_command}
+    %{command}
   end
 end",
 
