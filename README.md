@@ -134,7 +134,7 @@ Also, running a single query to update data can cause issues for large tables.
 
 #### Good
 
-There are three keys: batching, throttling, and running it outside a transaction. Use the Rails console or a separate migration with `disable_ddl_transaction!`.
+There are three keys to backfilling safely: batching, throttling, and running it outside a transaction. Use the Rails console or a separate migration with `disable_ddl_transaction!`.
 
 ```ruby
 class BackfillSomeColumn < ActiveRecord::Migration[6.0]
