@@ -173,6 +173,13 @@ end"
         end
       end
 
+      remove_index_index = @ordered_migrations.index { |k| k.first == :remove_index }
+      add_index_index = @ordered_migrations.drop(remove_index_index).index { |k| k.first == :add_index } if remove_index_index.present?
+
+      if remove_index_index.present? && add_index_index
+        raise_error :dangerous_replace_index
+      end
+
       result = yield
 
       if StrongMigrations.auto_analyze && direction == :up && postgresql? && method == :add_index

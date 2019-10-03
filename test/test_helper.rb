@@ -46,6 +46,8 @@ class CreateUsers < TestMigration
 
     create_table "orders" do |t|
     end
+
+    add_index "users", "city"
   end
 end
 migrate CreateUsers

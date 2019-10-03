@@ -239,6 +239,13 @@ class Custom < TestMigration
   end
 end
 
+class RemoveBeforeAddIndexTest < TestMigration
+  def change
+    remove_index :users, column: :city
+    add_index :users, [:name, :city], algorithm: :concurrently
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     skip unless postgres?
@@ -410,6 +417,11 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_custom
     assert_unsafe Custom, "Cannot add forbidden column"
+  end
+
+  def test_remove_before_add_index
+    skip unless postgres?
+    assert_unsafe RemoveBeforeAddIndexTest
   end
 
   private

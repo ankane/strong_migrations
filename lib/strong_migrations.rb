@@ -160,6 +160,14 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
     %{validate_foreign_key_code}
   end
 end",
+
+    dangerous_replace_index:
+"Dropping an old index before creating the new one might result in slow queries
+while building the new index.
+
+A safer approach could be to first create the new index and afterwards delete
+the old one.
+"
   }
 
   def self.add_check(&block)
