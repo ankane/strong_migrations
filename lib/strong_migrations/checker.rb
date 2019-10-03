@@ -6,6 +6,7 @@ module StrongMigrations
       @migration = migration
       @new_tables = []
       @safe = false
+      @ordered_migrations = []
     end
 
     def safety_assured
@@ -19,6 +20,8 @@ module StrongMigrations
     end
 
     def perform(method, *args)
+      @ordered_migrations << [method, args]
+
       unless safe?
         case method
         when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
