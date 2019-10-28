@@ -1,4 +1,4 @@
-## 0.4.2 [unreleased]
+## 0.4.2
 
 - Allow `add_reference` with concurrent indexes
 
