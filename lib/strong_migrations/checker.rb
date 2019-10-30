@@ -93,6 +93,10 @@ end"
           if type.to_s == "json" && postgresql?
             raise_error :add_column_json
           end
+
+          if column == ActiveRecord::Base.inheritance_column.to_sym
+            raise_error :add_type_column
+          end
         when :change_column
           table, column, type = args
 

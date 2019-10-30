@@ -44,6 +44,9 @@ end%{append}",
 "There's no equality operator for the json column type, which
 causes issues for SELECT DISTINCT queries. Use jsonb instead.",
 
+    add_type_column:
+"Adding type column in migration might cause downtime.",
+
     change_column:
 "Changing the type of an existing column requires the entire
 table and indexes to be rewritten. A safer approach is to:

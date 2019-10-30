@@ -59,6 +59,24 @@ class AddColumnJson < TestMigration
   end
 end
 
+class AddTypeColumn < TestMigration
+  def change
+    add_column :users, :type, :string
+  end
+end
+
+class AddTypeColumnWhenInheritanceColumnIsNotType < TestMigration
+  def change
+    add_column :users, :type, :string
+  end
+end
+
+class AddInheritanceColumn < TestMigration
+  def change
+    add_column :users, :my_type, :string
+  end
+end
+
 class ChangeColumn < TestMigration
   def change
     change_column :users, :properties, :bad_name
@@ -281,6 +299,24 @@ class StrongMigrationsTest < Minitest::Test
   def test_add_column_json
     skip unless postgres?
     assert_unsafe AddColumnJson
+  end
+
+  def test_add_type_column
+    ActiveRecord::Base.inheritance_column = :type
+    assert_unsafe AddTypeColumn
+    ActiveRecord::Base.inheritance_column = :my_type
+  end
+
+  def test_add_type_column_when_inheritance_column_is_not_type
+    ActiveRecord::Base.inheritance_column = :my_type
+    assert_safe AddTypeColumnWhenInheritanceColumnIsNotType
+    ActiveRecord::Base.inheritance_column = :type
+  end
+
+  def test_add_inheritance_column
+    ActiveRecord::Base.inheritance_column = :my_type
+    assert_unsafe AddInheritanceColumn
+    ActiveRecord::Base.inheritance_column = :type
   end
 
   def test_change_column
