@@ -403,6 +403,8 @@ class StrongMigrationsTest < Minitest::Test
     else
       assert_safe AddForeignKey
     end
+  ensure
+    StrongMigrations.target_postgresql_version = nil
   end
 
   def test_add_foreign_key_safe
