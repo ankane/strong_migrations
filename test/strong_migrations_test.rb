@@ -393,6 +393,11 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_foreign_key
+    assert_safe AddForeignKey
+  end
+
+  def test_add_foreign_key_before_pg_11
+    StrongMigrations.target_postgresql_version = 10
     if postgres?
       assert_unsafe AddForeignKey
     else

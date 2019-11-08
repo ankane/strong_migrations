@@ -142,7 +142,7 @@ end"
           options ||= {}
           validate = options.fetch(:validate, true)
 
-          if postgresql?
+          if postgresql? && postgresql_version < 110000
             if ActiveRecord::VERSION::STRING >= "5.2"
               if validate
                 raise_error :add_foreign_key,
