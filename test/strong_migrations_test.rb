@@ -393,26 +393,21 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_foreign_key
+    StrongMigrations.target_postgresql_version = 11
     assert_safe AddForeignKey
-  end
-
-  def test_add_foreign_key_before_pg_11
-    StrongMigrations.target_postgresql_version = 10
-    if postgres?
-      assert_unsafe AddForeignKey
-    else
-      assert_safe AddForeignKey
-    end
   ensure
     StrongMigrations.target_postgresql_version = nil
   end
 
   def test_add_foreign_key_safe
+    StrongMigrations.target_postgresql_version = 10
     if postgres? && ActiveRecord::VERSION::STRING <= "5.2"
       assert_unsafe AddForeignKeySafe
     else
       assert_safe AddForeignKeySafe
     end
+  ensure
+    StrongMigrations.target_postgresql_version = nil
   end
 
   def test_custom
