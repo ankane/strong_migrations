@@ -213,7 +213,7 @@ For polymorphic references, add a compound index on type and id.
 
 #### Bad
 
-In Postgres, new foreign keys are validated by default, which acquires an `AccessExclusiveLock` that can be [expensive on large tables](https://travisofthenorth.com/blog/2017/2/2/postgres-adding-foreign-keys-with-zero-downtime).
+In Postgres, new foreign keys are validated by default, which acquires a `ShareRowExclusiveLock` that can be [expensive on large tables](https://travisofthenorth.com/blog/2017/2/2/postgres-adding-foreign-keys-with-zero-downtime).
 
 ```ruby
 class AddForeignKeyOnUsers < ActiveRecord::Migration[6.0]
