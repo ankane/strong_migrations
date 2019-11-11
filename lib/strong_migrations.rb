@@ -41,8 +41,8 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end%{append}",
 
     add_column_json:
-"There's no equality operator for the json column type, which
-causes issues for SELECT DISTINCT queries. Use jsonb instead.",
+"There's no equality operator for the json column type, which can
+cause errors for existing SELECT DISTINCT queries. Use jsonb instead.",
 
     change_column:
 "Changing the type of an existing column requires the entire

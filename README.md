@@ -427,7 +427,7 @@ end
 
 #### Bad
 
-In Postgres, there’s no equality operator for the `json` column type, which causes issues for `SELECT DISTINCT` queries.
+In Postgres, there’s no equality operator for the `json` column type, which can cause errors for existing `SELECT DISTINCT` queries.
 
 ```ruby
 class AddPropertiesToUsers < ActiveRecord::Migration[6.0]
