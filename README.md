@@ -207,8 +207,6 @@ class AddReferenceToUsers < ActiveRecord::Migration[6.0]
 end
 ```
 
-For polymorphic references, add a compound index on type and id.
-
 ### Adding a foreign key
 
 #### Bad
