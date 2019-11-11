@@ -133,9 +133,18 @@ end"
           raise_error :execute, header: "Possibly dangerous operation"
         when :change_column_null
           table, column, null, default = args
-          if !null && !default.nil?
-            raise_error :change_column_null,
-              code: backfill_code(table, column, default)
+          if !null
+            if postgresql?
+              # match https://github.com/nullobject/rein
+              constraint_name = "#{table}_#{column}_null"
+
+              raise_error :change_column_null_postgresql,
+                add_constraint_code: constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column]),
+                validate_constraint_code: constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
+            elsif !default.nil?
+              raise_error :change_column_null,
+                code: backfill_code(table, column, default)
+            end
           end
         when :add_foreign_key
           from_table, to_table, options = args
@@ -159,8 +168,8 @@ end"
               fk_name = options[:name] || "fk_rails_#{hashed_identifier}"
 
               raise_error :add_foreign_key,
-                add_foreign_key_code: foreign_key_str("ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s) NOT VALID", [from_table, fk_name, column, to_table, primary_key]),
-                validate_foreign_key_code: foreign_key_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [from_table, fk_name])
+                add_foreign_key_code: constraint_str("ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s) NOT VALID", [from_table, fk_name, column, to_table, primary_key]),
+                validate_foreign_key_code: constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [from_table, fk_name])
             end
           end
         end
@@ -229,7 +238,7 @@ end"
       @migration.stop!(message.gsub(/%(?!{)/, "%%") % vars, header: header || "Dangerous operation detected")
     end
 
-    def foreign_key_str(statement, identifiers)
+    def constraint_str(statement, identifiers)
       # not all identifiers are tables, but this method of quoting should be fine
       code = statement % identifiers.map { |v| connection.quote_table_name(v) }
       "safety_assured do\n      execute '#{code}' \n    end"

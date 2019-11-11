@@ -384,7 +384,11 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_change_column_null_no_default
-    assert_safe ChangeColumnNullNoDefault
+    if postgres?
+      assert_unsafe ChangeColumnNullNoDefault
+    else
+      assert_safe ChangeColumnNullNoDefault
+    end
   end
 
   def test_down

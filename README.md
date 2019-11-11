@@ -357,6 +357,46 @@ class CreateUsers < ActiveRecord::Migration[6.0]
 end
 ```
 
+### Using change_column_null [master]
+
+#### Bad
+
+In Postgres, setting `NOT NULL` on an existing column requires an `AccessExclusiveLock`, which is expensive on large tables.
+
+```ruby
+class SetSomeColumnNotNull < ActiveRecord::Migration[6.0]
+  def change
+    change_column_null :users, :some_column, false
+  end
+end
+```
+
+#### Good
+
+Instead, add a constraint:
+
+```ruby
+class SetSomeColumnNotNull < ActiveRecord::Migration[6.0]
+  def change
+    safety_assured do
+      execute 'ALTER TABLE "users" ADD CONSTRAINT "users_some_column_null" CHECK ("some_column" IS NOT NULL) NOT VALID'
+    end
+  end
+end
+```
+
+Then validate it in a separate migration.
+
+```ruby
+class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
+  def change
+    safety_assured do
+      execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "users_some_column_null"'
+    end
+  end
+end
+```
+
 ### Using change_column_null with a default value
 
 #### Bad

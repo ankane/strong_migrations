@@ -1,3 +1,7 @@
+## 0.5.0 [unreleased]
+
+- Added Postgres-specific check for `change_column_null`
+
 ## 0.4.2
 
 - Allow `add_reference` with concurrent indexes

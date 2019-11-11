@@ -144,6 +144,23 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
+    change_column_null_postgresql:
+"Setting NOT NULL on a column requires an AccessExclusiveLock,
+which is expensive on large tables. Instead, use a constraint and
+validate it in a separate migration with a more agreeable RowShareLock.
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{add_constraint_code}
+  end
+end
+
+class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{validate_constraint_code}
+  end
+end",
+
     add_foreign_key:
 "New foreign keys are validated by default. This acquires an AccessExclusiveLock,
 which is expensive on large tables. Instead, validate it in a separate migration
