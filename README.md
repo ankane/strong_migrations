@@ -82,6 +82,8 @@ end
 
 ### Adding a column with a default value
 
+Note: This operation is safe in Postgres 11+.
+
 #### Bad
 
 Adding a column with a default value to an existing table causes the entire table to be rewritten.
@@ -93,8 +95,6 @@ class AddSomeColumnToUsers < ActiveRecord::Migration[6.0]
   end
 end
 ```
-
-> This operation is safe in Postgres 11+
 
 #### Good
 
