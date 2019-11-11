@@ -397,6 +397,8 @@ class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
 end
 ```
 
+Note: This is not 100% the same as `NOT NULL` column constraint. Here’s a [good explanation](https://medium.com/doctolib/adding-a-not-null-constraint-on-pg-faster-with-minimal-locking-38b2c00c4d1c).
+
 ### Using change_column_null with a default value
 
 #### Bad
