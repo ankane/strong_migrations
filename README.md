@@ -479,7 +479,7 @@ class AddSomeIndexToUsers < ActiveRecord::Migration[6.0]
 end
 ```
 
-> For Postgres, be sure to add them concurrently
+For Postgres, be sure to add them concurrently.
 
 ## Assuring Safety
 
@@ -509,7 +509,7 @@ end
 
 Use the `stop!` method to stop migrations.
 
-> Since `remove_column` always requires a `safety_assured` block, it’s not possible to add a custom check for `remove_column` operations
+Note: Since `remove_column` always requires a `safety_assured` block, it’s not possible to add a custom check for `remove_column` operations.
 
 ## Existing Migrations
 
