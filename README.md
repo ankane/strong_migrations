@@ -463,7 +463,7 @@ Some operations rarely cause issues in practice, but can be checked if desired. 
 StrongMigrations.enable_check(:remove_index)
 ```
 
-To enable a check for future migrations only, use:
+To start a check only after a specific migration, use:
 
 ```ruby
 StrongMigrations.enable_check(:remove_index, start_after: 20170101000000)
