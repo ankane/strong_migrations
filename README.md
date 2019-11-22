@@ -486,7 +486,7 @@ class RemoveSomeIndexFromUsers < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def change
-    remove_index :users, :some_column, algorithm: :concurrently
+    remove_index :users, column: :some_column, algorithm: :concurrently
   end
 end
 ```
