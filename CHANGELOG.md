@@ -1,6 +1,7 @@
-## 0.5.0 [unreleased]
+## 0.5.0 (unreleased)
 
 - Added Postgres-specific check for `change_column_null`
+- Added optional remove index check
 
 ## 0.4.2 (2019-10-27)
 

@@ -6,6 +6,18 @@ class AddIndex < TestMigration
   end
 end
 
+class RemoveIndex < TestMigration
+  def change
+    remove_index :users, column: :name, name: "index_users_on_name"
+  end
+end
+
+class RemoveIndexSafePostgres < TestMigration
+  def change
+    remove_index :users, column: :name, name: "index_users_on_name", algorithm: :concurrently
+  end
+end
+
 class AddIndexUp < TestMigration
   def self.up
     add_index :users, :name
@@ -241,13 +253,21 @@ end
 
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
-    skip unless postgres?
-    assert_unsafe AddIndex
+    if postgres?
+      assert_unsafe AddIndex
+    else
+      assert_safe AddIndex
+      assert_safe RemoveIndex
+    end
   end
 
   def test_add_index_up
-    skip unless postgres?
-    assert_unsafe AddIndexUp
+    if postgres?
+      assert_unsafe AddIndexUp
+    else
+      assert_safe AddIndexUp
+      assert_safe RemoveIndex
+    end
   end
 
   def test_add_index_safety_assured
@@ -265,6 +285,20 @@ class StrongMigrationsTest < Minitest::Test
   def test_add_index_safe_postgres
     skip unless postgres?
     assert_safe AddIndexSafePostgres
+    assert_safe RemoveIndex
+  end
+
+  def test_remove_index_postgres
+    skip unless postgres?
+    assert_safe AddIndexSafePostgres
+
+    begin
+      StrongMigrations.enable_check(:remove_index)
+      assert_unsafe RemoveIndex
+      assert_safe RemoveIndexSafePostgres
+    ensure
+      StrongMigrations.disable_check(:remove_index)
+    end
   end
 
   def test_add_column_default

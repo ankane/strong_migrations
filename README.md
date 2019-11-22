@@ -153,7 +153,7 @@ end
 
 #### Bad
 
-In Postgres, adding a non-concurrent index locks the table.
+In Postgres, adding an index non-concurrently locks the table.
 
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration[6.0]
@@ -183,7 +183,7 @@ If you forget `disable_ddl_transaction!`, the migration will fail. Also, note th
 
 #### Bad
 
-Rails adds a non-concurrent index to references by default, which is problematic for Postgres.
+Rails adds an index non-concurrently to references by default, which is problematic for Postgres.
 
 ```ruby
 class AddReferenceToUsers < ActiveRecord::Migration[6.0]
@@ -447,6 +447,42 @@ Use `jsonb` instead.
 class AddPropertiesToUsers < ActiveRecord::Migration[6.0]
   def change
     add_column :users, :properties, :jsonb
+  end
+end
+```
+
+## Optional Checks [master]
+
+These are checks for operations that rarely cause issues in practice, but can be enabled if desired. Enable with:
+
+```ruby
+StrongMigrations.enable_check(:remove_index)
+```
+
+### Removing an index
+
+#### Bad
+
+In Postgres, removing an index non-concurrently locks the table for a brief period.
+
+```ruby
+class RemoveSomeIndexFromUsers < ActiveRecord::Migration[6.0]
+  def change
+    remove_index :users, :some_column
+  end
+end
+```
+
+#### Good
+
+Remove indexes concurrently.
+
+```ruby
+class RemoveSomeIndexFromUsers < ActiveRecord::Migration[6.0]
+  disable_ddl_transaction!
+
+  def change
+    remove_index :users, :some_column, algorithm: :concurrently
   end
 end
 ```

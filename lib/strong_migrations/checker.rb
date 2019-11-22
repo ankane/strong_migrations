@@ -62,6 +62,13 @@ module StrongMigrations
           if postgresql? && options[:algorithm] != :concurrently && !@new_tables.include?(table.to_s)
             raise_error :add_index, command: command_str("add_index", [table, columns, options.merge(algorithm: :concurrently)])
           end
+        when :remove_index
+          table, options = args
+          options ||= {}
+
+          if enabled?(:remove_index) && postgresql? && options[:algorithm] != :concurrently && !@new_tables.include?(table.to_s)
+            raise_error :remove_index, command: command_str("remove_index", [table, options.merge(algorithm: :concurrently)])
+          end
         when :add_column
           table, column, type, options = args
           options ||= {}
@@ -270,6 +277,10 @@ end"
     def backfill_code(table, column, default)
       model = table.to_s.classify
       "#{model}.unscoped.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.1)\n    end"
+    end
+
+    def enabled?(check)
+      StrongMigrations.check_enabled?(check)
     end
   end
 end
