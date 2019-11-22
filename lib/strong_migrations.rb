@@ -14,7 +14,6 @@ module StrongMigrations
   self.auto_analyze = false
   self.start_after = 0
   self.checks = []
-  self.enabled_checks = {} # private, may change at any time
   self.error_messages = {
     add_column_default:
 "Adding a column with a non-null default causes the entire table to be rewritten.
@@ -190,6 +189,7 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
   }
+  self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h
 
   def self.add_check(&block)
     checks << block

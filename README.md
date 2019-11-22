@@ -557,6 +557,16 @@ Use the `stop!` method to stop migrations.
 
 Note: Since `remove_column` always requires a `safety_assured` block, it’s not possible to add a custom check for `remove_column` operations.
 
+## Disable Checks [master]
+
+Disable specific checks with:
+
+```ruby
+StrongMigrations.disable_check(:add_index)
+```
+
+Check the [source code](https://github.com/ankane/strong_migrations/blob/master/lib/strong_migrations.rb) for the list of keys.
+
 ## Existing Migrations
 
 To mark migrations as safe that were created before installing this gem, create an initializer with:

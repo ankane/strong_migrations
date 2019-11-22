@@ -1,5 +1,6 @@
 ## 0.5.0 (unreleased)
 
+- Added ability to disable checks
 - Added Postgres-specific check for `change_column_null`
 - Added optional remove index check
 

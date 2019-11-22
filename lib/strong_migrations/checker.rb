@@ -69,7 +69,7 @@ module StrongMigrations
           end
           options ||= {}
 
-          if enabled?(:remove_index) && postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
+          if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
             raise_error :remove_index, command: command_str("remove_index", [table, options.merge(algorithm: :concurrently)])
           end
         when :add_column
@@ -233,6 +233,8 @@ end"
     end
 
     def raise_error(message_key, header: nil, **vars)
+      return unless StrongMigrations.check_enabled?(message_key, version: version)
+
       message = StrongMigrations.error_messages[message_key] || "Missing message"
 
       vars[:migration_name] = self.class.name
@@ -284,10 +286,6 @@ end"
 
     def new_table?(table)
       @new_tables.include?(table.to_s)
-    end
-
-    def enabled?(check)
-      StrongMigrations.check_enabled?(check, version: version)
     end
   end
 end
