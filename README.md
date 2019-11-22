@@ -37,7 +37,11 @@ The following operations can cause downtime or errors:
 - [[+]](#using-change_column_null-with-a-default-value) using `change_column_null` with a default value
 - [[+]](#adding-a-json-column) adding a `json` column
 
-Also checks for best practices:
+Optional checks:
+
+- [[+]](#removing-an-index) removing an index non-concurrently
+
+Best practices:
 
 - [[+]](#keeping-non-unique-indexes-to-three-columns-or-less) keeping non-unique indexes to three columns or less
 
@@ -453,7 +457,7 @@ end
 
 ## Optional Checks [master]
 
-These are checks for operations that rarely cause issues in practice, but can be enabled if desired. Enable with:
+Some operations rarely cause issues in practice, but can be checked if desired. Enable checks with:
 
 ```ruby
 StrongMigrations.enable_check(:remove_index)
