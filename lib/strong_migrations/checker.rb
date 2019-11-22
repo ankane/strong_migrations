@@ -64,6 +64,9 @@ module StrongMigrations
           end
         when :remove_index
           table, options = args
+          unless options.is_a?(Hash)
+            options = {column: options}
+          end
           options ||= {}
 
           if enabled?(:remove_index) && postgresql? && options[:algorithm] != :concurrently && !@new_tables.include?(table.to_s)
