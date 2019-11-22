@@ -14,8 +14,6 @@ end
 adapter = ENV["ADAPTER"] || "postgres"
 ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migrations_test")
 
-StrongMigrations.start_after = 20170101000000
-
 ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout) if ENV["VERBOSE"]
 
 def migrate(migration, direction: :up)

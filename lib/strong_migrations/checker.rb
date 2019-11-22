@@ -287,7 +287,7 @@ end"
     end
 
     def enabled?(check)
-      StrongMigrations.check_enabled?(check)
+      StrongMigrations.check_enabled?(check, version: version)
     end
   end
 end

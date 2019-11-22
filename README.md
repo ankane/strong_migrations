@@ -463,6 +463,12 @@ Some operations rarely cause issues in practice, but can be checked if desired. 
 StrongMigrations.enable_check(:remove_index)
 ```
 
+Start checks after a specific version with:
+
+```ruby
+StrongMigrations.enable_check(:remove_index, start_after: 20170101000000)
+```
+
 ### Removing an index
 
 #### Bad

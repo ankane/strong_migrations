@@ -9,12 +9,12 @@ require "strong_migrations/version"
 
 module StrongMigrations
   class << self
-    attr_accessor :auto_analyze, :start_after, :checks, :error_messages, :target_postgresql_version, :disabled_checks
+    attr_accessor :auto_analyze, :start_after, :checks, :error_messages, :target_postgresql_version, :enabled_checks
   end
   self.auto_analyze = false
   self.start_after = 0
   self.checks = []
-  self.disabled_checks = [:remove_index] # private, may change to enabled_checks
+  self.enabled_checks = {} # private, may change at any time
   self.error_messages = {
     add_column_default:
 "Adding a column with a non-null default causes the entire table to be rewritten.
@@ -195,18 +195,21 @@ end",
     checks << block
   end
 
-  def self.enable_check(check)
-    disabled_checks.delete(check)
+  def self.enable_check(check, start_after: nil)
+    enabled_checks[check] = {start_after: start_after}
   end
 
   def self.disable_check(check)
-    if check_enabled?(check)
-      disabled_checks << check
-    end
+    enabled_checks.delete(check)
   end
 
-  def self.check_enabled?(check)
-    !disabled_checks.include?(check)
+  def self.check_enabled?(check, version: nil)
+    if enabled_checks[check]
+      start_after = enabled_checks[check][:start_after] || StrongMigrations.start_after
+      !version || version > start_after
+    else
+      false
+    end
   end
 end
 

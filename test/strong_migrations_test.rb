@@ -406,11 +406,15 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_version_safe
-    assert_safe VersionSafe
+    with_start_after(20170101000000) do
+      assert_safe VersionSafe
+    end
   end
 
   def test_version_unsafe
-    assert_unsafe VersionUnsafe
+    with_start_after(20170101000000) do
+      assert_unsafe VersionUnsafe
+    end
   end
 
   def test_change_column_null
@@ -451,6 +455,16 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   private
+
+  def with_start_after(start_after)
+    previous = StrongMigrations.start_after
+    begin
+      StrongMigrations.start_after = start_after
+      yield
+    ensure
+      StrongMigrations.start_after = previous
+    end
+  end
 
   def assert_unsafe(migration, message = nil)
     error = assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration) }
