@@ -265,8 +265,8 @@ end"
         if last_arg.any?
           str_args << last_arg.map do |k, v|
             if v.is_a?(Hash)
-              # pretty index: {algorithm: :concurrently}
-              "#{k}: {#{v.map { |k2, v2| "#{k2}: #{v2.inspect}" }.join(", ")}}"
+              # pretty index: { algorithm: :concurrently }
+              "#{k}: { #{v.map { |k2, v2| "#{k2}: #{v2.inspect}" }.join(", ")} }"
             else
               "#{k}: #{v.inspect}"
             end
