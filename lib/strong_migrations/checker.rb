@@ -83,13 +83,7 @@ module StrongMigrations
               options = options.except(:null)
               append = "
 
-Then add the NOT NULL constraint.
-
-class %{migration_name}NotNull < ActiveRecord::Migration%{migration_suffix}
-  def change
-    #{command_str("change_column_null", [table, column, false])}
-  end
-end"
+Then add the NOT NULL constraint."
             end
 
             raise_error :add_column_default,

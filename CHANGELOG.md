@@ -1,4 +1,4 @@
-## 0.5.0 (unreleased)
+## 0.5.0 (2019-12-05)
 
 - Added ability to disable checks
 - Added Postgres-specific check for `change_column_null`

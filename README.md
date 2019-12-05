@@ -34,7 +34,7 @@ The following operations can cause downtime or errors:
 - [[+]](#renaming-or-changing-the-type-of-a-column) renaming a column
 - [[+]](#renaming-a-table) renaming a table
 - [[+]](#creating-a-table-with-the-force-option) creating a table with the `force` option
-- [[+]](#using-change_column_null-with-a-default-value) using `change_column_null` with a default value
+- [[+]](#using-change_column_null) using `change_column_null`
 - [[+]](#adding-a-json-column) adding a `json` column
 
 Optional checks:
@@ -361,7 +361,7 @@ class CreateUsers < ActiveRecord::Migration[6.0]
 end
 ```
 
-### Using change_column_null [master]
+### Using change_column_null
 
 #### Bad
 
@@ -403,7 +403,7 @@ end
 
 Note: This is not 100% the same as `NOT NULL` column constraint. Here’s a [good explanation](https://medium.com/doctolib/adding-a-not-null-constraint-on-pg-faster-with-minimal-locking-38b2c00c4d1c).
 
-### Using change_column_null with a default value
+### Using change_column_null with a default value (non-Postgres)
 
 #### Bad
 
@@ -428,6 +428,8 @@ class ChangeSomeColumnNull < ActiveRecord::Migration[6.0]
   end
 end
 ```
+
+Note: In Postgres, `change_column_null` is still [not safe](#using-change_column_null) with this method.
 
 ### Adding a json column
 
@@ -455,7 +457,7 @@ class AddPropertiesToUsers < ActiveRecord::Migration[6.0]
 end
 ```
 
-## Optional Checks [master]
+## Optional Checks
 
 Some operations rarely cause issues in practice, but can be checked if desired. Enable checks with:
 
@@ -557,7 +559,7 @@ Use the `stop!` method to stop migrations.
 
 Note: Since `remove_column` always requires a `safety_assured` block, it’s not possible to add a custom check for `remove_column` operations.
 
-## Disable Checks [master]
+## Disable Checks
 
 Disable specific checks with:
 
