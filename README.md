@@ -34,7 +34,7 @@ The following operations can cause downtime or errors:
 - [[+]](#renaming-or-changing-the-type-of-a-column) renaming a column
 - [[+]](#renaming-a-table) renaming a table
 - [[+]](#creating-a-table-with-the-force-option) creating a table with the `force` option
-- [[+]](#using-change_column_null) using `change_column_null`
+- [[+]](#setting-not-null-on-an-existing-column) setting `NOT NULL` on an existing column
 - [[+]](#adding-a-json-column) adding a `json` column
 
 Optional checks:
@@ -361,7 +361,7 @@ class CreateUsers < ActiveRecord::Migration[6.0]
 end
 ```
 
-### Using change_column_null
+### Setting `NOT NULL` on an existing column
 
 #### Bad
 
@@ -403,7 +403,7 @@ end
 
 Note: This is not 100% the same as `NOT NULL` column constraint. Here’s a [good explanation](https://medium.com/doctolib/adding-a-not-null-constraint-on-pg-faster-with-minimal-locking-38b2c00c4d1c).
 
-### Using change_column_null with a default value (non-Postgres)
+### Using change_column_null with a default value
 
 #### Bad
 
@@ -429,7 +429,7 @@ class ChangeSomeColumnNull < ActiveRecord::Migration[6.0]
 end
 ```
 
-Note: In Postgres, `change_column_null` is still [not safe](#using-change_column_null) with this method.
+Note: In Postgres, `change_column_null` is still [not safe](#setting-not-null-on-an-existing-column) with this method.
 
 ### Adding a json column
 
