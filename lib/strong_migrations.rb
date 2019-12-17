@@ -3,6 +3,7 @@ require "active_support"
 require "strong_migrations/checker"
 require "strong_migrations/database_tasks"
 require "strong_migrations/migration"
+require "strong_migrations/migration_helpers"
 require "strong_migrations/railtie" if defined?(Rails)
 require "strong_migrations/unsafe_migration"
 require "strong_migrations/version"
@@ -215,6 +216,7 @@ end
 
 ActiveSupport.on_load(:active_record) do
   ActiveRecord::Migration.prepend(StrongMigrations::Migration)
+  ActiveRecord::Migration.send(:include, StrongMigrations::MigrationHelpers)
 
   if defined?(ActiveRecord::Tasks::DatabaseTasks)
     ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)
