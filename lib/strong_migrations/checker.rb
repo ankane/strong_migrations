@@ -231,7 +231,7 @@ Then add the NOT NULL constraint."
 
       message = StrongMigrations.error_messages[message_key] || "Missing message"
 
-      vars[:migration_name] = self.class.name
+      vars[:migration_name] = @migration.class.name
       vars[:migration_suffix] = "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]"
       vars[:base_model] = "ApplicationRecord"
 
