@@ -254,7 +254,17 @@ end
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     if postgres?
-      assert_unsafe AddIndex
+      assert_unsafe AddIndex, <<~EOF
+        Adding an index non-concurrently locks the table. Instead, use:
+
+        class AddIndex < ActiveRecord::Migration[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]
+          disable_ddl_transaction!
+
+          def change
+            add_index :users, :name, algorithm: :concurrently
+          end
+        end
+      EOF
     else
       assert_safe AddIndex
       assert_safe RemoveIndex
