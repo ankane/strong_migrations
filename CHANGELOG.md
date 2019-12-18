@@ -1,3 +1,7 @@
+## 0.5.1 (2019-12-17)
+
+- Fixed migration name in error messages
+
 ## 0.5.0 (2019-12-05)
 
 - Added ability to disable checks
