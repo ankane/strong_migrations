@@ -233,17 +233,10 @@ For Rails 5.2+, use:
 
 ```ruby
 class AddForeignKeyOnUsers < ActiveRecord::Migration[6.0]
+  disable_ddl_transaction!
+
   def change
     add_foreign_key :users, :orders, validate: false
-  end
-end
-```
-
-Then validate it in a separate migration.
-
-```ruby
-class ValidateForeignKeyOnUsers < ActiveRecord::Migration[6.0]
-  def change
     validate_foreign_key :users, :orders
   end
 end
@@ -253,21 +246,18 @@ For Rails < 5.2, use:
 
 ```ruby
 class AddForeignKeyOnUsers < ActiveRecord::Migration[5.1]
-  def change
+  disable_ddl_transaction!
+
+  def up
     safety_assured do
       execute 'ALTER TABLE "users" ADD CONSTRAINT "fk_rails_c1e9b98e31" FOREIGN KEY ("order_id") REFERENCES "orders" ("id") NOT VALID'
+      execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "fk_rails_c1e9b98e31"'
     end
   end
-end
-```
 
-Then validate it in a separate migration.
-
-```ruby
-class ValidateForeignKeyOnUsers < ActiveRecord::Migration[5.1]
-  def change
+  def down
     safety_assured do
-      execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "fk_rails_c1e9b98e31"'
+      execute 'ALTER TABLE "users" DROP CONSTRAINT "fk_rails_c1e9b98e31"'
     end
   end
 end
