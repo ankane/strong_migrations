@@ -1,6 +1,6 @@
-dist: xenial
+dist: bionic
 language: ruby
-rvm: 2.6.3
+rvm: 2.6
 gemfile:
   - Gemfile
   - test/gemfiles/activerecord52.gemfile
@@ -9,6 +9,8 @@ gemfile:
 script: bundle exec rake test
 services:
   - postgresql
+addons:
+  postgresql: 10
 before_script:
   - createdb strong_migrations_test
 matrix:
