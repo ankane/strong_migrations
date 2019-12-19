@@ -251,6 +251,14 @@ class Custom < TestMigration
   end
 end
 
+class CheckTimeouts < TestMigration
+  def change
+    safety_assured { execute "SELECT 1" }
+    $statement_timeout = connection.select_all("SHOW statement_timeout").first["statement_timeout"].to_i
+    $lock_timeout = connection.select_all("SHOW lock_timeout").first["lock_timeout"].to_i
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     if postgres?
@@ -462,6 +470,21 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_custom
     assert_unsafe Custom, "Cannot add forbidden column"
+  end
+
+  def test_timeouts
+    skip unless postgres?
+
+    StrongMigrations.statement_timeout = 1.hour
+    StrongMigrations.lock_timeout = 10.seconds
+
+    migrate CheckTimeouts
+
+    assert_equal 3600, $statement_timeout
+    assert_equal 10, $lock_timeout
+  ensure
+    StrongMigrations.statement_timeout = nil
+    StrongMigrations.lock_timeout = nil
   end
 
   private

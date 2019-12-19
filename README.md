@@ -624,15 +624,29 @@ Analyze tables automatically (to update planner statistics) after an index is ad
 StrongMigrations.auto_analyze = true
 ```
 
-### Lock Timeout
+### Timeouts
 
-It’s a good idea to set a lock timeout for the database user that runs migrations. This way, if migrations can’t acquire a lock in a timely manner, other statements won’t be stuck behind it. Here’s a great explanation of [how lock queues work](https://www.citusdata.com/blog/2018/02/15/when-postgresql-blocks/).
+It’s a good idea to set a long statement timeout and a short lock timeout for migrations. This way, migrations can run for a while, and if a migration can’t acquire a lock in a timely manner, other statements won’t be stuck behind it. Here’s a great explanation of [how lock queues work](https://www.citusdata.com/blog/2018/02/15/when-postgresql-blocks/).
+
+You can use: [master]
+
+```ruby
+StrongMigrations.statement_timeout = 1.hour
+StrongMigrations.lock_timeout = 10.seconds
+```
+
+Or set the timeouts directly on the database user that runs migrations.
 
 ```sql
+ALTER ROLE myuser SET statement_timeout = '1h';
 ALTER ROLE myuser SET lock_timeout = '10s';
 ```
 
-There’s also [a gem](https://github.com/gocardless/activerecord-safer_migrations) you can use for this.
+Note: If you use PgBouncer in transaction mode, you must set timeouts on the database user.
+
+### Permissions
+
+We recommend using a [separate database user](https://ankane.org/postgres-users) for migrations when possible so you don’t need to grant your app user permission to alter tables.
 
 ### Target Version
 

@@ -1,3 +1,7 @@
+## 0.5.2 (unreleased)
+
+- Added `statement_timeout` and `lock_timeout` functionality
+
 ## 0.5.1 (2019-12-17)
 
 - Fixed migration name in error messages

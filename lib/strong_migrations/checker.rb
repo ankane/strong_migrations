@@ -6,6 +6,7 @@ module StrongMigrations
       @migration = migration
       @new_tables = []
       @safe = false
+      @timeouts_set = false
     end
 
     def safety_assured
@@ -19,6 +20,8 @@ module StrongMigrations
     end
 
     def perform(method, *args)
+      set_timeouts
+
       unless safe?
         case method
         when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
@@ -190,6 +193,14 @@ Then add the NOT NULL constraint."
       end
 
       result
+    end
+
+    def set_timeouts
+      if !@timeouts_set
+        connection.select_all("SET statement_timeout TO #{connection.quote(StrongMigrations.statement_timeout)}") if StrongMigrations.statement_timeout
+        connection.select_all("SET lock_timeout TO #{connection.quote(StrongMigrations.lock_timeout)}") if StrongMigrations.lock_timeout
+        @timeouts_set = true
+      end
     end
 
     private
