@@ -32,6 +32,13 @@ module StrongMigrations
       end
     end
 
+    def add_null_constraint(table_name, column_name, name: nil)
+      ensure_postgresql(__method__)
+
+      name ||= null_constraint_name(table_name, column_name)
+      execute quote_identifiers("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL)", [table_name, name, column_name])
+    end unless method_defined?(:add_null_constraint)
+
     def add_null_constraint_safely(table_name, column_name)
       ensure_postgresql(__method__)
       ensure_not_in_transaction(__method__)
