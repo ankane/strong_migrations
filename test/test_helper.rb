@@ -49,7 +49,7 @@ end
 migrate CreateUsers
 
 class Minitest::Test
-  def postgres?
+  def postgresql?
     ENV["ADAPTER"].nil?
   end
 end

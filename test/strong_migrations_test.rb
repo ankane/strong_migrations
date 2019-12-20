@@ -261,7 +261,7 @@ end
 
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
-    if postgres?
+    if postgresql?
       assert_unsafe AddIndex, <<~EOF
         Adding an index non-concurrently locks the table. Instead, use:
 
@@ -280,7 +280,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_index_up
-    if postgres?
+    if postgresql?
       assert_unsafe AddIndexUp
     else
       assert_safe AddIndexUp
@@ -301,13 +301,13 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_index_safe_postgres
-    skip unless postgres?
+    skip unless postgresql?
     assert_safe AddIndexSafePostgres
     assert_safe RemoveIndex
   end
 
   def test_remove_index_postgres
-    skip unless postgres?
+    skip unless postgresql?
     assert_safe AddIndexSafePostgres
 
     begin
@@ -331,7 +331,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_column_json
-    skip unless postgres?
+    skip unless postgresql?
     assert_unsafe AddColumnJson
   end
 
@@ -340,7 +340,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_change_column_varchar_to_text
-    skip unless postgres?
+    skip unless postgresql?
     assert_safe ChangeColumnVarcharToText
   end
 
@@ -385,37 +385,37 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_index_columns_unique
-    skip unless postgres?
+    skip unless postgresql?
     assert_safe AddIndexColumnsUnique
   end
 
   def test_add_reference
-    skip unless postgres?
+    skip unless postgresql?
     assert_unsafe AddReference
   end
 
   def test_add_reference_polymorphic
-    skip unless postgres?
+    skip unless postgresql?
     assert_unsafe AddReferencePolymorphic
   end
 
   def test_safe_add_reference
-    skip unless postgres?
+    skip unless postgresql?
     assert_safe SafeAddReference
   end
 
   def test_add_reference_default
-    skip unless postgres?
+    skip unless postgresql?
     assert_unsafe AddReferenceDefault
   end
 
   def test_add_reference_concurrently
-    skip unless postgres?
+    skip unless postgresql?
     assert_safe AddReferenceConcurrently
   end
 
   def test_add_belongs_to
-    skip unless postgres?
+    skip unless postgresql?
     assert_unsafe AddBelongsTo
   end
 
@@ -440,7 +440,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_change_column_null_no_default
-    if postgres?
+    if postgresql?
       assert_unsafe ChangeColumnNullNoDefault
     else
       assert_safe ChangeColumnNullNoDefault
@@ -453,7 +453,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_foreign_key
-    if postgres?
+    if postgresql?
       assert_unsafe AddForeignKey
     else
       assert_safe AddForeignKey
@@ -461,7 +461,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_foreign_key_safe
-    if postgres? && ActiveRecord::VERSION::STRING <= "5.2"
+    if postgresql? && ActiveRecord::VERSION::STRING <= "5.2"
       assert_unsafe AddForeignKeySafe
     else
       assert_safe AddForeignKeySafe
@@ -473,7 +473,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_timeouts
-    skip unless postgres?
+    skip unless postgresql?
 
     StrongMigrations.statement_timeout = 1.hour
     StrongMigrations.lock_timeout = 10.seconds

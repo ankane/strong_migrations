@@ -16,7 +16,7 @@ end
 
 class MigrationHelpersTest < Minitest::Test
   def test_add_foreign_key_safely
-    skip unless postgres?
+    skip unless postgresql?
 
     migrate(AddForeignKeySafely)
 
@@ -34,13 +34,13 @@ class MigrationHelpersTest < Minitest::Test
   end
 
   def test_add_foreign_key_safely_raises_inside_transaction
-    skip unless postgres?
+    skip unless postgresql?
     error = assert_raises(StrongMigrations::Error) { migrate_inside_transaction(AddForeignKeySafelyTransaction) }
     assert_match "Cannot run `add_foreign_key_safely` inside a transaction", error.message
   end
 
   def test_add_foreign_key_safely_raises_for_non_postgres
-    skip if postgres?
+    skip if postgresql?
     error = assert_raises(StrongMigrations::Error) { migrate(AddForeignKeySafely) }
     assert_match "Postgres only", error.message
   end
