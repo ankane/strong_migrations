@@ -32,17 +32,17 @@ module StrongMigrations
       end
     end
 
-    def add_null_constraint_safely(table_name, column_name)
+    def add_null_constraint_safely(table_name, column_name, name: nil)
       ensure_postgresql(__method__)
       ensure_not_in_transaction(__method__)
 
       reversible do |dir|
         dir.up do
-          constraint_name = null_constraint_name(table_name, column_name)
+          name ||= null_constraint_name(table_name, column_name)
 
           safety_assured do
-            execute quote_identifiers("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table_name, constraint_name, column_name])
-            execute quote_identifiers("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table_name, constraint_name])
+            execute quote_identifiers("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table_name, name, column_name])
+            execute quote_identifiers("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table_name, name])
           end
         end
 
@@ -53,17 +53,17 @@ module StrongMigrations
     end
 
     # removing constraints is safe, but this method is safe to reverse as well
-    def remove_null_constraint_safely(table_name, column_name)
+    def remove_null_constraint_safely(table_name, column_name, name: nil)
       # could also ensure in transaction so it can be reversed
       # but that's more of a concern for a reversible migrations check
       ensure_postgresql(__method__)
 
       reversible do |dir|
         dir.up do
-          constraint_name = null_constraint_name(table_name, column_name)
+          name ||= null_constraint_name(table_name, column_name)
 
           safety_assured do
-            execute quote_identifiers("ALTER TABLE %s DROP CONSTRAINT %s", [table_name, constraint_name])
+            execute quote_identifiers("ALTER TABLE %s DROP CONSTRAINT %s", [table_name, name])
           end
         end
         dir.down do
