@@ -165,7 +165,7 @@ end",
 
     change_column_null_postgresql:
 "Setting NOT NULL on a column requires an AccessExclusiveLock,
-which is expensive on large tables. Instead, use a constraint and
+which is expensive on large tables. Instead, we can use a constraint and
 validate it in a separate step with a more agreeable RowShareLock.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
