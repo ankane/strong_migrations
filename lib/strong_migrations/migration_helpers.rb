@@ -66,6 +66,7 @@ module StrongMigrations
             execute quote_identifiers("ALTER TABLE %s DROP CONSTRAINT %s", [table_name, name])
           end
         end
+
         dir.down do
           add_null_constraint_safely(table_name, column_name)
         end
