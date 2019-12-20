@@ -4,20 +4,12 @@ module StrongMigrations
       ensure_postgresql(__method__)
       ensure_not_in_transaction(__method__)
 
-      if ActiveRecord::VERSION::STRING >= "5.2"
-        reversible do |dir|
-          dir.up do
+      reversible do |dir|
+        dir.up do
+          if ActiveRecord::VERSION::STRING >= "5.2"
             add_foreign_key(from_table, to_table, options.merge(validate: false))
             validate_foreign_key(from_table, to_table)
-          end
-
-          dir.down do
-            remove_foreign_key(from_table, to_table)
-          end
-        end
-      else
-        reversible do |dir|
-          dir.up do
+          else
             options = connection.foreign_key_options(from_table, to_table, options)
             fk_name, column, primary_key = options.values_at(:name, :column, :primary_key)
             primary_key ||= "id"
@@ -32,10 +24,10 @@ module StrongMigrations
               execute quote_identifiers("ALTER TABLE %s VALIDATE CONSTRAINT %s", [from_table, fk_name])
             end
           end
+        end
 
-          dir.down do
-            remove_foreign_key(from_table, to_table)
-          end
+        dir.down do
+          remove_foreign_key(from_table, to_table)
         end
       end
     end
