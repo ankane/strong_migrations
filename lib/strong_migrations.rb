@@ -3,6 +3,7 @@ require "active_support"
 require "strong_migrations/checker"
 require "strong_migrations/database_tasks"
 require "strong_migrations/migration"
+require "strong_migrations/migration_helpers"
 require "strong_migrations/railtie" if defined?(Rails)
 require "strong_migrations/unsafe_migration"
 require "strong_migrations/version"
@@ -175,18 +176,15 @@ end",
 
     add_foreign_key:
 "New foreign keys are validated by default. This acquires an AccessExclusiveLock,
-which is expensive on large tables. Instead, validate it in a separate migration
+which is expensive on large tables. To work around this, you can use `add_foreign_key_concurrently`
+helper. This method ensures that no downtime is needed. It will create foreign key and validate it separately
 with a more agreeable RowShareLock.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
-  def change
-    %{add_foreign_key_code}
-  end
-end
+  disable_ddl_transaction!
 
-class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
-    %{validate_foreign_key_code}
+    %{command}
   end
 end",
   }
@@ -219,5 +217,6 @@ ActiveSupport.on_load(:active_record) do
 
   if defined?(ActiveRecord::Tasks::DatabaseTasks)
     ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)
+    ActiveRecord::Migration.include(StrongMigrations::MigrationHelpers)
   end
 end
