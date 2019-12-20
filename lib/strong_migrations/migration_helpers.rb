@@ -54,6 +54,7 @@ module StrongMigrations
 
     def remove_null_constraint_safely(table_name, column_name)
       # could also ensure in transaction so it can be reversed
+      # but that's more of a concern for a reversible migrations check
       ensure_postgresql(__method__)
 
       reversible do |dir|
