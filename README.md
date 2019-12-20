@@ -181,7 +181,13 @@ class AddSomeIndexToUsers < ActiveRecord::Migration[6.0]
 end
 ```
 
-If you forget `disable_ddl_transaction!`, the migration will fail. Also, note that indexes on new tables (those created in the same migration) don’t require this. Check out [gindex](https://github.com/ankane/gindex) to quickly generate index migrations without memorizing the syntax.
+If you forget `disable_ddl_transaction!`, the migration will fail. Also, note that indexes on new tables (those created in the same migration) don’t require this.
+
+With [gindex](https://github.com/ankane/gindex), you can generate an index migration instantly with:
+
+```sh
+rails generate index table column
+```
 
 ### Adding a reference
 
