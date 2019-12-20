@@ -32,31 +32,40 @@ module StrongMigrations
       end
     end
 
-    def change_column_null_safely(table_name, column_name, null, default = nil)
+    def add_null_constraint_safely(table_name, column_name)
       ensure_postgresql(__method__)
       ensure_not_in_transaction(__method__)
 
-      if null
-        change_column_null(table_name, column_name, null, default)
-      else
-        raise StrongMigrations::Error, "Default not supported yet" unless default.nil?
+      reversible do |dir|
+        dir.up do
+          constraint_name = null_constraint_name(table_name, column_name)
 
-        # match https://github.com/nullobject/rein
-        constraint_name = "#{table_name}_#{column_name}_null"
-
-        reversible do |dir|
-          dir.up do
-            safety_assured do
-              execute quote_identifiers("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table_name, constraint_name, column_name])
-              execute quote_identifiers("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table_name, constraint_name])
-            end
+          safety_assured do
+            execute quote_identifiers("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table_name, constraint_name, column_name])
+            execute quote_identifiers("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table_name, constraint_name])
           end
+        end
 
-          dir.down do
-            safety_assured do
-              execute quote_identifiers("ALTER TABLE %s DROP CONSTRAINT %s", [table_name, constraint_name])
-            end
+        dir.down do
+          remove_null_constraint_safely(table_name, column_name)
+        end
+      end
+    end
+
+    def remove_null_constraint_safely(table_name, column_name)
+      # could also ensure in transaction so it can be reversed
+      ensure_postgresql(__method__)
+
+      reversible do |dir|
+        dir.up do
+          constraint_name = null_constraint_name(table_name, column_name)
+
+          safety_assured do
+            execute quote_identifiers("ALTER TABLE %s DROP CONSTRAINT %s", [table_name, constraint_name])
           end
+        end
+        dir.down do
+          add_null_constraint_safely(table_name, column_name)
         end
       end
     end
@@ -75,6 +84,11 @@ module StrongMigrations
       if connection.transaction_open?
         raise StrongMigrations::Error, "Cannot run `#{method_name}` inside a transaction. Use `disable_ddl_transaction` to disable the transaction."
       end
+    end
+
+    # match https://github.com/nullobject/rein
+    def null_constraint_name(table_name, column_name)
+      "#{table_name}_#{column_name}_null"
     end
 
     def on_delete_update_statement(delete_or_update, action)

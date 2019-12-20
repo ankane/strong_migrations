@@ -143,7 +143,7 @@ Then add the NOT NULL constraint."
           if !null
             if postgresql?
               raise_error :change_column_null_postgresql,
-                command: command_str(:change_column_null_safely, args)
+                command: command_str(:add_null_constraint_safely, args)
             elsif !default.nil?
               raise_error :change_column_null,
                 code: backfill_code(table, column, default)

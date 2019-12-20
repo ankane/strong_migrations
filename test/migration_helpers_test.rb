@@ -6,9 +6,9 @@ class AddForeignKeySafely < TestMigration
   end
 end
 
-class ChangeColumnNullSafely < TestMigration
+class AddNullConstraintSafely < TestMigration
   def change
-    change_column_null_safely :users, :name, false
+    add_null_constraint_safely :users, :name
   end
 end
 
@@ -43,11 +43,11 @@ class MigrationHelpersTest < Minitest::Test
     assert_match "Postgres only", error.message
   end
 
-  def test_change_column_null_safely
+  def test_add_null_constraint_safely
     skip unless postgresql?
 
-    migrate(ChangeColumnNullSafely)
-    migrate(ChangeColumnNullSafely, direction: :down)
+    migrate(AddNullConstraintSafely)
+    migrate(AddNullConstraintSafely, direction: :down)
   end
 
   private
