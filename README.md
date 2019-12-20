@@ -186,7 +186,7 @@ If you forget `disable_ddl_transaction!`, the migration will fail. Also, note th
 With [gindex](https://github.com/ankane/gindex), you can generate an index migration instantly with:
 
 ```sh
-rails generate index table column
+rails g index table column
 ```
 
 ### Adding a reference
