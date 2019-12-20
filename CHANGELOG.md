@@ -1,5 +1,6 @@
 ## 0.5.2 (unreleased)
 
+- Added `add_foreign_key_safely` method
 - Added `statement_timeout` and `lock_timeout` functionality
 
 ## 0.5.1 (2019-12-17)

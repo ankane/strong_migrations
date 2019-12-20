@@ -1,14 +1,20 @@
+# dependencies
 require "active_support"
 
+# modules
 require "strong_migrations/checker"
 require "strong_migrations/database_tasks"
 require "strong_migrations/migration"
 require "strong_migrations/migration_helpers"
-require "strong_migrations/railtie" if defined?(Rails)
-require "strong_migrations/unsafe_migration"
 require "strong_migrations/version"
 
+# integrations
+require "strong_migrations/railtie" if defined?(Rails)
+
 module StrongMigrations
+  class Error < StandardError; end
+  class UnsafeMigration < Error; end
+
   class << self
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
       :target_postgresql_version, :enabled_checks, :lock_timeout, :statement_timeout
@@ -176,8 +182,7 @@ end",
 
     add_foreign_key:
 "New foreign keys are validated by default. This acquires an AccessExclusiveLock,
-which is expensive on large tables. To work around this, you can use `add_foreign_key_concurrently`
-helper. This method ensures that no downtime is needed. It will create foreign key and validate it separately
+which is expensive on large tables. Instead, we can validate it in a separate step
 with a more agreeable RowShareLock.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
@@ -214,9 +219,9 @@ end
 
 ActiveSupport.on_load(:active_record) do
   ActiveRecord::Migration.prepend(StrongMigrations::Migration)
+  ActiveRecord::Migration.include(StrongMigrations::MigrationHelpers)
 
   if defined?(ActiveRecord::Tasks::DatabaseTasks)
     ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)
-    ActiveRecord::Migration.include(StrongMigrations::MigrationHelpers)
   end
 end

@@ -161,7 +161,7 @@ Then add the NOT NULL constraint."
           if postgresql?
             if ActiveRecord::VERSION::STRING < "5.2" || validate
               raise_error :add_foreign_key,
-                command: command_str(:add_foreign_key_concurrently, [from_table, to_table, options])
+                command: command_str(:add_foreign_key_safely, [from_table, to_table, options])
             end
           end
         end
