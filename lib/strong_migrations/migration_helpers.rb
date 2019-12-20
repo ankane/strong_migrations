@@ -10,7 +10,7 @@ module StrongMigrations
       else
         reversible do |dir|
           dir.up do
-            options = foreign_key_options(from_table, to_table, options)
+            options = connection.foreign_key_options(from_table, to_table, options)
             fk_name, column, primary_key = options.values_at(:name, :column, :primary_key)
             primary_key ||= "id"
 
