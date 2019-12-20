@@ -142,12 +142,8 @@ Then add the NOT NULL constraint."
           table, column, null, default = args
           if !null
             if postgresql?
-              # match https://github.com/nullobject/rein
-              constraint_name = "#{table}_#{column}_null"
-
               raise_error :change_column_null_postgresql,
-                add_constraint_code: constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column]),
-                validate_constraint_code: constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
+                command: command_str(:change_column_null_safely, args)
             elsif !default.nil?
               raise_error :change_column_null,
                 code: backfill_code(table, column, default)

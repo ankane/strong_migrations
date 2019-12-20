@@ -6,6 +6,12 @@ class AddForeignKeySafely < TestMigration
   end
 end
 
+class ChangeColumnNullSafely < TestMigration
+  def change
+    change_column_null_safely :users, :name, false
+  end
+end
+
 class MigrationHelpersTest < Minitest::Test
   def test_add_foreign_key_safely
     skip unless postgresql?
@@ -35,6 +41,13 @@ class MigrationHelpersTest < Minitest::Test
     skip if postgresql?
     error = assert_raises(StrongMigrations::Error) { migrate(AddForeignKeySafely) }
     assert_match "Postgres only", error.message
+  end
+
+  def test_change_column_null_safely
+    skip unless postgresql?
+
+    migrate(ChangeColumnNullSafely)
+    migrate(ChangeColumnNullSafely, direction: :down)
   end
 
   private

@@ -32,6 +32,35 @@ module StrongMigrations
       end
     end
 
+    def change_column_null_safely(table_name, column_name, null, default = nil)
+      ensure_postgresql(__method__)
+      ensure_not_in_transaction(__method__)
+
+      if null
+        change_column_null(table_name, column_name, null, default)
+      else
+        raise StrongMigrations::Error, "Default not supported yet" unless default.nil?
+
+        # match https://github.com/nullobject/rein
+        constraint_name = "#{table_name}_#{column_name}_null"
+
+        reversible do |dir|
+          dir.up do
+            safety_assured do
+              execute quote_identifiers("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table_name, constraint_name, column_name])
+              execute quote_identifiers("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table_name, constraint_name])
+            end
+          end
+
+          dir.down do
+            safety_assured do
+              execute quote_identifiers("ALTER TABLE %s DROP CONSTRAINT %s", [table_name, constraint_name])
+            end
+          end
+        end
+      end
+    end
+
     private
 
     def ensure_postgresql(method_name)
