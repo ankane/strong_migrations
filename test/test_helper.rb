@@ -48,6 +48,9 @@ class CreateUsers < TestMigration
 end
 migrate CreateUsers
 
+class User < ActiveRecord::Base
+end
+
 class Minitest::Test
   def postgresql?
     ENV["ADAPTER"].nil?

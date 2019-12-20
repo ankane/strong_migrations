@@ -1,5 +1,7 @@
 module StrongMigrations
   class Checker
+    include Util
+
     attr_accessor :direction
 
     def initialize(migration)
@@ -81,20 +83,8 @@ module StrongMigrations
           default = options[:default]
 
           if !default.nil? && !(postgresql? && postgresql_version >= 110000)
-
-            if options[:null] == false
-              options = options.except(:null)
-              append = "
-
-Then add the NOT NULL constraint."
-            end
-
             raise_error :add_column_default,
-              add_command: command_str("add_column", [table, column, type, options.except(:default)]),
-              change_command: command_str("change_column_default", [table, column, default]),
-              remove_command: command_str("remove_column", [table, column]),
-              code: backfill_code(table, column, default),
-              append: append
+              command: command_str("add_column_safely", [table, column, type, options])
           end
 
           if type.to_s == "json" && postgresql?
@@ -186,10 +176,6 @@ Then add the NOT NULL constraint."
 
     private
 
-    def connection
-      @migration.connection
-    end
-
     def version
       @migration.version
     end
@@ -200,22 +186,6 @@ Then add the NOT NULL constraint."
 
     def version_safe?
       version && version <= StrongMigrations.start_after
-    end
-
-    def postgresql?
-      %w(PostgreSQL PostGIS).include?(connection.adapter_name)
-    end
-
-    def postgresql_version
-      @postgresql_version ||= begin
-        target_version = StrongMigrations.target_postgresql_version
-        if target_version && defined?(Rails) && (Rails.env.development? || Rails.env.test?)
-          # we only need major version right now
-          target_version.to_i * 10000
-        else
-          connection.execute("SHOW server_version_num").first["server_version_num"].to_i
-        end
-      end
     end
 
     def raise_error(message_key, header: nil, **vars)
@@ -238,7 +208,7 @@ Then add the NOT NULL constraint."
 
     def constraint_str(statement, identifiers)
       # not all identifiers are tables, but this method of quoting should be fine
-      code = statement % identifiers.map { |v| connection.quote_table_name(v) }
+      code = quote_identifiers(statement, identifiers)
       "safety_assured do\n      execute '#{code}' \n    end"
     end
 
