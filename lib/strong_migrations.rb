@@ -2,6 +2,7 @@
 require "active_support"
 
 # modules
+require "strong_migrations/util"
 require "strong_migrations/checker"
 require "strong_migrations/database_tasks"
 require "strong_migrations/migration"
@@ -25,28 +26,15 @@ module StrongMigrations
   self.error_messages = {
     add_column_default:
 "Adding a column with a non-null default causes the entire table to be rewritten.
-Instead, add the column without a default value, then change the default.
+Instead, add the column without a default value, backfill and then change the default.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
-  def up
-    %{add_command}
-    %{change_command}
-  end
-
-  def down
-    %{remove_command}
-  end
-end
-
-Then backfill the existing rows in the Rails console or a separate migration with disable_ddl_transaction!.
-
-class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   disable_ddl_transaction!
 
   def change
-    %{code}
+    %{command}
   end
-end%{append}",
+end",
 
     add_column_json:
 "There's no equality operator for the json column type, which can

@@ -61,7 +61,7 @@ end
 class AddColumnDefaultSafe < TestMigration
   def change
     add_column :users, :nice, :boolean
-    change_column_default :users, :nice, false
+    change_column_default :users, :nice, from: nil, to: false
   end
 end
 
@@ -328,6 +328,7 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_add_column_default_safe
     assert_safe AddColumnDefaultSafe
+    assert_safe AddColumnDefaultSafe, direction: :down
   end
 
   def test_add_column_json

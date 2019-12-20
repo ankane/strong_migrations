@@ -2,6 +2,8 @@
 
 - Added `add_foreign_key_safely` method
 - Added `add_null_constraint_safely` and `remove_null_constraint_safely` methods
+- Added `add_column_safely` method
+- Added `backfill_column_safely` method
 - Added `statement_timeout` and `lock_timeout` functionality
 
 ## 0.5.1 (2019-12-17)
