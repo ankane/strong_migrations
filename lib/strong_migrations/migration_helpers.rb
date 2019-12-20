@@ -52,6 +52,7 @@ module StrongMigrations
       end
     end
 
+    # removing constraints is safe, but this method is safe to reverse as well
     def remove_null_constraint_safely(table_name, column_name)
       # could also ensure in transaction so it can be reversed
       # but that's more of a concern for a reversible migrations check
