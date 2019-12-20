@@ -12,6 +12,18 @@ class AddNullConstraintSafely < TestMigration
   end
 end
 
+class AddColumnSafely < TestMigration
+  def change
+    add_column_safely :users, :nice, :boolean, default: true, null: false
+  end
+end
+
+class BackfillColumnSafely < TestMigration
+  def up
+    backfill_column_safely :users, :city, "Kyiv", batch_size: 1
+  end
+end
+
 class MigrationHelpersTest < Minitest::Test
   def test_add_foreign_key_safely
     skip unless postgresql?
@@ -48,6 +60,48 @@ class MigrationHelpersTest < Minitest::Test
 
     migrate(AddNullConstraintSafely)
     migrate(AddNullConstraintSafely, direction: :down)
+  end
+
+  def test_add_column_safely_raises_inside_transaction
+    skip unless postgresql?
+    error = assert_raises(StrongMigrations::Error) { migrate_inside_transaction(AddColumnSafely) }
+    assert_match "Cannot run `add_column_safely` inside a transaction", error.message
+  end
+
+  def test_add_foreign_key_safely_raises_for_non_postgres
+    skip if postgresql?
+    error = assert_raises(StrongMigrations::Error) { migrate(AddColumnSafely) }
+    assert_match "is intended for Postgres", error.message
+  end
+
+  def test_add_column_safely
+    skip unless postgresql?
+
+    User.reset_column_information
+    migrate(AddColumnSafely)
+
+    column = User.columns.find { |c| c.name == "nice" }
+    assert_equal :boolean, column.type
+    assert_equal "true", column.default
+    assert_equal false, column.null
+
+    migrate(AddColumnSafely, direction: :down)
+  ensure
+    User.reset_column_information
+  end
+
+  def test_backfill_column_safely_raises_inside_transaction
+    error = assert_raises(StrongMigrations::Error) { migrate_inside_transaction(BackfillColumnSafely) }
+    assert_match "Cannot run `backfill_column_safely` inside a transaction", error.message
+  end
+
+  def test_backfill_column_safely
+    User.create([{ name: "John", city: "San Francisco" }, { name: "Jane", city: "London" }])
+    migrate(BackfillColumnSafely)
+    users = User.all
+    assert users.all? { |u| u.city == "Kyiv" }
+  ensure
+    User.delete_all
   end
 
   private
