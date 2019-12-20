@@ -5,8 +5,16 @@ module StrongMigrations
       ensure_not_in_transaction(__method__)
 
       if ActiveRecord::VERSION::STRING >= "5.2"
-        add_foreign_key(from_table, to_table, options.merge(validate: false))
-        validate_foreign_key(from_table, to_table)
+        reversible do |dir|
+          dir.up do
+            add_foreign_key(from_table, to_table, options.merge(validate: false))
+            validate_foreign_key(from_table, to_table)
+          end
+
+          dir.down do
+            remove_foreign_key(from_table, to_table)
+          end
+        end
       else
         reversible do |dir|
           dir.up do
