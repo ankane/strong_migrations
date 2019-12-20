@@ -1,5 +1,7 @@
 module StrongMigrations
   class Checker
+    include Util
+
     attr_accessor :direction
 
     def initialize(migration)
@@ -81,20 +83,24 @@ module StrongMigrations
           default = options[:default]
 
           if !default.nil? && !((postgresql? && postgresql_version >= Gem::Version.new("11")) || (mysql? && mysql_version >= Gem::Version.new("8.0.12")) || (mariadb? && mariadb_version >= Gem::Version.new("10.3.2")))
-
-            if options[:null] == false
-              options = options.except(:null)
-              append = "
+            if helpers?
+              raise_error :add_column_default_helper,
+                command: command_str("add_column_safely", [table, column, type, options])
+            else
+              if options[:null] == false
+                options = options.except(:null)
+                append = "
 
 Then add the NOT NULL constraint."
-            end
+              end
 
-            raise_error :add_column_default,
-              add_command: command_str("add_column", [table, column, type, options.except(:default)]),
-              change_command: command_str("change_column_default", [table, column, default]),
-              remove_command: command_str("remove_column", [table, column]),
-              code: backfill_code(table, column, default),
-              append: append
+              raise_error :add_column_default,
+                add_command: command_str("add_column", [table, column, type, options.except(:default)]),
+                change_command: command_str("change_column_default", [table, column, default]),
+                remove_command: command_str("remove_column", [table, column]),
+                code: backfill_code(table, column, default),
+                append: append
+            end
           end
 
           if type.to_s == "json" && postgresql?
@@ -259,43 +265,6 @@ Then add the NOT NULL constraint."
       version && version <= StrongMigrations.start_after
     end
 
-    def postgresql?
-      connection.adapter_name =~ /postg/i # PostgreSQL, PostGIS
-    end
-
-    def postgresql_version
-      @postgresql_version ||= begin
-        target_version(StrongMigrations.target_postgresql_version) do
-          # only works with major versions
-          connection.select_all("SHOW server_version_num").first["server_version_num"].to_i / 10000
-        end
-      end
-    end
-
-    def mysql?
-      connection.adapter_name =~ /mysql/i && !connection.try(:mariadb?)
-    end
-
-    def mysql_version
-      @mysql_version ||= begin
-        target_version(StrongMigrations.target_mysql_version) do
-          connection.select_all("SELECT VERSION()").first["VERSION()"].split("-").first
-        end
-      end
-    end
-
-    def mariadb?
-      connection.adapter_name =~ /mysql/i && connection.try(:mariadb?)
-    end
-
-    def mariadb_version
-      @mariadb_version ||= begin
-        target_version(StrongMigrations.target_mariadb_version) do
-          connection.select_all("SELECT VERSION()").first["VERSION()"].split("-").first
-        end
-      end
-    end
-
     def target_version(target_version)
       version =
         if target_version && defined?(Rails) && (Rails.env.development? || Rails.env.test?)
@@ -330,7 +299,7 @@ Then add the NOT NULL constraint."
 
     def constraint_str(statement, identifiers)
       # not all identifiers are tables, but this method of quoting should be fine
-      code = statement % identifiers.map { |v| connection.quote_table_name(v) }
+      code = quote_identifiers(statement, identifiers)
       "safety_assured do\n      execute '#{code}' \n    end"
     end
 

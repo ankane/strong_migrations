@@ -2,6 +2,7 @@
 require "active_support"
 
 # modules
+require "strong_migrations/util"
 require "strong_migrations/checker"
 require "strong_migrations/database_tasks"
 require "strong_migrations/migration"
@@ -48,6 +49,18 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
     %{code}
   end
 end%{append}",
+
+    add_column_default_helper:
+"Adding a column with a non-null default causes the entire table to be rewritten.
+Instead, add the column without a default value, change the default and then backfill.
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  disable_ddl_transaction!
+
+  def change
+    %{command}
+  end
+end",
 
     add_column_json:
 "There's no equality operator for the json column type, which can

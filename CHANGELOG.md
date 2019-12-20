@@ -14,6 +14,8 @@
 - Added `auto_analyze` for MySQL and MariaDB
 - Added `target_mysql_version` and `target_mariadb_version`
 - Switched to `up` for backfilling
+- Added `add_column_safely` method
+- Added `backfill_column_safely` method
 
 ## 0.5.1 (2019-12-17)
 

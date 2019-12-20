@@ -1,5 +1,7 @@
 module StrongMigrations
   module MigrationHelpers
+    include Util
+
     def add_foreign_key_safely(from_table, to_table, **options)
       ensure_postgresql(__method__)
       ensure_not_in_transaction(__method__)
@@ -73,14 +75,83 @@ module StrongMigrations
       end
     end
 
+    def add_column_safely(table_name, column_name, type, **options)
+      default = options.delete(:default)
+
+      if column_can_be_added_safely?(default)
+        safety_assured { add_column(table_name, column_name, type, default: default, **options) }
+      else
+        ensure_not_in_transaction(__method__)
+
+        reversible do |dir|
+          dir.up do
+            transaction do
+              add_column(table_name, column_name, type, default: nil, **options)
+              change_column_default(table_name, column_name, default)
+            end
+
+            backfill_column_safely(table_name, column_name, default)
+
+            allow_null = options[:null]
+            add_null_constraint_safely(table_name, column_name) unless allow_null
+          end
+
+          dir.down do
+            remove_column(table_name, column_name)
+          end
+        end
+      end
+    end
+
+    def backfill_column_safely(table_name, column_name, value)
+      ensure_not_in_transaction(__method__)
+
+      table = Arel::Table.new(table_name)
+      primary_key = connection.primary_key(table_name)
+
+      start_arel = table
+        .project(table[primary_key])
+        .where(table[column_name].eq(nil))
+        .order(table[primary_key].asc)
+        .take(1)
+
+      result = connection.exec_query(start_arel.to_sql)
+      return if result.empty?
+
+      start_pk = result.first[primary_key]
+      batch_size = 10_000
+
+      loop do
+        finish_arel = table
+          .project(table[primary_key])
+          .where(table[primary_key].gteq(start_pk))
+          .order(table[primary_key].asc)
+          .skip(batch_size)
+          .take(1)
+
+        finish_result = connection.exec_query(finish_arel.to_sql).first
+
+        update_arel = Arel::UpdateManager.new
+          .table(table)
+          .set([[table[column_name], value]])
+          .where(table[primary_key].gteq(start_pk))
+
+        if finish_result
+          finish_pk = finish_result[primary_key]
+          update_arel = update_arel.where(table[primary_key].lt(finish_pk))
+          start_pk = finish_pk
+        end
+
+        safety_assured { execute(update_arel.to_sql) }
+
+        break unless finish_pk
+      end
+    end
+
     private
 
     def ensure_postgresql(method_name)
       raise StrongMigrations::Error, "`#{method_name}` is intended for Postgres only" unless postgresql?
-    end
-
-    def postgresql?
-      %w(PostgreSQL PostGIS).include?(connection.adapter_name)
     end
 
     def ensure_not_in_transaction(method_name)
@@ -110,8 +181,8 @@ module StrongMigrations
       end
     end
 
-    def quote_identifiers(statement, identifiers)
-      statement % identifiers.map { |v| connection.quote_table_name(v) }
+    def column_can_be_added_safely?(default)
+      default.nil? || (postgresql? && postgresql_version >= Gem::Version.new("11")) || (mysql? && mysql_version >= Gem::Version.new("8.0.12")) || (mariadb? && mariadb_version >= Gem::Version.new("10.3.2"))
     end
   end
 end

@@ -53,6 +53,9 @@ class CreateUsers < TestMigration
 end
 migrate CreateUsers
 
+class User < ActiveRecord::Base
+end
+
 module Helpers
   def postgresql?
     ENV["ADAPTER"].nil?
