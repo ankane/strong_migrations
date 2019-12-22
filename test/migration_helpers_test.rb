@@ -24,6 +24,34 @@ class BackfillColumnSafely < TestMigration
   end
 end
 
+class AddMoneyToUsers < TestMigration
+  def change
+    safety_assured do
+      add_column :users, :money, :decimal, limit: 4, default: 100.0, precision: 10, scale: 3, comment: "Balance in $"
+      add_index :users, :money
+    end
+  end
+end
+
+class RenameColumnSafely < TestMigration
+  def change
+    rename_column_safely :users, :money, :balance
+  end
+end
+
+class RenameColumnSafelyForeignKey < TestMigration
+  def change
+    safety_assured { add_foreign_key :users, :orders }
+    rename_column_safely :users, :order_id, :new_order_id
+  end
+end
+
+class RenameColumnSafelyCleanup < TestMigration
+  def change
+    rename_column_safely_cleanup :users, :money, :balance
+  end
+end
+
 class MigrationHelpersTest < Minitest::Test
   def test_add_foreign_key_safely
     skip unless postgresql?
@@ -102,6 +130,70 @@ class MigrationHelpersTest < Minitest::Test
     assert users.all? { |u| u.city == "Kyiv" }
   ensure
     User.delete_all
+  end
+
+  def test_rename_column_safely_raises_inside_transaction
+    error = assert_raises(StrongMigrations::Error) { migrate_inside_transaction(RenameColumnSafely) }
+    assert_match "Cannot run `rename_column_safely` inside a transaction", error.message
+  end
+
+  def test_rename_column_safely_copies_column
+    migrate(AddMoneyToUsers)
+    migrate(RenameColumnSafely)
+    columns = connection.columns("users")
+    old_column = columns.find { |c| c.name == "money" }
+    new_column = columns.find { |c| c.name == "balance" }
+
+    assert_equal old_column.type,       new_column.type
+    assert_equal old_column.limit,      new_column.limit
+    assert_equal old_column.default,    new_column.default
+    assert_equal old_column.precision,  new_column.precision
+    assert_equal old_column.scale,      new_column.scale
+    assert_equal old_column.comment,    new_column.comment
+  ensure
+    migrate(RenameColumnSafely, direction: :down)
+    migrate(AddMoneyToUsers, direction: :down)
+  end
+
+  def test_rename_column_safely_copies_foreign_keys
+    migrate(RenameColumnSafelyForeignKey)
+    assert connection.foreign_key_exists?(:users, column: :new_order_id)
+  ensure
+    migrate(RenameColumnSafelyForeignKey, direction: :down)
+    refute connection.foreign_key_exists?(:users, column: :new_order_id)
+  end
+
+  def test_rename_column_safely_copies_column_indexes
+    migrate(AddMoneyToUsers)
+    migrate(RenameColumnSafely)
+    assert connection.index_exists?(:users, :balance)
+  ensure
+    migrate(RenameColumnSafely, direction: :down)
+    migrate(AddMoneyToUsers, direction: :down)
+  end
+
+  def test_rename_column_safely_copies_data_to_new_column
+    User.reset_column_information
+    migrate(AddMoneyToUsers)
+    migrate(RenameColumnSafely)
+    user = User.create(name: "Dima", city: "Kyiv", money: 10.0)
+    assert_equal 10.0, user.reload.balance
+  ensure
+    User.delete_all
+    migrate(RenameColumnSafely, direction: :down)
+    migrate(AddMoneyToUsers, direction: :down)
+  end
+
+  def test_rename_column_safely_cleanup_removes_old_column
+    migrate(AddMoneyToUsers)
+    migrate(RenameColumnSafely)
+    migrate(RenameColumnSafelyCleanup)
+
+    assert_equal false, connection.column_exists?(:users, :money)
+  ensure
+    migrate(RenameColumnSafelyCleanup, direction: :down)
+    migrate(RenameColumnSafely, direction: :down)
+    migrate(AddMoneyToUsers, direction: :down)
   end
 
   private
