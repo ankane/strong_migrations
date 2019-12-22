@@ -109,7 +109,7 @@ module StrongMigrations
       ensure_not_in_transaction(__method__)
 
       table = Arel::Table.new(table_name)
-      count_arel = table.project(Arel.star.count)
+      count_arel = table.project(Arel.star.count.as("count"))
       total = connection.exec_query(count_arel.to_sql).first["count"]
 
       return if total == 0
@@ -150,6 +150,58 @@ module StrongMigrations
       end
     end
 
+    def rename_column_safely(table_name, old, new)
+      if !postgresql? && !mysql?
+        raise StrongMigrations::Error, "`#{__method__}` is intended for Postgres and Mysql only"
+      end
+
+      ensure_not_in_transaction(__method__)
+      ensure_trigger_privileges(table_name)
+
+      reversible do |dir|
+        dir.up do
+          copy_column(table_name, old, new)
+          safety_assured { create_column_rename_triggers(table_name, old, new) }
+        end
+
+        dir.down do
+          trigger_name = rename_column_trigger_name(table_name, old, new)
+
+          safety_assured do
+            remove_column_rename_triggers(table_name, trigger_name)
+
+            if mysql?
+              # Foreign key should be removed before removing column
+              foreign_key = foreign_key_for(table_name, new)
+              remove_foreign_key(table_name, column: new) if foreign_key
+            end
+
+            remove_column(table_name, new)
+          end
+        end
+      end
+    end
+
+    def rename_column_safely_cleanup(table_name, old, new)
+      ensure_not_in_transaction(__method__)
+      ensure_trigger_privileges(table_name)
+
+      reversible do |dir|
+        dir.up do
+          trigger_name = rename_column_trigger_name(table_name, old, new)
+          safety_assured do
+            remove_column_rename_triggers(table_name, trigger_name)
+            remove_column(table_name, old)
+          end
+        end
+
+        dir.down do
+          copy_column(table_name, new, old)
+          safety_assured { create_column_rename_triggers(table_name, old, new) }
+        end
+      end
+    end
+
     private
 
     def ensure_postgresql(method_name)
@@ -181,6 +233,198 @@ module StrongMigrations
         # same error message as Active Record
         raise "'#{action}' is not supported for :on_update or :on_delete.\nSupported values are: :nullify, :cascade, :restrict"
       end
+    end
+
+    def ensure_trigger_privileges(table_name)
+      privileges =
+        if postgresql?
+          trigger_privileges_postgresql?(table_name)
+        else
+          # It is very hard to check in Mysql if user has trigger privileges.
+          # Let's assume that 'yes' and fail later.
+          true
+        end
+
+      unless privileges
+        raise StrongMigrations::Error, "Current database user cannot create, execute, or drop triggers on the #{table_name} table."
+      end
+    end
+
+    def trigger_privileges_postgresql?(table_name)
+      quoted_table = connection.quote(table_name)
+      row = connection.exec_query("SELECT has_table_privilege(#{quoted_table}, 'TRIGGER')")
+      row.first["has_table_privilege"]
+    rescue ActiveRecord::StatementInvalid
+      # Non-existing table
+      false
+    end
+
+    def copy_column(table_name, old, new)
+      old_column = columns(table_name).find { |c| c.name == old.to_s }
+
+      add_column(table_name, new, old_column.type,
+        limit: old_column.limit,
+        precision: old_column.precision,
+        scale: old_column.scale,
+        comment: old_column.comment
+      )
+
+      change_column_default(table_name, new, old_column.default) if old_column.default.present?
+
+      value_arel = Arel::Table.new(table_name)[old]
+      backfill_column_safely(table_name, new, value_arel)
+
+      add_null_constraint_safely(table_name, new) unless old_column.null
+
+      copy_foreign_key(table_name, old, new)
+      copy_indexes(table_name, old, new)
+    end
+
+    def copy_foreign_key(table_name, old, new)
+      fk = foreign_key_for(table_name, old)
+      return unless fk
+
+      options = {
+        column: new,
+        primary_key: fk.primary_key,
+        on_delete: fk.on_delete,
+        on_update: fk.on_update
+      }
+
+      if postgresql?
+        add_foreign_key_safely(table_name, fk.to_table, options)
+      else
+        add_foreign_key(table_name, fk.to_table, options)
+      end
+    end
+
+    def foreign_key_for(table_name, column_name)
+      column_name = column_name.to_s
+      foreign_keys(table_name).find { |fk| fk.column == column_name }
+    end
+
+    def copy_indexes(table_name, old, new)
+      old = old.to_s
+      new = new.to_s
+
+      indexes = indexes(table_name).select { |index| index.columns.include?(old) }
+
+      indexes.each do |index|
+        new_columns = index.columns.map do |column|
+          column == old ? new : column
+        end
+
+        options = copy_index_options(index, old, new)
+        options[:algorithm] = :concurrently if postgresql?
+        add_index(table_name, new_columns, options)
+      end
+    end
+
+    def copy_index_options(index, old, new)
+      unless index.name.include?(old)
+        raise StrongMigrations::Error, <<~ERROR
+            Cannot copy the index #{index.name} as it does not contain old column in its name.
+            Rename it manually before proceeding.
+          ERROR
+      end
+
+      name = index.name.gsub(old, new)
+
+      options = {
+        unique: index.unique,
+        name: name,
+        length: index.lengths,
+        order: index.orders,
+        where: index.where,
+        using: index.using,
+      }
+
+      if ActiveRecord::VERSION::STRING >= "5.2"
+        options[:opclass] = index.opclasses
+      end
+
+      options
+    end
+
+    def create_column_rename_triggers(table_name, old, new)
+      trigger_name  = rename_column_trigger_name(table_name, old, new)
+      quoted_table  = connection.quote_table_name(table_name)
+      quoted_old    = connection.quote_column_name(old)
+      quoted_new    = connection.quote_column_name(new)
+
+      if postgresql?
+        create_column_rename_triggers_postgresql(trigger_name, quoted_table, quoted_old, quoted_new)
+      else
+        create_column_rename_triggers_mysql(trigger_name, quoted_table, quoted_old, quoted_new)
+      end
+    end
+
+    def rename_column_trigger_name(table_name, old, new)
+      "trigger_rails_" + Digest::SHA256.hexdigest("#{table_name}_#{old}_#{new}").first(10)
+    end
+
+    def create_column_rename_triggers_postgresql(trigger, table, old, new)
+      execute <<~SQL
+        CREATE OR REPLACE FUNCTION #{trigger}() RETURNS trigger AS $$
+          BEGIN
+            NEW.#{new} := NEW.#{old};
+            RETURN NEW;
+          END;
+        $$ LANGUAGE 'plpgsql';
+      SQL
+
+      execute <<~SQL
+        DROP TRIGGER IF EXISTS #{trigger} ON #{table}
+      SQL
+
+      execute <<~SQL
+        CREATE TRIGGER #{trigger} BEFORE INSERT OR UPDATE ON #{table}
+          FOR EACH ROW EXECUTE PROCEDURE #{trigger}();
+      SQL
+    end
+
+    def create_column_rename_triggers_mysql(trigger, table, old, new)
+      insert_trigger = "#{trigger}_before_insert"
+      update_trigger = "#{trigger}_before_update"
+
+      execute <<~SQL
+        DROP TRIGGER IF EXISTS #{insert_trigger}
+      SQL
+
+      execute <<~SQL
+        CREATE TRIGGER #{insert_trigger} BEFORE INSERT ON #{table}
+          FOR EACH ROW SET NEW.#{new} = NEW.#{old};
+      SQL
+
+      execute <<~SQL
+        DROP TRIGGER IF EXISTS #{update_trigger}
+      SQL
+
+      execute <<~SQL
+        CREATE TRIGGER #{update_trigger} BEFORE UPDATE ON #{table}
+          FOR EACH ROW SET NEW.#{new} = NEW.#{old};
+      SQL
+    end
+
+    def remove_column_rename_triggers(table, trigger)
+      if postgresql?
+        remove_column_rename_triggers_postgresql(table, trigger)
+      else
+        remove_column_rename_triggers_mysql(trigger)
+      end
+    end
+
+    def remove_column_rename_triggers_postgresql(table, trigger)
+      execute("DROP TRIGGER IF EXISTS #{trigger} ON #{table}")
+      execute("DROP FUNCTION IF EXISTS #{trigger}()")
+    end
+
+    def remove_column_rename_triggers_mysql(trigger)
+      insert_trigger = "#{trigger}_before_insert"
+      update_trigger = "#{trigger}_before_update"
+
+      execute("DROP TRIGGER IF EXISTS #{insert_trigger}")
+      execute("DROP TRIGGER IF EXISTS #{update_trigger}")
     end
   end
 end

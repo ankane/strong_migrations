@@ -8,6 +8,10 @@ module StrongMigrations
       %w(PostgreSQL PostGIS).include?(connection.adapter_name)
     end
 
+    def mysql?
+      connection.adapter_name == "Mysql2"
+    end
+
     def postgresql_version
       @postgresql_version ||= begin
         target_version = StrongMigrations.target_postgresql_version
