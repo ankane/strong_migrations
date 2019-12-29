@@ -91,15 +91,31 @@ module StrongMigrations
             raise_error :add_column_json
           end
         when :change_column
-          table, column, type = args
+          table, column, type, options = args
+          options ||= {}
 
           safe = false
+          found_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
+          raise StrongMigrations::Error, "Column '#{column}' of relation '#{table}' does not exist" unless found_column
+
           # assume Postgres 9.1+ since previous versions are EOL
           if postgresql? && type.to_s == "text"
-            found_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
-            safe = found_column && found_column.type == :string
+            safe = found_column.type == :string
           end
-          raise_error :change_column unless safe
+
+          unless safe
+            down_options = {}
+            options.each do |option, value|
+              if value != found_column.send(option)
+                down_options[option] = found_column.send(option)
+              end
+            end
+            previous_type = found_column.type
+
+            raise_error :change_column,
+              up_command: command_str("change_column_safely", [table, column, type, options]),
+              down_command: command_str("change_column_safely", [table, column, previous_type, down_options])
+          end
         when :create_table
           table, options = args
           options ||= {}

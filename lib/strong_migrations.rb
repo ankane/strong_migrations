@@ -49,7 +49,21 @@ table and indexes to be rewritten. A safer approach is to:
 3. Backfill data from the old column to the new column
 4. Move reads from the old column to the new column
 5. Stop writing to the old column
-6. Drop the old column",
+6. Drop the old column
+
+To achieve this, you can use:
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  disable_ddl_transaction!
+
+  def up
+    %{up_command}
+  end
+
+  def down
+    %{down_command}
+  end
+end",
 
     remove_column: "ActiveRecord caches attributes which causes problems
 when removing columns. Be sure to ignore the column%{column_suffix}:

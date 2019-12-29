@@ -73,7 +73,7 @@ end
 
 class ChangeColumn < TestMigration
   def change
-    change_column :users, :properties, :bad_name
+    change_column :users, :name, :string, null: false
   end
 end
 

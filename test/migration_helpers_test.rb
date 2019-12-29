@@ -52,6 +52,22 @@ class RenameColumnSafelyCleanup < TestMigration
   end
 end
 
+class ChangeColumnSafely < TestMigration
+  def up
+    change_column_safely :users, :bio, :string, default: "No bio"
+  end
+
+  def down
+    change_column_safely :users, :bio, :string, default: nil
+  end
+end
+
+class ChangeColumnSafelyNonReversible < TestMigration
+  def change
+    change_column_safely :users, :bio, :string, default: "No bio"
+  end
+end
+
 class MigrationHelpersTest < Minitest::Test
   def test_add_foreign_key_safely
     skip unless postgresql?
@@ -196,6 +212,32 @@ class MigrationHelpersTest < Minitest::Test
     migrate(AddMoneyToUsers, direction: :down)
   end
 
+  def test_change_column_safely_raises_inside_transaction
+    skip unless postgresql?
+    error = assert_raises(StrongMigrations::Error) { migrate_inside_transaction(ChangeColumnSafely) }
+    assert_match "Cannot run `change_column_safely` inside a transaction", error.message
+  end
+
+  def test_change_column_safely_is_not_reversible
+    skip unless postgresql?
+    migrate(ChangeColumnSafelyNonReversible)
+
+    assert_raises(ActiveRecord::IrreversibleMigration) do
+      migrate(ChangeColumnSafelyNonReversible, direction: :down)
+    end
+  end
+
+  def test_change_column_safely
+    skip unless postgresql?
+    migrate(ChangeColumnSafely)
+    column = column_for("users", "bio")
+    assert_equal "No bio", column.default
+
+    migrate(ChangeColumnSafely, direction: :down)
+    column = column_for("users", "bio")
+    assert_nil column.default
+  end
+
   private
 
   def connection
@@ -207,5 +249,10 @@ class MigrationHelpersTest < Minitest::Test
     ActiveRecord::Base.transaction do
       migrate(migration)
     end
+  end
+
+  def column_for(table, name)
+    name = name.to_s
+    connection.columns(table).find { |c| c.name == name }
   end
 end

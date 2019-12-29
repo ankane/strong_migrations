@@ -150,7 +150,7 @@ module StrongMigrations
       end
     end
 
-    def rename_column_safely(table_name, old, new)
+    def rename_column_safely(table_name, old, new, options = {})
       if !postgresql? && !mysql?
         raise StrongMigrations::Error, "`#{__method__}` is intended for Postgres and Mysql only"
       end
@@ -160,7 +160,7 @@ module StrongMigrations
 
       reversible do |dir|
         dir.up do
-          copy_column(table_name, old, new)
+          copy_column(table_name, old, new, options)
           safety_assured { create_column_rename_triggers(table_name, old, new) }
         end
 
@@ -183,21 +183,54 @@ module StrongMigrations
     end
 
     def rename_column_safely_cleanup(table_name, old, new)
-      ensure_not_in_transaction(__method__)
+      if !postgresql? && !mysql?
+        raise StrongMigrations::Error, "`#{__method__}` is intended for Postgres and Mysql only"
+      end
+
       ensure_trigger_privileges(table_name)
 
       reversible do |dir|
         dir.up do
           trigger_name = rename_column_trigger_name(table_name, old, new)
-          safety_assured do
-            remove_column_rename_triggers(table_name, trigger_name)
-            remove_column(table_name, old)
+          transaction do
+            safety_assured do
+              remove_column_rename_triggers(table_name, trigger_name)
+              remove_column(table_name, old)
+            end
           end
         end
 
         dir.down do
           copy_column(table_name, new, old)
           safety_assured { create_column_rename_triggers(table_name, old, new) }
+        end
+      end
+    end
+
+    def change_column_safely(table_name, column_name, type, options = {})
+      ensure_postgresql(__method__)
+      ensure_not_in_transaction(__method__)
+      ensure_trigger_privileges(table_name)
+
+      reversible do |dir|
+        dir.up do
+          temp_column = "#{column_name}_for_type_change"
+          rename_column_safely(table_name, column_name, temp_column, type: type, **options)
+
+          transaction do
+            rename_column_safely_cleanup(table_name, column_name, temp_column)
+            safety_assured { rename_column(table_name, temp_column, column_name) }
+          end
+        end
+
+        dir.down do
+          # same error message as Active Record
+          raise ActiveRecord::IrreversibleMigration, <<~ERROR
+            This migration uses #{__method__}, which is not automatically reversible.
+            To make the migration reversible you can either:
+            1. Define #up and #down methods in place of the #change method.
+            2. Use the #reversible method to define reversible behavior.
+          ERROR
         end
       end
     end
@@ -259,25 +292,32 @@ module StrongMigrations
       false
     end
 
-    def copy_column(table_name, old, new)
+    def copy_column(table_name, old, new, options = {})
       old_column = columns(table_name).find { |c| c.name == old.to_s }
+      type, limit, default, null, precision, scale, collation, comment = copy_column_options(old_column, options)
 
-      add_column(table_name, new, old_column.type,
-        limit: old_column.limit,
-        precision: old_column.precision,
-        scale: old_column.scale,
-        comment: old_column.comment
+      add_column(table_name, new, type,
+        limit: limit,
+        precision: precision,
+        scale: scale,
+        comment: comment
       )
 
-      change_column_default(table_name, new, old_column.default) if old_column.default.present?
+      change_column_default(table_name, new, default) if default.present?
 
       value_arel = Arel::Table.new(table_name)[old]
       backfill_column_safely(table_name, new, value_arel)
 
-      add_null_constraint_safely(table_name, new) unless old_column.null
+      add_null_constraint_safely(table_name, new) unless null
 
       copy_foreign_key(table_name, old, new)
       copy_indexes(table_name, old, new)
+    end
+
+    def copy_column_options(column, new_options)
+      [:type, :limit, :default, :null, :precision, :scale, :collation, :comment].map do |option|
+        new_options.fetch(option, column.send(option))
+      end
     end
 
     def copy_foreign_key(table_name, old, new)
@@ -300,14 +340,14 @@ module StrongMigrations
 
     def foreign_key_for(table_name, column_name)
       column_name = column_name.to_s
-      foreign_keys(table_name).find { |fk| fk.column == column_name }
+      connection.foreign_keys(table_name).find { |fk| fk.column == column_name }
     end
 
     def copy_indexes(table_name, old, new)
       old = old.to_s
       new = new.to_s
 
-      indexes = indexes(table_name).select { |index| index.columns.include?(old) }
+      indexes = connection.indexes(table_name).select { |index| index.columns.include?(old) }
 
       indexes.each do |index|
         new_columns = index.columns.map do |column|
