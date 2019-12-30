@@ -87,7 +87,7 @@ module StrongMigrations
         reversible do |dir|
           dir.up do
             transaction do
-              add_column(table_name, column_name, type, default: nil, **options)
+              add_column(table_name, column_name, type, default: nil, **options) unless connection.column_exists?(table_name, column_name, type)
               change_column_default(table_name, column_name, default)
             end
 
@@ -109,19 +109,18 @@ module StrongMigrations
       ensure_not_in_transaction(__method__)
 
       table = Arel::Table.new(table_name)
-      count_arel = table.project(Arel.star.count)
-      total = connection.exec_query(count_arel.to_sql).first["count"]
-
-      return if total == 0
-
       primary_key = connection.primary_key(table_name)
 
       start_arel = table
         .project(table[primary_key])
+        .where(table[column_name].not_eq(value))
         .order(table[primary_key].asc)
         .take(1)
 
-      start_pk = connection.exec_query(start_arel.to_sql).first[primary_key]
+      result = connection.exec_query(start_arel.to_sql)
+      return if result.empty?
+
+      start_pk = result.first[primary_key]
 
       loop do
         finish_arel = table
