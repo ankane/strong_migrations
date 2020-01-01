@@ -132,8 +132,14 @@ module StrongMigrations
           table, column, null, default = args
           if !null
             if postgresql?
-              raise_error :change_column_null_postgresql,
-                command: command_str(:add_null_constraint_safely, [table, column])
+              command =
+                if postgresql_version >= 120000
+                  command_str(:change_column_null_safely, [table, column, false, default])
+                else
+                  command_str(:add_null_constraint_safely, [table, column])
+                end
+
+              raise_error :change_column_null_postgresql, command: command
             elsif !default.nil?
               raise_error :change_column_null,
                 code: backfill_code(table, column, default)

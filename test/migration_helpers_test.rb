@@ -24,6 +24,12 @@ class BackfillColumnSafely < TestMigration
   end
 end
 
+class ChangeColumnNullSafely < TestMigration
+  def change
+    change_column_null_safely :users, :city, false, "Kyiv"
+  end
+end
+
 class MigrationHelpersTest < Minitest::Test
   def test_add_foreign_key_safely
     skip unless postgresql?
@@ -102,6 +108,27 @@ class MigrationHelpersTest < Minitest::Test
     assert users.all? { |u| u.city == "Kyiv" }
   ensure
     User.delete_all
+  end
+
+  def test_change_column_null_safely_raises_inside_transaction
+    skip if !postgresql? || postgresql_version < 120000
+    error = assert_raises(StrongMigrations::Error) { migrate_inside_transaction(ChangeColumnNullSafely) }
+    assert_match "Cannot run `change_column_null_safely` inside a transaction", error.message
+  end
+
+  def test_change_column_null_safely_raises_for_non_postgres
+    skip if postgresql?
+    error = assert_raises(StrongMigrations::Error) { migrate(ChangeColumnNullSafely) }
+    assert_match "Postgres only", error.message
+  end
+
+  def test_change_column_null_safely
+    skip if !postgresql? || postgresql_version < 120000
+    migrate(ChangeColumnNullSafely)
+    column = connection.columns("users").find { |c| c.name == "city" }
+    assert_equal false, column.null
+
+    migrate(ChangeColumnNullSafely, direction: :down)
   end
 
   private

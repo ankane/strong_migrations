@@ -55,6 +55,10 @@ class Minitest::Test
   def postgresql?
     ENV["ADAPTER"].nil?
   end
+
+  def postgresql_version
+    ActiveRecord::Base.connection.postgresql_version
+  end
 end
 
 StrongMigrations.add_check do |method, args|

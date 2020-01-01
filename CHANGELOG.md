@@ -1,5 +1,6 @@
 ## 0.5.2 (unreleased)
 
+- Added `change_column_null_safely` method
 - Added `add_foreign_key_safely` method
 - Added `add_null_constraint_safely` and `remove_null_constraint_safely` methods
 - Added `add_column_safely` method

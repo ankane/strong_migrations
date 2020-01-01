@@ -149,6 +149,34 @@ module StrongMigrations
       end
     end
 
+    def change_column_null_safely(table_name, column_name, null, default = nil)
+      ensure_postgresql(__method__)
+      if postgresql_version < 120000
+        raise StrongMigrations::Error, "`#{__method__}` is intended for Postgres 12+." \
+          "For older versions use add_null_constraint_safely/remove_null_constraint_safely."
+      end
+
+      ensure_not_in_transaction(__method__)
+
+      reversible do |dir|
+        dir.up do
+          if null
+            make_column_nullable(table_name, column_name)
+          else
+            make_column_non_nullable(table_name, column_name, default)
+          end
+        end
+
+        dir.down do
+          if null
+            make_column_non_nullable(table_name, column_name, default)
+          else
+            make_column_nullable(table_name, column_name)
+          end
+        end
+      end
+    end
+
     private
 
     def ensure_postgresql(method_name)
@@ -180,6 +208,19 @@ module StrongMigrations
         # same error message as Active Record
         raise "'#{action}' is not supported for :on_update or :on_delete.\nSupported values are: :nullify, :cascade, :restrict"
       end
+    end
+
+    def make_column_nullable(table_name, column_name)
+      change_column_null(table_name, column_name, true)
+    end
+
+    def make_column_non_nullable(table_name, column_name, default)
+      default_after_type_cast = connection.type_cast(default)
+      backfill_column_safely(table_name, column_name, default_after_type_cast)
+
+      add_null_constraint_safely(table_name, column_name)
+      safety_assured { change_column_null(table_name, column_name, false) }
+      remove_null_constraint_safely(table_name, column_name)
     end
   end
 end
