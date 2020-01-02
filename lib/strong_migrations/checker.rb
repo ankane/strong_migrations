@@ -195,7 +195,8 @@ Then add the NOT NULL constraint."
     end
 
     def safe?
-      @safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) || direction == :down || version_safe?
+      @safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) ||
+        (direction == :down && !StrongMigrations.check_rollback) || version_safe?
     end
 
     def version_safe?

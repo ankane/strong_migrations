@@ -1,5 +1,6 @@
 ## 0.5.2 (unreleased)
 
+- Add ability to catch unsafe migrations during rollback
 - Added `add_foreign_key_safely` method
 - Added `add_null_constraint_safely` and `remove_null_constraint_safely` methods
 - Added `statement_timeout` and `lock_timeout` functionality

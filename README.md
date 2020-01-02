@@ -585,6 +585,14 @@ StrongMigrations.start_after = 20170101000000
 
 Use the version from your latest migration.
 
+## Rollbacks
+
+By default, migrations safety is not checked during rollback. To enable it, create an initializer with:
+
+```ruby
+StrongMigrations.check_rollback = true
+```
+
 ## Dangerous Tasks
 
 For safety, dangerous database tasks are disabled in production - `db:drop`, `db:reset`, `db:schema:load`, and `db:structure:load`. To get around this, use:

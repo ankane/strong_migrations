@@ -17,7 +17,7 @@ module StrongMigrations
 
   class << self
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
-      :target_postgresql_version, :enabled_checks, :lock_timeout, :statement_timeout
+      :target_postgresql_version, :enabled_checks, :lock_timeout, :statement_timeout, :check_rollback
   end
   self.auto_analyze = false
   self.start_after = 0
@@ -190,6 +190,7 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
   }
   self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h
+  self.check_rollback = false
 
   def self.add_check(&block)
     checks << block

@@ -259,6 +259,16 @@ class CheckTimeouts < TestMigration
   end
 end
 
+class CheckRollback < TestMigration
+  def up
+    add_column :users, :age, :integer
+  end
+
+  def down
+    remove_column :users, :age
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     if postgresql?
@@ -485,6 +495,18 @@ class StrongMigrationsTest < Minitest::Test
   ensure
     StrongMigrations.statement_timeout = nil
     StrongMigrations.lock_timeout = nil
+  end
+
+  def test_check_rollback
+    migrate(CheckRollback)
+    assert_safe CheckRollback, direction: :down
+
+    migrate(CheckRollback)
+    StrongMigrations.check_rollback = true
+    assert_raises(StrongMigrations::UnsafeMigration) { migrate(CheckRollback, direction: :down) }
+  ensure
+    StrongMigrations.check_rollback = false
+    assert_safe CheckRollback, direction: :down
   end
 
   private
