@@ -259,6 +259,12 @@ class CheckTimeouts < TestMigration
   end
 end
 
+class CheckReversibleMigrations < TestMigration
+  def change
+    safety_assured { execute "SELECT 1" }
+  end
+end
+
 class StrongMigrationsTest < Minitest::Test
   def test_add_index
     if postgresql?
@@ -485,6 +491,17 @@ class StrongMigrationsTest < Minitest::Test
   ensure
     StrongMigrations.statement_timeout = nil
     StrongMigrations.lock_timeout = nil
+  end
+
+  def test_reversible_migrations
+    assert_safe CheckReversibleMigrations
+
+    begin
+      StrongMigrations.enable_check(:reversible_migrations)
+      assert_unsafe CheckReversibleMigrations
+    ensure
+      StrongMigrations.disable_check(:reversible_migrations)
+    end
   end
 
   private

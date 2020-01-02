@@ -167,6 +167,10 @@ Then add the NOT NULL constraint."
         end
       end
 
+      if check_reversible_migration?
+        raise_error :reversible_migrations unless reversible_migration?
+      end
+
       result = yield
 
       if StrongMigrations.auto_analyze && direction == :up && postgresql? && method == :add_index
@@ -219,7 +223,7 @@ Then add the NOT NULL constraint."
     end
 
     def raise_error(message_key, header: nil, **vars)
-      return unless StrongMigrations.check_enabled?(message_key, version: version)
+      return unless enabled?(message_key)
 
       message = StrongMigrations.error_messages[message_key] || "Missing message"
 
@@ -272,6 +276,27 @@ Then add the NOT NULL constraint."
 
     def new_table?(table)
       @new_tables.include?(table.to_s)
+    end
+
+    def check_reversible_migration?
+      !@migration.is_a?(ActiveRecord::Schema) && direction == :up && !version_safe? && enabled?(:reversible_migrations)
+    end
+
+    def reversible_migration?
+      klass = ActiveRecord::Migration::CommandRecorder
+      old_commands = klass.instance_method(:commands)
+      klass.define_method(:commands) { [] }
+
+      @migration.migrate(:down)
+      true
+    rescue ActiveRecord::IrreversibleMigration
+      false
+    ensure
+      klass.define_method(:commands, old_commands)
+    end
+
+    def enabled?(check)
+      StrongMigrations.check_enabled?(check, version: version)
     end
   end
 end

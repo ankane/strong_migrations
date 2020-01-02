@@ -188,8 +188,11 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
     %{command}
   end
 end",
+
+    reversible_migrations:
+"Migration is not reversible.",
   }
-  self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h
+  self.enabled_checks = (error_messages.keys - [:remove_index, :reversible_migrations]).map { |k| [k, {}] }.to_h
 
   def self.add_check(&block)
     checks << block
