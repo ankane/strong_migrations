@@ -147,7 +147,7 @@ class BackfillSomeColumn < ActiveRecord::Migration[6.0]
   def change
     User.unscoped.where(some_column: nil).in_batches do |relation|
       relation.update_all some_column: "default_value"
-      sleep(0.1) # throttle
+      sleep(0.01) # throttle
     end
   end
 end
