@@ -24,6 +24,14 @@ matrix:
         - mysql
       before_script:
         - mysqladmin create strong_migrations_test
+    - gemfile: test/gemfiles/mysql2.gemfile
+      env:
+        - ADAPTER=mysql2
+        - HELPERS=t
+      services:
+        - mysql
+      before_script:
+        - mysqladmin create strong_migrations_test
 notifications:
   email:
     on_success: never

@@ -248,8 +248,10 @@ end",
   end
 
   def self.enable_helpers
-    ActiveRecord::Migration.include(StrongMigrations::MigrationHelpers)
-    self.helpers = true
+    unless helpers
+      ActiveRecord::Migration.include(StrongMigrations::MigrationHelpers)
+      self.helpers = true
+    end
   end
 end
 
