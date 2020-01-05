@@ -296,7 +296,7 @@ Then add the NOT NULL constraint."
 
     def backfill_code(table, column, default)
       model = table.to_s.classify
-      "#{model}.unscoped.where(#{column}: nil).in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
+      "#{model}.unscoped.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
     end
 
     def new_table?(table)
