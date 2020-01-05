@@ -1,12 +1,16 @@
 require_relative "test_helper"
 
 class AddForeignKeySafely < TestMigration
+  disable_ddl_transaction!
+
   def change
     add_foreign_key_safely :users, :orders
   end
 end
 
 class AddNullConstraintSafely < TestMigration
+  disable_ddl_transaction!
+
   def change
     add_null_constraint_safely :users, :name
   end
@@ -37,7 +41,7 @@ class MigrationHelpersTest < Minitest::Test
 
   def test_add_foreign_key_safely_raises_inside_transaction
     skip unless postgresql?
-    error = assert_raises(StrongMigrations::Error) { migrate_inside_transaction(AddForeignKeySafely) }
+    error = assert_raises(StrongMigrations::Error) { migrate(AddForeignKeySafely, transaction: true) }
     assert_match "Cannot run `add_foreign_key_safely` inside a transaction", error.message
   end
 
@@ -58,12 +62,5 @@ class MigrationHelpersTest < Minitest::Test
 
   def connection
     ActiveRecord::Base.connection
-  end
-
-  # Emulate running migration using `rake db:migrate`
-  def migrate_inside_transaction(migration)
-    ActiveRecord::Base.transaction do
-      migrate(migration)
-    end
   end
 end

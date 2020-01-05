@@ -13,6 +13,8 @@ class RemoveIndex < TestMigration
 end
 
 class RemoveIndexSafePostgres < TestMigration
+  disable_ddl_transaction!
+
   def change
     remove_index :users, column: :name, name: "index_users_on_name", algorithm: :concurrently
   end
@@ -29,6 +31,8 @@ class AddIndexUp < TestMigration
 end
 
 class AddIndexSafePostgres < TestMigration
+  disable_ddl_transaction!
+
   def change
     add_index :users, :name, algorithm: :concurrently
   end
@@ -170,6 +174,8 @@ class AddIndexColumns < TestMigration
 end
 
 class AddIndexColumnsUnique < TestMigration
+  disable_ddl_transaction!
+
   def change
     add_index :users, :name, unique: true, algorithm: :concurrently
   end
@@ -200,6 +206,8 @@ class AddReferenceDefault < TestMigration
 end
 
 class AddReferenceConcurrently < TestMigration
+  disable_ddl_transaction!
+
   def change
     add_reference :users, :ip, index: {algorithm: :concurrently}
   end

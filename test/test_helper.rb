@@ -16,9 +16,14 @@ ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migration
 
 ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout) if ENV["VERBOSE"]
 
-def migrate(migration, direction: :up)
+def migrate(migration, direction: :up, transaction: nil)
+  transaction = !migration.disable_ddl_transaction if transaction.nil?
   ActiveRecord::Migration.suppress_messages do
-    migration.migrate(direction)
+    if transaction
+      ActiveRecord::Base.transaction { migration.migrate(direction) }
+    else
+      migration.migrate(direction)
+    end
   end
   true
 end
