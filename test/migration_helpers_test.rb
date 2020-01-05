@@ -13,6 +13,10 @@ class AddNullConstraintSafely < TestMigration
 end
 
 class MigrationHelpersTest < Minitest::Test
+  def setup
+    skip unless ENV["HELPERS"]
+  end
+
   def test_add_foreign_key_safely
     skip unless postgresql?
 

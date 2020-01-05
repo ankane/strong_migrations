@@ -142,8 +142,17 @@ Then add the NOT NULL constraint."
           table, column, null, default = args
           if !null
             if postgresql?
-              raise_error :change_column_null_postgresql,
-                command: command_str(:add_null_constraint_safely, [table, column])
+              if StrongMigrations.helpers
+                raise_error :change_column_null_postgresql_helper,
+                  command: command_str(:add_null_constraint_safely, [table, column])
+              else
+                # match https://github.com/nullobject/rein
+                constraint_name = "#{table}_#{column}_null"
+
+                raise_error :change_column_null_postgresql,
+                  add_constraint_code: constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column]),
+                  validate_constraint_code: constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
+              end
             elsif !default.nil?
               raise_error :change_column_null,
                 code: backfill_code(table, column, default)
@@ -155,9 +164,31 @@ Then add the NOT NULL constraint."
           validate = options.fetch(:validate, true)
 
           if postgresql?
-            if ActiveRecord::VERSION::STRING < "5.2" || validate
-              raise_error :add_foreign_key,
-                command: command_str(:add_foreign_key_safely, [from_table, to_table, options])
+            if StrongMigrations.helpers
+              if ActiveRecord::VERSION::STRING < "5.2" || validate
+                raise_error :add_foreign_key_helper,
+                  command: command_str(:add_foreign_key_safely, [from_table, to_table, options])
+              end
+            else
+              if ActiveRecord::VERSION::STRING >= "5.2"
+                if validate
+                  raise_error :add_foreign_key,
+                    add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options.merge(validate: false)]),
+                    validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
+                end
+              else
+                # always validated before 5.2
+
+                # fk name logic from rails
+                primary_key = options[:primary_key] || "id"
+                column = options[:column] || "#{to_table.to_s.singularize}_id"
+                hashed_identifier = Digest::SHA256.hexdigest("#{from_table}_#{column}_fk").first(10)
+                fk_name = options[:name] || "fk_rails_#{hashed_identifier}"
+
+                raise_error :add_foreign_key,
+                  add_foreign_key_code: constraint_str("ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s) NOT VALID", [from_table, fk_name, column, to_table, primary_key]),
+                  validate_foreign_key_code: constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [from_table, fk_name])
+              end
             end
           end
         end

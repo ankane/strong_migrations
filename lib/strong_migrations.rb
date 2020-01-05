@@ -17,7 +17,7 @@ module StrongMigrations
 
   class << self
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
-      :target_postgresql_version, :enabled_checks, :lock_timeout, :statement_timeout
+      :target_postgresql_version, :enabled_checks, :lock_timeout, :statement_timeout, :helpers
   end
   self.auto_analyze = false
   self.start_after = 0
@@ -165,6 +165,23 @@ end",
 
     change_column_null_postgresql:
 "Setting NOT NULL on a column requires an AccessExclusiveLock,
+which is expensive on large tables. Instead, use a constraint and
+validate it in a separate migration with a more agreeable RowShareLock.
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{add_constraint_code}
+  end
+end
+
+class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{validate_constraint_code}
+  end
+end",
+
+    change_column_null_postgresql_helper:
+"Setting NOT NULL on a column requires an AccessExclusiveLock,
 which is expensive on large tables. Instead, we can use a constraint and
 validate it in a separate step with a more agreeable RowShareLock.
 
@@ -178,6 +195,23 @@ end",
 
     add_foreign_key:
 "New foreign keys are validated by default. This acquires an AccessExclusiveLock,
+which is expensive on large tables. Instead, validate it in a separate migration
+with a more agreeable RowShareLock.
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{add_foreign_key_code}
+  end
+end
+
+class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{validate_foreign_key_code}
+  end
+end",
+
+    add_foreign_key_helper:
+"New foreign keys are validated by default. This acquires an AccessExclusiveLock,
 which is expensive on large tables. Instead, we can validate it in a separate step
 with a more agreeable RowShareLock.
 
@@ -190,6 +224,7 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
   }
   self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h
+  self.helpers = false
 
   def self.add_check(&block)
     checks << block
@@ -211,11 +246,15 @@ end",
       false
     end
   end
+
+  def self.enable_helpers
+    ActiveRecord::Migration.include(StrongMigrations::MigrationHelpers)
+    self.helpers = true
+  end
 end
 
 ActiveSupport.on_load(:active_record) do
   ActiveRecord::Migration.prepend(StrongMigrations::Migration)
-  ActiveRecord::Migration.include(StrongMigrations::MigrationHelpers)
 
   if defined?(ActiveRecord::Tasks::DatabaseTasks)
     ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)

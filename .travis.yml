@@ -6,6 +6,9 @@ gemfile:
   - test/gemfiles/activerecord52.gemfile
   - test/gemfiles/activerecord51.gemfile
   - test/gemfiles/activerecord50.gemfile
+env:
+  -
+  - HELPERS=t
 script: bundle exec rake test
 services:
   - postgresql
