@@ -61,7 +61,7 @@ end
 class AddColumnDefaultSafe < TestMigration
   def change
     add_column :users, :nice, :boolean
-    change_column_default :users, :nice, false
+    change_column_default :users, :nice, from: true, to: false
   end
 end
 
@@ -78,8 +78,12 @@ class ChangeColumn < TestMigration
 end
 
 class ChangeColumnVarcharToText < TestMigration
-  def change
+  def up
     change_column :users, :name, :text
+  end
+
+  def down
+    change_column :users, :name, :string
   end
 end
 
@@ -163,7 +167,7 @@ end
 
 class AddIndexColumnsUnique < TestMigration
   def change
-    add_index :users, [:name, :name, :name, :name], unique: true, algorithm: :concurrently
+    add_index :users, :name, unique: true, algorithm: :concurrently
   end
 end
 
@@ -303,17 +307,16 @@ class StrongMigrationsTest < Minitest::Test
   def test_add_index_safe_postgres
     skip unless postgresql?
     assert_safe AddIndexSafePostgres
-    assert_safe RemoveIndex
   end
 
   def test_remove_index_postgres
     skip unless postgresql?
-    assert_safe AddIndexSafePostgres
+    migrate AddIndexSafePostgres
 
     begin
       StrongMigrations.enable_check(:remove_index)
       assert_unsafe RemoveIndex
-      assert_safe RemoveIndexSafePostgres
+      migrate RemoveIndexSafePostgres
     ensure
       StrongMigrations.disable_check(:remove_index)
     end
@@ -447,11 +450,6 @@ class StrongMigrationsTest < Minitest::Test
     end
   end
 
-  def test_down
-    assert_safe SafeUp
-    assert_safe SafeUp, direction: :down
-  end
-
   def test_add_foreign_key
     if postgresql?
       assert_unsafe AddForeignKey
@@ -505,7 +503,8 @@ class StrongMigrationsTest < Minitest::Test
     assert_match message, error.message if message
   end
 
-  def assert_safe(migration, direction: :up)
-    assert migrate(migration, direction: direction)
+  def assert_safe(migration)
+    assert migrate(migration, direction: :up)
+    assert migrate(migration, direction: :down)
   end
 end
