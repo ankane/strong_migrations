@@ -238,14 +238,12 @@ end
 class AddForeignKey < TestMigration
   def change
     add_foreign_key :users, :orders
-    remove_foreign_key :users, :orders
   end
 end
 
 class AddForeignKeySafe < TestMigration
   def change
     add_foreign_key :users, :orders, validate: false
-    remove_foreign_key :users, :orders
   end
 end
 
@@ -279,7 +277,6 @@ class StrongMigrationsTest < Minitest::Test
       EOF
     else
       assert_safe AddIndex
-      assert_safe RemoveIndex
     end
   end
 
@@ -288,7 +285,6 @@ class StrongMigrationsTest < Minitest::Test
       assert_unsafe AddIndexUp
     else
       assert_safe AddIndexUp
-      assert_safe RemoveIndex
     end
   end
 
