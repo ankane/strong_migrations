@@ -301,7 +301,7 @@ class ChangeSomeColumnType < ActiveRecord::Migration[6.0]
 end
 ```
 
-One exception is changing a `varchar` column to `text`, which is safe in Postgres.
+One exception is changing a `varchar` column to `text`, which is safe in Postgres, though it rewrites any indexes on the column, which requries an exclusive lock.
 
 #### Good
 
