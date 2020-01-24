@@ -80,7 +80,7 @@ module StrongMigrations
           options ||= {}
           default = options[:default]
 
-          if !default.nil? && !((postgresql? && postgresql_version >= Gem::Version.new("11")) || (mysql? && mysql_version >= Gem::Verison.new("8.0.12")) || (mariadb? && mariadb_version >= Gem::Version.new("10.3.2")))
+          if !default.nil? && !((postgresql? && postgresql_version >= Gem::Version.new("11")) || (mysql? && mysql_version >= Gem::Version.new("8.0.12")) || (mariadb? && mariadb_version >= Gem::Version.new("10.3.2")))
 
             if options[:null] == false
               options = options.except(:null)
@@ -265,14 +265,9 @@ Then add the NOT NULL constraint."
 
     def postgresql_version
       @postgresql_version ||= begin
-        target_version = StrongMigrations.target_postgresql_version
-        version =
-          if target_version && defined?(Rails) && (Rails.env.development? || Rails.env.test?)
-            target_version.to_s
-          else
-            connection.execute("SHOW server_version_num").first["server_version_num"].to_i
-          end
-        Gem::Version.new(version)
+        target_version(StrongMigrations.target_postgresql_version) do
+          connection.execute("SHOW server_version_num").first["server_version_num"].to_i
+        end
       end
     end
 
@@ -282,14 +277,9 @@ Then add the NOT NULL constraint."
 
     def mysql_version
       @mysql_version ||= begin
-        target_version = StrongMigrations.target_mysql_version
-        version =
-          if target_version && defined?(Rails) && (Rails.env.development? || Rails.env.test?)
-            target_version.to_s
-          else
-            connection.select_all("SELECT VERSION()").first["VERSION()"].split("-").first
-          end
-        Gem::Version.new(version)
+        target_version(StrongMigrations.target_mysql_version) do
+          connection.select_all("SELECT VERSION()").first["VERSION()"].split("-").first
+        end
       end
     end
 
@@ -299,15 +289,20 @@ Then add the NOT NULL constraint."
 
     def mariadb_version
       @mariadb_version ||= begin
-        target_version = StrongMigrations.target_mariadb_version
-        version =
-          if target_version && defined?(Rails) && (Rails.env.development? || Rails.env.test?)
-            target_version.to_s
-          else
-            connection.select_all("SELECT VERSION()").first["VERSION()"].split("-").first
-          end
-        Gem::Version.new(version)
+        target_version(StrongMigrations.target_mariadb_version) do
+          connection.select_all("SELECT VERSION()").first["VERSION()"].split("-").first
+        end
       end
+    end
+
+    def target_version(target_version)
+      version =
+        if target_version && defined?(Rails) && (Rails.env.development? || Rails.env.test?)
+          target_version.to_s
+        else
+          yield
+        end
+      Gem::Version.new(version)
     end
 
     def helpers?
