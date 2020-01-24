@@ -348,8 +348,8 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_add_column_default
     StrongMigrations.target_postgresql_version = "10"
-    StrongMigrations.target_mysql_version = "10"
-    StrongMigrations.target_mariadb_version = "10.2"
+    StrongMigrations.target_mysql_version = "8.0.11"
+    StrongMigrations.target_mariadb_version = "10.3.1"
     assert_unsafe AddColumnDefault
   ensure
     StrongMigrations.target_postgresql_version = nil
@@ -361,7 +361,7 @@ class StrongMigrationsTest < Minitest::Test
     skip unless postgresql? || mysql? || mariadb?
 
     StrongMigrations.target_postgresql_version = "11"
-    StrongMigrations.target_mysql_version = "10.8.12"
+    StrongMigrations.target_mysql_version = "8.0.12"
     StrongMigrations.target_mariadb_version = "10.3.2"
     assert_safe AddColumnDefault
   ensure
