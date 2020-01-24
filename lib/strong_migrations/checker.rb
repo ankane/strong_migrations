@@ -209,8 +209,34 @@ Then add the NOT NULL constraint."
 
     def set_timeouts
       if !@timeouts_set
-        connection.select_all("SET statement_timeout TO #{connection.quote(StrongMigrations.statement_timeout)}") if StrongMigrations.statement_timeout
-        connection.select_all("SET lock_timeout TO #{connection.quote(StrongMigrations.lock_timeout)}") if StrongMigrations.lock_timeout
+        if StrongMigrations.statement_timeout
+          statement =
+            if postgresql?
+              "SET statement_timeout TO #{connection.quote(StrongMigrations.statement_timeout)}"
+            elsif mysql?
+              "SET max_execution_time = #{connection.quote(StrongMigrations.statement_timeout.to_i * 1000)}"
+            elsif mariadb?
+              "SET max_statement_timeout = #{connection.quote(StrongMigrations.statement_timeout)}"
+            else
+              raise StrongMigrations::Error, "Statement timeout not supported for this database"
+            end
+
+          connection.select_all(statement)
+        end
+
+        if StrongMigrations.lock_timeout
+          statement =
+            if postgresql?
+              "SET lock_timeout TO #{connection.quote(StrongMigrations.lock_timeout)}"
+            elsif mysql? || mariadb?
+              "SET lock_wait_timeout = #{connection.quote(StrongMigrations.lock_timeout)}"
+            else
+              raise StrongMigrations::Error, "Lock timeout not supported for this database"
+            end
+
+          connection.select_all(statement)
+        end
+
         @timeouts_set = true
       end
     end

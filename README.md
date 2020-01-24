@@ -639,11 +639,9 @@ StrongMigrations.target_mariadb_version = "10.3" # or 10.2, etc [master]
 
 For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
 
-## Postgres-Specific Features
+## Timeouts
 
-### Timeouts
-
-It’s a good idea to set a long statement timeout and a short lock timeout for migrations. This way, migrations can run for a while, and if a migration can’t acquire a lock in a timely manner, other statements won’t be stuck behind it. Here’s a great explanation of [how lock queues work](https://www.citusdata.com/blog/2018/02/15/when-postgresql-blocks/).
+It’s a good idea to set a long statement timeout and a short lock timeout for migrations. This way, migrations can run for a while, and if a migration can’t acquire a lock in a timely manner, other statements won’t be stuck behind it.
 
 You can use: [master]
 
@@ -652,7 +650,7 @@ StrongMigrations.statement_timeout = 1.hour
 StrongMigrations.lock_timeout = 10.seconds
 ```
 
-Or set the timeouts directly on the database user that runs migrations.
+Or set the timeouts directly on the database user that runs migrations. For Postgres, use:
 
 ```sql
 ALTER ROLE myuser SET statement_timeout = '1h';
@@ -661,7 +659,7 @@ ALTER ROLE myuser SET lock_timeout = '10s';
 
 Note: If you use PgBouncer in transaction mode, you must set timeouts on the database user.
 
-### Permissions
+## Permissions
 
 We recommend using a [separate database user](https://ankane.org/postgres-users) for migrations when possible so you don’t need to grant your app user permission to alter tables.
 
