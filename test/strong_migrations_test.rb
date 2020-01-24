@@ -357,7 +357,7 @@ class StrongMigrationsTest < Minitest::Test
     StrongMigrations.target_mariadb_version = nil
   end
 
-  def test_add_column_default_safe
+  def test_add_column_default_safe_latest
     skip unless postgresql? || mysql? || mariadb?
 
     StrongMigrations.target_postgresql_version = "11"

@@ -260,13 +260,13 @@ Then add the NOT NULL constraint."
     end
 
     def postgresql?
-      %w(PostgreSQL PostGIS).include?(connection.adapter_name)
+      connection.adapter_name =~ /postg/i # PostgreSQL, PostGIS
     end
 
     def postgresql_version
       @postgresql_version ||= begin
         target_version(StrongMigrations.target_postgresql_version) do
-          connection.execute("SHOW server_version_num").first["server_version_num"].to_i
+          connection.select_all("SHOW server_version").first["server_version"]
         end
       end
     end
