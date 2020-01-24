@@ -2,6 +2,8 @@
 
 Catch unsafe migrations in development
 
+Supports for PostgreSQL, MySQL, and MariaDB
+
 :tangerine: Battle-tested at [Instacart](https://www.instacart.com/opensource)
 
 [![Build Status](https://travis-ci.org/ankane/strong_migrations.svg?branch=master)](https://travis-ci.org/ankane/strong_migrations)
@@ -633,9 +635,9 @@ StrongMigrations.auto_analyze = true
 If your development database version is different from production, you can specify the production version so the right checks are run in development.
 
 ```ruby
-StrongMigrations.target_postgresql_version = "10"   # or 9.6, etc
-StrongMigrations.target_mysql_version = "8.0.12"    # [master]
-StrongMigrations.target_mariadb_version = "10.3.2"  # [master]
+StrongMigrations.target_postgresql_version = "10"  # or 9.6, etc
+StrongMigrations.target_mysql_version = "8.0.12"   # [master]
+StrongMigrations.target_mariadb_version = "10.3.2" # [master]
 ```
 
 For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
