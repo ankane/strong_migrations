@@ -15,16 +15,18 @@ before_script:
   - createdb strong_migrations_test
 matrix:
   include:
-    - gemfile: test/gemfiles/mysql2.gemfile
+    - name: MySQL
+      gemfile: test/gemfiles/mysql2.gemfile
       env: ADAPTER=mysql2
       services:
         - mysql
       before_script:
         - mysqladmin create strong_migrations_test
-    - gemfile: test/gemfiles/mysql2.gemfile
+    - name: MariaDB
+      gemfile: test/gemfiles/mysql2.gemfile
       env: ADAPTER=mysql2
       addons:
-        mariadb: "10.3"
+        mariadb: 10.3
       before_script:
         - mysqladmin create strong_migrations_test
         - mysql -u root -e 'CREATE USER IF NOT EXISTS travis@localhost'
