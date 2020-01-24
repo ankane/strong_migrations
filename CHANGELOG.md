@@ -1,6 +1,6 @@
-## 0.6.0 (unreleased)
+## 0.6.0 (2020-01-24)
 
-- Added `statement_timeout` and `lock_timeout` functionality
+- Added `statement_timeout` and `lock_timeout`
 - Adding a column with a non-null default value is safe in MySQL 8.0.12+ and MariaDB 10.3.2+
 - Added `change_column_null` check for MySQL and MariaDB
 - Added `auto_analyze` for MySQL and MariaDB
