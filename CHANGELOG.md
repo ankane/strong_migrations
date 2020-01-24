@@ -3,8 +3,6 @@
 - Adding a column with a non-null default value is safe in MariaDB 10.3.2+
 - Added MariaDB-specific check for `change_column_null`
 - Added `target_mariadb_version`
-- Added `add_foreign_key_safely` method
-- Added `add_null_constraint_safely` and `remove_null_constraint_safely` methods
 - Added `statement_timeout` and `lock_timeout` functionality
 - Switched to `up` for backfilling
 

@@ -251,12 +251,12 @@ end",
     end
   end
 
-  def self.enable_helpers
-    unless helpers
-      ActiveRecord::Migration.include(StrongMigrations::MigrationHelpers)
-      self.helpers = true
-    end
-  end
+  # def self.enable_helpers
+  #   unless helpers
+  #     ActiveRecord::Migration.include(StrongMigrations::MigrationHelpers)
+  #     self.helpers = true
+  #   end
+  # end
 end
 
 ActiveSupport.on_load(:active_record) do
