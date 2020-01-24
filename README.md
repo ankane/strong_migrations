@@ -620,6 +620,14 @@ StrongMigrations.error_messages[:add_column_default] = "Your custom instructions
 
 Check the [source code](https://github.com/ankane/strong_migrations/blob/master/lib/strong_migrations.rb) for the list of keys.
 
+## Analyze Tables
+
+Analyze tables automatically (to update planner statistics) after an index is added. Create an initializer with:
+
+```ruby
+StrongMigrations.auto_analyze = true
+```
+
 ## Target Version
 
 If your development database version is different from production, you can specify the production version so the right checks are run in development.
@@ -632,14 +640,6 @@ StrongMigrations.target_mariadb_version = "10.3" # or 10.2, etc [master]
 For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
 
 ## Postgres-Specific Features
-
-### Analyze Tables
-
-Analyze tables automatically (to update planner statistics) after an index is added. Create an initializer with:
-
-```ruby
-StrongMigrations.auto_analyze = true
-```
 
 ### Timeouts
 

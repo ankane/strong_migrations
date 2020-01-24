@@ -196,8 +196,12 @@ Then add the NOT NULL constraint."
 
       result = yield
 
-      if StrongMigrations.auto_analyze && direction == :up && postgresql? && method == :add_index
-        connection.execute "ANALYZE VERBOSE #{connection.quote_table_name(args[0].to_s)}"
+      if StrongMigrations.auto_analyze && direction == :up && method == :add_index
+        if postgresql?
+          connection.execute "ANALYZE VERBOSE #{connection.quote_table_name(args[0].to_s)}"
+        elsif mariadb? || mysql?
+          connection.execute "ANALYZE TABLE #{connection.quote_table_name(args[0].to_s)}"
+        end
       end
 
       result
@@ -243,6 +247,10 @@ Then add the NOT NULL constraint."
           connection.execute("SHOW server_version_num").first["server_version_num"].to_i
         end
       end
+    end
+
+    def mysql?
+      connection.adapter_name =~ /mysql/i && !connection.try(:mariadb?)
     end
 
     def mariadb?
