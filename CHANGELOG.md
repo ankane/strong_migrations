@@ -3,6 +3,7 @@
 - Added `add_foreign_key_safely` method
 - Added `add_null_constraint_safely` and `remove_null_constraint_safely` methods
 - Added `statement_timeout` and `lock_timeout` functionality
+- Switched to `up` for backfilling
 
 ## 0.5.1 (2019-12-17)
 

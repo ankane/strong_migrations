@@ -43,7 +43,7 @@ Then backfill the existing rows in the Rails console or a separate migration wit
 class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   disable_ddl_transaction!
 
-  def change
+  def up
     %{code}
   end
 end%{append}",
@@ -158,7 +158,7 @@ Rails console or a separate migration with disable_ddl_transaction!.
 class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   disable_ddl_transaction!
 
-  def change
+  def up
     %{code}
   end
 end",

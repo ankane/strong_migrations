@@ -144,7 +144,7 @@ There are three keys to backfilling safely: batching, throttling, and running it
 class BackfillSomeColumn < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
-  def change
+  def up
     User.unscoped.in_batches do |relation|
       relation.update_all some_column: "default_value"
       sleep(0.01) # throttle
