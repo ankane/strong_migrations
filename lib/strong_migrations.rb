@@ -193,6 +193,9 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
+    change_column_null_mariadb:
+"Setting NOT NULL on an existing column is not safe in MariaDB.",
+
     add_foreign_key:
 "New foreign keys are validated by default. This acquires an AccessExclusiveLock,
 which is expensive on large tables. Instead, validate it in a separate migration
