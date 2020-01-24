@@ -216,7 +216,7 @@ Then add the NOT NULL constraint."
             elsif mysql?
               "SET max_execution_time = #{connection.quote(StrongMigrations.statement_timeout.to_i * 1000)}"
             elsif mariadb?
-              "SET max_statement_timeout = #{connection.quote(StrongMigrations.statement_timeout)}"
+              "SET max_statement_time = #{connection.quote(StrongMigrations.statement_timeout)}"
             else
               raise StrongMigrations::Error, "Statement timeout not supported for this database"
             end

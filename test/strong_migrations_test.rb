@@ -266,10 +266,26 @@ class Custom < TestMigration
 end
 
 class CheckTimeouts < TestMigration
+  include Helpers
+
   def change
     safety_assured { execute "SELECT 1" }
-    $statement_timeout = connection.select_all("SHOW statement_timeout").first["statement_timeout"].to_i
-    $lock_timeout = connection.select_all("SHOW lock_timeout").first["lock_timeout"].to_i
+
+    $statement_timeout =
+      if postgresql?
+        connection.select_all("SHOW statement_timeout").first["statement_timeout"].to_i
+      elsif mysql?
+        connection.select_all("SHOW VARIABLES LIKE 'max_execution_time'").first["Value"].to_i * 1000
+      else
+        connection.select_all("SHOW VARIABLES LIKE 'max_statement_time'").first["Value"].to_i
+      end
+
+    $lock_timeout =
+      if postgresql?
+        connection.select_all("SHOW lock_timeout").first["lock_timeout"].to_i
+      else
+        connection.select_all("SHOW VARIABLES LIKE 'lock_wait_timeout'").first["Value"].to_i
+      end
   end
 end
 
@@ -492,7 +508,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_timeouts
-    skip unless postgresql?
+    skip unless postgresql? || mysql? || mariadb?
 
     StrongMigrations.statement_timeout = 1.hour
     StrongMigrations.lock_timeout = 10.seconds

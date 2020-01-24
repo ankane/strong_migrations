@@ -53,15 +53,21 @@ class CreateUsers < TestMigration
 end
 migrate CreateUsers
 
-class Minitest::Test
+module Helpers
   def postgresql?
     ENV["ADAPTER"].nil?
+  end
+
+  def mysql?
+    ENV["ADAPTER"] == "mysql2" && !ActiveRecord::Base.connection.try(:mariadb?)
   end
 
   def mariadb?
     ENV["ADAPTER"] == "mysql2" && ActiveRecord::Base.connection.try(:mariadb?)
   end
 end
+
+Minitest::Test.include(Helpers)
 
 StrongMigrations.add_check do |method, args|
   if method == :add_column && args[1].to_s == "forbidden"
