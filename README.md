@@ -86,7 +86,7 @@ end
 
 ### Adding a column with a default value
 
-Note: This operation is safe in Postgres 11+ and MariaDB 10.3.2+ [master].
+Note: This operation is safe in Postgres 11+, MySQL 8.0.12+ [master], and MariaDB 10.3.2+ [master].
 
 #### Bad
 
@@ -633,7 +633,8 @@ StrongMigrations.auto_analyze = true
 If your development database version is different from production, you can specify the production version so the right checks are run in development.
 
 ```ruby
-StrongMigrations.target_postgresql_version = 10     # or 9.6, etc
+StrongMigrations.target_postgresql_version = "10"   # or 9.6, etc
+StrongMigrations.target_mysql_version = "8.0.12"    # [master]
 StrongMigrations.target_mariadb_version = "10.3.2"  # [master]
 ```
 

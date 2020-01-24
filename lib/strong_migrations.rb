@@ -17,7 +17,7 @@ module StrongMigrations
 
   class << self
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
-      :target_postgresql_version, :target_mariadb_version,
+      :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
       :enabled_checks, :lock_timeout, :statement_timeout, :helpers
   end
   self.auto_analyze = false
