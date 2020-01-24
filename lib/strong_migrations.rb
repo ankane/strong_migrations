@@ -194,8 +194,8 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
-    change_column_null_mariadb:
-"Setting NOT NULL on an existing column is not safe in MariaDB.",
+    change_column_null_mysql:
+"Setting NOT NULL on an existing column is not safe with your database engine.",
 
     add_foreign_key:
 "New foreign keys are validated by default. This acquires an AccessExclusiveLock,

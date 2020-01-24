@@ -484,7 +484,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_change_column_null_no_default
-    if postgresql? || mariadb?
+    if postgresql? || mysql? || mariadb?
       assert_unsafe ChangeColumnNullNoDefault
     else
       assert_safe ChangeColumnNullNoDefault
