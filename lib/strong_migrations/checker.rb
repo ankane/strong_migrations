@@ -80,7 +80,7 @@ module StrongMigrations
           options ||= {}
           default = options[:default]
 
-          if !default.nil? && !((postgresql? && postgresql_version >= 110000) || (mariadb? && mariadb_version > Gem::Version.new("10.3.2")))
+          if !default.nil? && !((postgresql? && postgresql_version >= Gem::Version.new("11")) || (mariadb? && mariadb_version >= Gem::Version.new("10.3.2")))
 
             if options[:null] == false
               options = options.except(:null)
@@ -266,12 +266,13 @@ Then add the NOT NULL constraint."
     def postgresql_version
       @postgresql_version ||= begin
         target_version = StrongMigrations.target_postgresql_version
-        if target_version && defined?(Rails) && (Rails.env.development? || Rails.env.test?)
-          # we only need major version right now
-          target_version.to_i * 10000
-        else
-          connection.execute("SHOW server_version_num").first["server_version_num"].to_i
-        end
+        version =
+          if target_version && defined?(Rails) && (Rails.env.development? || Rails.env.test?)
+            target_version.to_s
+          else
+            connection.execute("SHOW server_version_num").first["server_version_num"].to_i
+          end
+        Gem::Version.new(version)
       end
     end
 
@@ -288,7 +289,7 @@ Then add the NOT NULL constraint."
         target_version = StrongMigrations.target_mariadb_version
         version =
           if target_version && defined?(Rails) && (Rails.env.development? || Rails.env.test?)
-            target_version
+            target_version.to_s
           else
             connection.select_all("SELECT VERSION()").first["VERSION()"].split("-").first
           end
