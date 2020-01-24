@@ -1,10 +1,10 @@
 ## 0.6.0 (unreleased)
 
-- Adding a column with a non-null default value is safe in MariaDB 10.3.2+
-- Added MariaDB-specific check for `change_column_null`
-- Added `target_mariadb_version`
-- Added `auto_analyze` for MySQL and MariaDB
 - Added `statement_timeout` and `lock_timeout` functionality
+- Adding a column with a non-null default value is safe in MySQL 8.0.12+ and MariaDB 10.3.2+
+- Added `change_column_null` check for MySQL and MariaDB
+- Added `auto_analyze` for MySQL and MariaDB
+- Added `target_mysql_version` and `target_mariadb_version`
 - Switched to `up` for backfilling
 
 ## 0.5.1 (2019-12-17)
