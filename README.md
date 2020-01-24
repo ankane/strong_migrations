@@ -620,6 +620,17 @@ StrongMigrations.error_messages[:add_column_default] = "Your custom instructions
 
 Check the [source code](https://github.com/ankane/strong_migrations/blob/master/lib/strong_migrations.rb) for the list of keys.
 
+## Target Version
+
+If your development database version is different from production, you can specify the production version so the right checks are run in development.
+
+```ruby
+StrongMigrations.target_postgresql_version = 10 # or 9.6, etc
+StrongMigrations.target_mariadb_version = "10.3" # or 10.2, etc [master]
+```
+
+For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
+
 ## Postgres-Specific Features
 
 ### Analyze Tables
@@ -653,16 +664,6 @@ Note: If you use PgBouncer in transaction mode, you must set timeouts on the dat
 ### Permissions
 
 We recommend using a [separate database user](https://ankane.org/postgres-users) for migrations when possible so you don’t need to grant your app user permission to alter tables.
-
-### Target Version
-
-If your development database version is different from production, you can specify the production version so the right checks are run in development.
-
-```ruby
-StrongMigrations.target_postgresql_version = 10 # or 9.6, etc
-```
-
-For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
 
 ## Additional Reading
 

@@ -57,6 +57,10 @@ class Minitest::Test
   def postgresql?
     ENV["ADAPTER"].nil?
   end
+
+  def mariadb?
+    ENV["ADAPTER"] == "mysql2" && ActiveRecord::Base.connection.try(:mariadb?)
+  end
 end
 
 StrongMigrations.add_check do |method, args|

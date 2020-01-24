@@ -250,7 +250,16 @@ Then add the NOT NULL constraint."
     end
 
     def mariadb_version
-      Gem::Version.new(connection.select_all("SELECT VERSION()").first["VERSION()"].split("-").first)
+      @mariadb_version ||= begin
+        target_version = StrongMigrations.target_mariadb_version
+        version =
+          if target_version && defined?(Rails) && (Rails.env.development? || Rails.env.test?)
+            target_version
+          else
+            connection.select_all("SELECT VERSION()").first["VERSION()"].split("-").first
+          end
+        Gem::Version.new(version)
+      end
     end
 
     def helpers?

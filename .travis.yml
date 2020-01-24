@@ -32,6 +32,14 @@ matrix:
         - mysql
       before_script:
         - mysqladmin create strong_migrations_test
+    - gemfile: test/gemfiles/mysql2.gemfile
+      env: ADAPTER=mysql2
+      addons:
+        mariadb: "10.3"
+      before_script:
+        - mysqladmin create strong_migrations_test
+        - mysql -u root -e 'CREATE USER IF NOT EXISTS travis@localhost'
+        - mysql -u root -e 'GRANT ALL ON *.* TO travis@localhost'
 notifications:
   email:
     on_success: never
