@@ -80,7 +80,7 @@ module StrongMigrations
           options ||= {}
           default = options[:default]
 
-          if !default.nil? && !(postgresql? && postgresql_version >= 110000)
+          if !default.nil? && !((postgresql? && postgresql_version >= 110000) || (mariadb? && mariadb_version > Gem::Version.new("10.3.2")))
 
             if options[:null] == false
               options = options.except(:null)
@@ -241,6 +241,14 @@ Then add the NOT NULL constraint."
           connection.execute("SHOW server_version_num").first["server_version_num"].to_i
         end
       end
+    end
+
+    def mariadb?
+      connection.adapter_name =~ /mysql/i && connection.try(:mariadb?)
+    end
+
+    def mariadb_version
+      Gem::Version.new(connection.select_all("SELECT VERSION()").first["VERSION()"].split("-").first)
     end
 
     def helpers?

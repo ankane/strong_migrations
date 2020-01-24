@@ -86,7 +86,7 @@ end
 
 ### Adding a column with a default value
 
-Note: This operation is safe in Postgres 11+.
+Note: This operation is safe in Postgres 11+ and MariaDB 10.3.2+ [master].
 
 #### Bad
 
