@@ -6,9 +6,6 @@ gemfile:
   - test/gemfiles/activerecord52.gemfile
   - test/gemfiles/activerecord51.gemfile
   - test/gemfiles/activerecord50.gemfile
-env:
-  -
-  - HELPERS=t
 script: bundle exec rake test
 services:
   - postgresql
@@ -20,14 +17,6 @@ matrix:
   include:
     - gemfile: test/gemfiles/mysql2.gemfile
       env: ADAPTER=mysql2
-      services:
-        - mysql
-      before_script:
-        - mysqladmin create strong_migrations_test
-    - gemfile: test/gemfiles/mysql2.gemfile
-      env:
-        - ADAPTER=mysql2
-        - HELPERS=t
       services:
         - mysql
       before_script:
