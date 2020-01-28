@@ -273,7 +273,7 @@ class CheckTimeouts < TestMigration
 
     $statement_timeout =
       if postgresql?
-        connection.select_all("SHOW statement_timeout").first["statement_timeout"].to_i
+        connection.select_all("SHOW statement_timeout").first["statement_timeout"]
       elsif mysql?
         connection.select_all("SHOW VARIABLES LIKE 'max_execution_time'").first["Value"].to_i / 1000
       else
@@ -282,7 +282,7 @@ class CheckTimeouts < TestMigration
 
     $lock_timeout =
       if postgresql?
-        connection.select_all("SHOW lock_timeout").first["lock_timeout"].to_i
+        connection.select_all("SHOW lock_timeout").first["lock_timeout"]
       else
         connection.select_all("SHOW VARIABLES LIKE 'lock_wait_timeout'").first["Value"].to_i
       end
@@ -512,7 +512,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_timeouts
-    skip unless postgresql? || mysql? || mariadb?
+    skip unless mysql? || mariadb?
 
     StrongMigrations.statement_timeout = 1.hour
     StrongMigrations.lock_timeout = 10.seconds
@@ -521,6 +521,21 @@ class StrongMigrationsTest < Minitest::Test
 
     assert_equal 3600, $statement_timeout
     assert_equal 10, $lock_timeout
+  ensure
+    StrongMigrations.statement_timeout = nil
+    StrongMigrations.lock_timeout = nil
+  end
+
+  def test_postgresql_timeouts
+    skip unless postgresql?
+
+    StrongMigrations.statement_timeout = 1.hour
+    StrongMigrations.lock_timeout = 10.seconds
+
+    migrate CheckTimeouts
+
+    assert_equal "1h", $statement_timeout
+    assert_equal "10s", $lock_timeout
   ensure
     StrongMigrations.statement_timeout = nil
     StrongMigrations.lock_timeout = nil

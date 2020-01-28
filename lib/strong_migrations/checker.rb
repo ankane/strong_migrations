@@ -212,7 +212,7 @@ Then add the NOT NULL constraint."
         if StrongMigrations.statement_timeout
           statement =
             if postgresql?
-              "SET statement_timeout TO #{connection.quote(StrongMigrations.statement_timeout)}"
+              "SET statement_timeout TO #{connection.quote(StrongMigrations.statement_timeout.to_i * 1000)}"
             elsif mysql?
               "SET max_execution_time = #{connection.quote(StrongMigrations.statement_timeout.to_i * 1000)}"
             elsif mariadb?
@@ -227,7 +227,7 @@ Then add the NOT NULL constraint."
         if StrongMigrations.lock_timeout
           statement =
             if postgresql?
-              "SET lock_timeout TO #{connection.quote(StrongMigrations.lock_timeout)}"
+              "SET lock_timeout TO #{connection.quote(StrongMigrations.lock_timeout.to_i * 1000)}"
             elsif mysql? || mariadb?
               "SET lock_wait_timeout = #{connection.quote(StrongMigrations.lock_timeout)}"
             else
