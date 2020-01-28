@@ -1,3 +1,7 @@
+## 0.6.1 (unreleased)
+
+- Fixed timeouts for PostgreSQL
+
 ## 0.6.0 (2020-01-24)
 
 - Added `statement_timeout` and `lock_timeout`
