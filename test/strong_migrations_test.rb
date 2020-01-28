@@ -512,30 +512,20 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_timeouts
-    skip unless mysql? || mariadb?
+    skip unless postgresql? || mysql? || mariadb?
 
     StrongMigrations.statement_timeout = 1.hour
     StrongMigrations.lock_timeout = 10.seconds
 
     migrate CheckTimeouts
 
-    assert_equal 3600, $statement_timeout
-    assert_equal 10, $lock_timeout
-  ensure
-    StrongMigrations.statement_timeout = nil
-    StrongMigrations.lock_timeout = nil
-  end
-
-  def test_postgresql_timeouts
-    skip unless postgresql?
-
-    StrongMigrations.statement_timeout = 1.hour
-    StrongMigrations.lock_timeout = 10.seconds
-
-    migrate CheckTimeouts
-
-    assert_equal "1h", $statement_timeout
-    assert_equal "10s", $lock_timeout
+    if postgresql?
+      assert_equal "1h", $statement_timeout
+      assert_equal "10s", $lock_timeout
+    else
+      assert_equal 3600, $statement_timeout
+      assert_equal 10, $lock_timeout
+    end
   ensure
     StrongMigrations.statement_timeout = nil
     StrongMigrations.lock_timeout = nil
