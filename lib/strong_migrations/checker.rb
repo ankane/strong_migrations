@@ -266,7 +266,8 @@ Then add the NOT NULL constraint."
     def postgresql_version
       @postgresql_version ||= begin
         target_version(StrongMigrations.target_postgresql_version) do
-          connection.select_all("SHOW server_version").first["server_version"]
+          # only works with major versions
+          connection.select_all("SHOW server_version_num").first["server_version_num"].to_i / 10000
         end
       end
     end

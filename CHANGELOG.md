@@ -1,3 +1,7 @@
+## 0.6.2 (unreleased)
+
+- Fixed PostgreSQL version check
+
 ## 0.6.1 (2020-01-28)
 
 - Fixed timeouts for PostgreSQL
