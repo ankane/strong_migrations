@@ -1,4 +1,4 @@
-## 0.6.2 (unreleased)
+## 0.6.2 (2020-02-03)
 
 - Fixed PostgreSQL version check
 
