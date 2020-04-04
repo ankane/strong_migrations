@@ -2,6 +2,7 @@
 
 - Increasing precision of `decimal` or `numeric` column is safe in Postgres 9.2+
 - Making `decimal` or `numeric` column unconstrained is safe in Postgres 9.2+
+- Changing between `timestamp` and `timestamptz` when session time zone is UTC in Postgres 12+
 
 ## 0.6.2 (2020-02-03)
 

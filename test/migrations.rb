@@ -125,6 +125,13 @@ class ChangeColumnDecimalUnconstrained < TestMigration
   end
 end
 
+class ChangeColumnTimestamps < TestMigration
+  def up
+    change_column :users, :deleted_at, :timestamptz
+    change_column :users, :deleted_at, :timestamp
+  end
+end
+
 class ChangeColumnNull < TestMigration
   def change
     change_column_null :users, :name, false, "Andy"

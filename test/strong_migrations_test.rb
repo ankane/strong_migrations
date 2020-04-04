@@ -119,6 +119,16 @@ class StrongMigrationsTest < Minitest::Test
     assert_safe ChangeColumnDecimalIncreasePrecision
   end
 
+  def test_change_column_timestamps
+    skip unless postgresql?
+    StrongMigrations.target_postgresql_version = "12"
+    assert_safe ChangeColumnTimestamps
+    StrongMigrations.target_postgresql_version = "11"
+    assert_unsafe ChangeColumnTimestamps
+  ensure
+    StrongMigrations.target_postgresql_version = nil
+  end
+
   def test_execute_arbitrary_sql
     assert_unsafe ExecuteArbitrarySQL
   end

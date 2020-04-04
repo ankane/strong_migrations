@@ -45,6 +45,7 @@ class CreateUsers < TestMigration
       t.string :name
       t.string :city
       t.decimal :credit_score, precision: 10, scale: 5
+      t.timestamp :deleted_at
       t.references :order
     end
 

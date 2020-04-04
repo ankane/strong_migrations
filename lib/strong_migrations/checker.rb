@@ -126,6 +126,10 @@ Then add the NOT NULL constraint."
                       options[:scale] == found_column.scale
                     )
                   )
+              when "datetime", "timestamp", "timestamptz"
+                safe = ["timestamp without time zone", "timestamp with time zone"].include?(found_column.sql_type) &&
+                  postgresql_version >= Gem::Version.new("12") &&
+                  connection.select_all("SHOW timezone").first["TimeZone"] == "UTC"
               end
             end
           end
