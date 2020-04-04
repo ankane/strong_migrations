@@ -303,7 +303,11 @@ class ChangeSomeColumnType < ActiveRecord::Migration[6.0]
 end
 ```
 
-One exception is changing a `varchar` column to `text`, which is safe in Postgres.
+A few changes are safe in Postges:
+
+- Changing a `varchar` column to `text`
+- Increasing the precision of a `decimal` or `numeric` column [master]
+- Making a `decimal` or `numeric` column unconstrained [master]
 
 #### Good
 

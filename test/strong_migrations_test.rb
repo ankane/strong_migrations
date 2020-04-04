@@ -95,6 +95,38 @@ class ChangeColumnVarcharToText < TestMigration
   end
 end
 
+class ChangeColumnDecimalDecreasePrecision < TestMigration
+  def up
+    change_column :users, :credit_score, :decimal, precision: 9, scale: 5
+  end
+end
+
+class ChangeColumnDecimalChangeScale < TestMigration
+  def up
+    change_column :users, :credit_score, :decimal, precision: 10, scale: 6
+  end
+end
+
+class ChangeColumnDecimalIncreasePrecision < TestMigration
+  def up
+    change_column :users, :credit_score, :decimal, precision: 11, scale: 5
+  end
+
+  def down
+    change_column :users, :credit_score, :decimal, precision: 10, scale: 5
+  end
+end
+
+class ChangeColumnDecimalUnconstrained < TestMigration
+  def up
+    change_column :users, :credit_score, :decimal
+  end
+
+  def down
+    change_column :users, :credit_score, :decimal, precision: 10, scale: 5
+  end
+end
+
 class ChangeColumnNull < TestMigration
   def change
     change_column_null :users, :name, false, "Andy"
@@ -386,6 +418,26 @@ class StrongMigrationsTest < Minitest::Test
   def test_change_column_varchar_to_text
     skip unless postgresql?
     assert_safe ChangeColumnVarcharToText
+  end
+
+  def test_change_column_decimal_decrease_precision
+    skip unless postgresql?
+    assert_unsafe ChangeColumnDecimalDecreasePrecision
+  end
+
+  def test_change_column_decimal_change_scale
+    skip unless postgresql?
+    assert_unsafe ChangeColumnDecimalChangeScale
+  end
+
+  def test_change_column_decimal_increase_precision
+    skip unless postgresql?
+    assert_safe ChangeColumnDecimalIncreasePrecision
+  end
+
+  def test_change_column_decimal_unconstrained
+    skip unless postgresql?
+    assert_safe ChangeColumnDecimalIncreasePrecision
   end
 
   def test_execute_arbitrary_sql

@@ -44,6 +44,7 @@ class CreateUsers < TestMigration
     create_table "users" do |t|
       t.string :name
       t.string :city
+      t.decimal :credit_score, precision: 10, scale: 5
       t.references :order
     end
 

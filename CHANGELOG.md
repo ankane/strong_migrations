@@ -1,3 +1,8 @@
+## 0.6.3 (unreleased)
+
+- Increasing precision of `decimal` or `numeric` column is safe in Postgres 9.2+
+- Making `decimal` or `numeric` column unconstrained is safe in Postgres 9.2+
+
 ## 0.6.2 (2020-02-03)
 
 - Fixed PostgreSQL version check
