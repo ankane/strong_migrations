@@ -99,6 +99,26 @@ class StrongMigrationsTest < Minitest::Test
     assert_safe ChangeColumnVarcharToText
   end
 
+  def test_change_column_varchar_increase_limit
+    assert_safe ChangeColumnVarcharIncreaseLimit
+  end
+
+  def test_change_column_varchar_increase_limit_over_256
+    if postgresql?
+      assert_safe ChangeColumnVarcharIncreaseLimit256
+    elsif mysql? || mariadb?
+      assert_unsafe ChangeColumnVarcharIncreaseLimit256
+    end
+  end
+
+  def test_change_column_varchar_decrease_limit
+    if postgresql?
+      assert_safe ChangeColumnVarcharDecreaseLimit
+    elsif mysql? || mariadb?
+      assert_unsafe ChangeColumnVarcharDecreaseLimit
+    end
+  end
+
   def test_change_column_decimal_decrease_precision
     skip unless postgresql?
     assert_unsafe ChangeColumnDecimalDecreasePrecision

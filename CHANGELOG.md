@@ -3,6 +3,8 @@
 - Increasing precision of `decimal` or `numeric` column is safe in Postgres 9.2+
 - Making `decimal` or `numeric` column unconstrained is safe in Postgres 9.2+
 - Changing between `timestamp` and `timestamptz` when session time zone is UTC in Postgres 12+
+- Increasing the length of a `varchar` column from under 255 up to 255 in MySQL and MariaDB
+- Increasing the length of a `varchar` column over 255 in MySQL and MariaDB
 
 ## 0.6.2 (2020-02-03)
 

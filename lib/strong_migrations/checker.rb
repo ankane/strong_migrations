@@ -106,16 +106,17 @@ Then add the NOT NULL constraint."
 
           safe = false
           # assume Postgres 9.5+ since previous versions are EOL
-          if postgresql?
-            existing_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
-            if existing_column
+          existing_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
+          if existing_column
+            sql_type = existing_column.sql_type.split("(").first
+            if postgresql?
               case type.to_s
               when "string", "text"
                 # safe to change limit for varchar
-                safe = ["character varying", "text"].include?(existing_column.sql_type)
+                safe = ["character varying", "text"].include?(sql_type)
               when "numeric", "decimal"
                 # numeric and decimal are equivalent and can be used interchangably
-                safe = ["numeric", "decimal"].include?(existing_column.sql_type.split("(").first) &&
+                safe = ["numeric", "decimal"].include?(sql_type) &&
                   (
                     (
                       # unconstrained
@@ -128,9 +129,17 @@ Then add the NOT NULL constraint."
                     )
                   )
               when "datetime", "timestamp", "timestamptz"
-                safe = ["timestamp without time zone", "timestamp with time zone"].include?(existing_column.sql_type) &&
+                safe = ["timestamp without time zone", "timestamp with time zone"].include?(sql_type) &&
                   postgresql_version >= Gem::Version.new("12") &&
                   connection.select_all("SHOW timezone").first["TimeZone"] == "UTC"
+              end
+            elsif mysql? || mariadb?
+              case type.to_s
+              when "string", "text"
+                safe = ["varchar"].include?(sql_type) &&
+                  options[:limit] && existing_column.limit &&
+                  options[:limit] >= existing_column.limit &&
+                  (existing_column.limit > 255 || options[:limit] <= 255)
               end
             end
           end

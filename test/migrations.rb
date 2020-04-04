@@ -93,6 +93,36 @@ class ChangeColumnVarcharToText < TestMigration
   end
 end
 
+class ChangeColumnVarcharIncreaseLimit < TestMigration
+  def up
+    change_column :users, :country, :string, limit: 21
+  end
+
+  def down
+    change_column :users, :country, :string, limit: 20
+  end
+end
+
+class ChangeColumnVarcharIncreaseLimit256 < TestMigration
+  def up
+    change_column :users, :country, :string, limit: 256
+  end
+
+  def down
+    change_column :users, :country, :string, limit: 20
+  end
+end
+
+class ChangeColumnVarcharDecreaseLimit < TestMigration
+  def up
+    change_column :users, :country, :string, limit: 19
+  end
+
+  def down
+    change_column :users, :country, :string, limit: 20
+  end
+end
+
 class ChangeColumnDecimalDecreasePrecision < TestMigration
   def up
     change_column :users, :credit_score, :decimal, precision: 9, scale: 5

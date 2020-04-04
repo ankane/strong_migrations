@@ -310,6 +310,11 @@ A few changes are safe in Postgres:
 - Making a `decimal` or `numeric` column unconstrained [master]
 - Changing between `timestamp` and `timestamptz` columns when session time zone is UTC in Postgres 12+ [master]
 
+And a few in MySQL and MariaDB:
+
+- Increasing the length of a `varchar` column from under 255 up to 255 [master]
+- Increasing the length of a `varchar` column over 255 [master]
+
 #### Good
 
 A safer approach is to:
