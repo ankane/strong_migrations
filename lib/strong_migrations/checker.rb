@@ -136,6 +136,8 @@ Then add the NOT NULL constraint."
             elsif mysql? || mariadb?
               case type.to_s
               when "string", "text"
+                # https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html
+                # https://mariadb.com/kb/en/innodb-online-ddl-operations-with-the-instant-alter-algorithm/#changing-the-data-type-of-a-column
                 safe = ["varchar"].include?(sql_type) &&
                   options[:limit] && existing_column.limit &&
                   options[:limit] >= existing_column.limit &&
