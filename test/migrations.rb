@@ -10,7 +10,7 @@ class RemoveIndex < TestMigration
   end
 end
 
-class RemoveIndexSafePostgres < TestMigration
+class RemoveIndexConcurrently < TestMigration
   disable_ddl_transaction!
 
   def change
@@ -28,7 +28,7 @@ class AddIndexUp < TestMigration
   end
 end
 
-class AddIndexSafePostgres < TestMigration
+class AddIndexConcurrently < TestMigration
   disable_ddl_transaction!
 
   def change

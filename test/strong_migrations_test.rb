@@ -39,19 +39,19 @@ class StrongMigrationsTest < Minitest::Test
     assert_safe AddIndexSchema
   end
 
-  def test_add_index_safe_postgres
+  def test_add_index_concurrently
     skip unless postgresql?
-    assert_safe AddIndexSafePostgres
+    assert_safe AddIndexConcurrently
   end
 
-  def test_remove_index_postgres
+  def test_remove_index_concurrently
     skip unless postgresql?
-    migrate AddIndexSafePostgres
+    migrate AddIndexConcurrently
 
     begin
       StrongMigrations.enable_check(:remove_index)
       assert_unsafe RemoveIndex
-      migrate RemoveIndexSafePostgres
+      migrate RemoveIndexConcurrently
     ensure
       StrongMigrations.disable_check(:remove_index)
     end
