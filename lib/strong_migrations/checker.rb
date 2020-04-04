@@ -105,7 +105,6 @@ Then add the NOT NULL constraint."
           options ||= {}
 
           safe = false
-          # assume Postgres 9.5+ since previous versions are EOL
           existing_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
           if existing_column
             sql_type = existing_column.sql_type.split("(").first
