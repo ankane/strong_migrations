@@ -107,28 +107,28 @@ Then add the NOT NULL constraint."
           safe = false
           # assume Postgres 9.5+ since previous versions are EOL
           if postgresql?
-            found_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
-            if found_column
+            existing_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
+            if existing_column
               case type.to_s
               when "string", "text"
                 # safe to change limit for varchar
-                safe = ["character varying", "text"].include?(found_column.sql_type)
+                safe = ["character varying", "text"].include?(existing_column.sql_type)
               when "numeric", "decimal"
                 # numeric and decimal are equivalent and can be used interchangably
-                safe = ["numeric", "decimal"].include?(found_column.sql_type.split("(").first) &&
+                safe = ["numeric", "decimal"].include?(existing_column.sql_type.split("(").first) &&
                   (
                     (
                       # unconstrained
                       !options[:precision] && !options[:scale]
                     ) || (
                       # increased precision, same scale
-                      options[:precision] && found_column.precision &&
-                      options[:precision] >= found_column.precision &&
-                      options[:scale] == found_column.scale
+                      options[:precision] && existing_column.precision &&
+                      options[:precision] >= existing_column.precision &&
+                      options[:scale] == existing_column.scale
                     )
                   )
               when "datetime", "timestamp", "timestamptz"
-                safe = ["timestamp without time zone", "timestamp with time zone"].include?(found_column.sql_type) &&
+                safe = ["timestamp without time zone", "timestamp with time zone"].include?(existing_column.sql_type) &&
                   postgresql_version >= Gem::Version.new("12") &&
                   connection.select_all("SHOW timezone").first["TimeZone"] == "UTC"
               end
