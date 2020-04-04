@@ -700,5 +700,12 @@ To get started with development:
 git clone https://github.com/ankane/strong_migrations.git
 cd strong_migrations
 bundle install
+
+# Postgres
+createdb strong_migrations_test
 bundle exec rake test
+
+# MySQL and MariaDB
+mysqladmin create strong_migrations_test
+BUNDLE_GEMFILE=test/gemfiles/mysql2.gemfile ADAPTER=mysql2 bundle exec rake test
 ```
