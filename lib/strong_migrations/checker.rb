@@ -138,10 +138,11 @@ Then add the NOT NULL constraint."
               when "string"
                 # https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html
                 # https://mariadb.com/kb/en/innodb-online-ddl-operations-with-the-instant-alter-algorithm/#changing-the-data-type-of-a-column
+                # increased limit, but doesn't change number of length bytes
                 limit = options[:limit] || 255
                 safe = ["varchar"].include?(sql_type) &&
                   limit >= existing_column.limit &&
-                  (existing_column.limit > 255 || limit <= 255)
+                  (limit <= 255 || existing_column.limit > 255)
               end
             end
           end
