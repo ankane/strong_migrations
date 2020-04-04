@@ -303,7 +303,7 @@ class ChangeSomeColumnType < ActiveRecord::Migration[6.0]
 end
 ```
 
-A few changes are safe in Postges:
+A few changes are safe in Postgres:
 
 - Changing a `varchar` column to `text`
 - Increasing the precision of a `decimal` or `numeric` column [master]
