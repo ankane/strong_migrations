@@ -305,10 +305,10 @@ end
 
 A few changes are safe in Postgres:
 
-- Changing a `varchar` column to `text`
+- Changing between `varchar` and `text` columns
 - Increasing the precision of a `decimal` or `numeric` column [master]
 - Making a `decimal` or `numeric` column unconstrained [master]
-- Changing between `timestamp` and `timestamptz` when session time zone is UTC in Postgres 12+ [master]
+- Changing between `timestamp` and `timestamptz` columns when session time zone is UTC in Postgres 12+ [master]
 
 #### Good
 
