@@ -362,7 +362,8 @@ Then add the NOT NULL constraint."
       end
 
       # escape % not followed by {
-      @migration.stop!(message.gsub(/%(?!{)/, "%%") % vars, header: header || "Dangerous operation detected")
+      message = message.gsub(/%(?!{)/, "%%") % vars if message.include?("%")
+      @migration.stop!(message, header: header || "Dangerous operation detected")
     end
 
     def constraint_str(statement, identifiers)
