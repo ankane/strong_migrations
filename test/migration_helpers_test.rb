@@ -1,21 +1,5 @@
 require_relative "test_helper"
 
-class AddForeignKeySafely < TestMigration
-  disable_ddl_transaction!
-
-  def change
-    add_foreign_key_safely :users, :orders
-  end
-end
-
-class AddNullConstraintSafely < TestMigration
-  disable_ddl_transaction!
-
-  def change
-    add_null_constraint_safely :users, :name
-  end
-end
-
 class MigrationHelpersTest < Minitest::Test
   def setup
     skip unless ENV["HELPERS"]
