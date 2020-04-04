@@ -306,14 +306,14 @@ end
 A few changes are safe in Postgres:
 
 - Changing between `varchar` and `text` columns
-- Increasing the precision of a `decimal` or `numeric` column [master]
-- Making a `decimal` or `numeric` column unconstrained [master]
-- Changing between `timestamp` and `timestamptz` columns when session time zone is UTC in Postgres 12+ [master]
+- Increasing the precision of a `decimal` or `numeric` column
+- Making a `decimal` or `numeric` column unconstrained
+- Changing between `timestamp` and `timestamptz` columns when session time zone is UTC in Postgres 12+
 
 And a few in MySQL and MariaDB:
 
-- Increasing the length of a `varchar` column from under 255 up to 255 [master]
-- Increasing the length of a `varchar` column over 255 [master]
+- Increasing the length of a `varchar` column from under 255 up to 255
+- Increasing the length of a `varchar` column over 255
 
 #### Good
 
