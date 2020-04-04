@@ -19,7 +19,7 @@ jobs:
       gemfile: test/gemfiles/activerecord50.gemfile
     - name: MySQL
       rvm: 2.7
-      gemfile: test/gemfiles/mysql2.gemfile
+      gemfile: Gemfile
       env: ADAPTER=mysql2
       services:
         - mysql
@@ -27,7 +27,7 @@ jobs:
         - mysqladmin create strong_migrations_test
     - name: MariaDB
       rvm: 2.7
-      gemfile: test/gemfiles/mysql2.gemfile
+      gemfile: Gemfile
       env: ADAPTER=mysql2
       addons:
         mariadb: 10.3
