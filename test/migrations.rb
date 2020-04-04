@@ -257,17 +257,7 @@ class CreateTableForce < TestMigration
   end
 end
 
-class VersionSafe < TestMigration
-  def change
-    change_column_null :users, :city, false, "San Francisco"
-  end
-
-  def version
-    20170101000000
-  end
-end
-
-class VersionUnsafe < TestMigration
+class Version < TestMigration
   def change
     change_column_null :users, :city, false, "San Francisco"
   end

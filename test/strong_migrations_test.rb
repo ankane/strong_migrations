@@ -199,14 +199,14 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_version_safe
-    with_start_after(20170101000000) do
-      assert_safe VersionSafe
+    with_start_after(20170101000001) do
+      assert_safe Version
     end
   end
 
   def test_version_unsafe
     with_start_after(20170101000000) do
-      assert_unsafe VersionUnsafe
+      assert_unsafe Version
     end
   end
 
