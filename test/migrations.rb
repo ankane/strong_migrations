@@ -223,7 +223,7 @@ class AddReferencePolymorphic < TestMigration
   end
 end
 
-class SafeAddReference < TestMigration
+class AddReferenceNoIndex < TestMigration
   def change
     add_reference :users, :country, index: false
   end

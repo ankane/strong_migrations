@@ -174,9 +174,9 @@ class StrongMigrationsTest < Minitest::Test
     assert_unsafe AddReferencePolymorphic
   end
 
-  def test_safe_add_reference
+  def test_add_reference_no_index
     skip unless postgresql?
-    assert_safe SafeAddReference
+    assert_safe AddReferenceNoIndex
   end
 
   def test_add_reference_default
