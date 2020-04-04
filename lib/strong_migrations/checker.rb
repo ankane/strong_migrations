@@ -139,6 +139,7 @@ Then add the NOT NULL constraint."
                 # https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html
                 # https://mariadb.com/kb/en/innodb-online-ddl-operations-with-the-instant-alter-algorithm/#changing-the-data-type-of-a-column
                 # increased limit, but doesn't change number of length bytes
+                # 1-255 = 1 byte, 256-65532 = 2 bytes, 65533+ = too big for varchar
                 limit = options[:limit] || 255
                 safe = ["varchar"].include?(sql_type) &&
                   limit >= existing_column.limit &&
