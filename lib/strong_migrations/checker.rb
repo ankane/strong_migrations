@@ -110,11 +110,12 @@ Then add the NOT NULL constraint."
             found_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
             if found_column
               case type.to_s
-              when "text"
-                safe = found_column.type == :string
+              when "string", "text"
+                # safe to change limit for varchar
+                safe = ["character varying", "text"].include?(found_column.sql_type)
               when "numeric", "decimal"
                 # numeric and decimal are equivalent and can be used interchangably
-                safe = [:numeric, :decimal].include?(found_column.type) &&
+                safe = ["numeric", "decimal"].include?(found_column.sql_type.split("(").first) &&
                   (
                     (
                       # unconstrained
