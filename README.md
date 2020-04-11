@@ -18,9 +18,7 @@ Add this line to your application’s Gemfile:
 gem 'strong_migrations'
 ```
 
-We highly recommend [setting timeouts](#timeouts) as well.
-
-If you have existing migrations, you can [mark them as safe](#existing-migrations).
+If you have existing migrations, you can [mark them as safe](#existing-migrations). We highly recommend [setting timeouts](#timeouts) as well.
 
 ## Checks
 
@@ -89,7 +87,7 @@ end
 
 ### Adding a column with a default value
 
-This operation is safe in Postgres 11+, MySQL 8.0.12+, and MariaDB 10.3.2+
+Note: This operation is safe in Postgres 11+, MySQL 8.0.12+, and MariaDB 10.3.2+.
 
 #### Bad
 
