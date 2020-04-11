@@ -518,8 +518,6 @@ Note: This is not 100% the same as `NOT NULL` column constraint. Here’s a [goo
 
 ### Keeping non-unique indexes to three columns or less
 
-*Best practice*
-
 #### Bad
 
 Adding a non-unique index with more than three columns rarely improves performance.
