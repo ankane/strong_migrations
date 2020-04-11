@@ -30,7 +30,8 @@ Potentially dangerous operations:
 - [changing the type of a column](#renaming-or-changing-the-type-of-a-column)
 - [renaming a column](#renaming-or-changing-the-type-of-a-column)
 - [renaming a table](#renaming-a-table)
-- [creating a table with the `force` option](#creating-a-table-with-the-force-option)
+- [creating a table with the force option](#creating-a-table-with-the-force-option)
+- [using change_column_null with a default value](#using-change_column_null-with-a-default-value)
 - [executing SQL directly](#executing-SQL-directly)
 
 Postgres-specific checks:
@@ -39,8 +40,8 @@ Postgres-specific checks:
 - [removing an index non-concurrently](#removing-an-index)
 - [adding a reference](#adding-a-reference)
 - [adding a foreign key](#adding-a-foreign-key)
-- [adding a `json` column](#adding-a-json-column)
-- [setting `NOT NULL` on an existing column](#setting-not-null-on-an-existing-column)
+- [adding a json column](#adding-a-json-column)
+- [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
 
 Best practices:
 
