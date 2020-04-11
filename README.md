@@ -2,6 +2,8 @@
 
 Catch unsafe migrations in development
 
+Strong Migrations detects potentially dangerous operations, prevents them from running by default, and provides instructions on safer ways to do what you want.
+
 Supports for PostgreSQL, MySQL, and MariaDB
 
 :tangerine: Battle-tested at [Instacart](https://www.instacart.com/opensource)
@@ -18,13 +20,7 @@ gem 'strong_migrations'
 
 We highly recommend [setting timeouts](#timeouts) as well.
 
-## How It Works
-
-Strong Migrations detects potentially dangerous operations in migrations, prevents them from running by default, and provides instructions on safer ways to do what you want.
-
-![Screenshot](https://ankane.org/images/strong-migrations.png)
-
-## Dangerous Operations
+## Operations
 
 The following operations can cause downtime or errors:
 
@@ -48,8 +44,6 @@ Optional checks:
 Best practices:
 
 - [[+]](#keeping-non-unique-indexes-to-three-columns-or-less) keeping non-unique indexes to three columns or less
-
-## The Zero Downtime Way
 
 ### Removing a column
 
