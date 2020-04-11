@@ -16,6 +16,8 @@ Add this line to your application’s Gemfile:
 gem 'strong_migrations'
 ```
 
+We highly recommend [setting timeouts](#timeouts) as well.
+
 ## How It Works
 
 Strong Migrations detects potentially dangerous operations in migrations, prevents them from running by default, and provides instructions on safer ways to do what you want.
@@ -656,7 +658,7 @@ For safety, this option only affects development and test environments. In other
 
 It’s a good idea to set a long statement timeout and a short lock timeout for migrations. This way, migrations can run for a while, and if a migration can’t acquire a lock in a timely manner, other statements won’t be stuck behind it.
 
-You can use:
+Create `config/initializers/strong_migrations.rb` with:
 
 ```ruby
 StrongMigrations.statement_timeout = 1.hour
