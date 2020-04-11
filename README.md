@@ -286,7 +286,7 @@ Note: In Postgres, `change_column_null` is still [not safe](#setting-not-null-on
 Strong Migrations can’t ensure safety for raw SQL statements. Make really sure that what you’re doing is safe, then use:
 
 ```ruby
-class MySafeMigration < ActiveRecord::Migration[6.0]
+class ExecuteSQL < ActiveRecord::Migration[6.0]
   def change
     safety_assured { execute "..." }
   end
