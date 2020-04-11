@@ -1,3 +1,7 @@
+## 0.6.4 (unreleased)
+
+- Added check for `add_reference` with `foreign_key: true`
+
 ## 0.6.3 (2020-04-04)
 
 - Increasing precision of `decimal` or `numeric` column is safe in Postgres 9.2+

@@ -68,6 +68,17 @@ class StrongMigrationsTest < Minitest::Test
     StrongMigrations.target_mariadb_version = nil
   end
 
+  def test_add_column_default_not_null
+    StrongMigrations.target_postgresql_version = "10"
+    StrongMigrations.target_mysql_version = "8.0.11"
+    StrongMigrations.target_mariadb_version = "10.3.1"
+    assert_unsafe AddColumnDefaultNotNull, /Then add the NOT NULL constraint/
+  ensure
+    StrongMigrations.target_postgresql_version = nil
+    StrongMigrations.target_mysql_version = nil
+    StrongMigrations.target_mariadb_version = nil
+  end
+
   def test_add_column_default_safe_latest
     skip unless postgresql? || mysql? || mariadb?
 
@@ -217,6 +228,11 @@ class StrongMigrationsTest < Minitest::Test
   def test_add_reference_concurrently
     skip unless postgresql?
     assert_safe AddReferenceConcurrently
+  end
+
+  def test_add_reference_foreign_key
+    skip unless postgresql?
+    assert_unsafe AddReferenceForeignKey, /Then add the foreign key/
   end
 
   def test_add_belongs_to

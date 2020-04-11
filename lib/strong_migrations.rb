@@ -47,7 +47,7 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def up
     %{code}
   end
-end%{append}",
+end",
 
     add_column_json:
 "There's no equality operator for the json column type, which can
@@ -100,7 +100,7 @@ end",
 6. Drop the old table",
 
     add_reference:
-"Adding an index non-concurrently locks the table. Instead, use:
+"%{headline} Instead, use:
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   disable_ddl_transaction!

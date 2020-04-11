@@ -86,7 +86,7 @@ module StrongMigrations
               options = options.except(:null)
               append = "
 
-Then add the NOT NULL constraint."
+Then add the NOT NULL constraint in separate migrations."
             end
 
             raise_error :add_column_default,
@@ -159,19 +159,34 @@ Then add the NOT NULL constraint."
           table, reference, options = args
           options ||= {}
 
-          index_value = options.fetch(:index, true)
-          concurrently_set = index_value.is_a?(Hash) && index_value[:algorithm] == :concurrently
+          if postgresql?
+            index_value = options.fetch(:index, true)
+            concurrently_set = index_value.is_a?(Hash) && index_value[:algorithm] == :concurrently
+            bad_index = index_value && !concurrently_set
 
-          if postgresql? && index_value && !concurrently_set
-            columns = options[:polymorphic] ? [:"#{reference}_type", :"#{reference}_id"] : :"#{reference}_id"
+            if bad_index || options[:foreign_key]
+              columns = options[:polymorphic] ? [:"#{reference}_type", :"#{reference}_id"] : :"#{reference}_id"
 
-            if index_value.is_a?(Hash)
-              options[:index] = options[:index].merge(algorithm: :concurrently)
-            else
-              options = options.merge(index: {algorithm: :concurrently})
+              if index_value.is_a?(Hash)
+                options[:index] = options[:index].merge(algorithm: :concurrently)
+              else
+                options = options.merge(index: {algorithm: :concurrently})
+              end
+
+              if options.delete(:foreign_key)
+                headline = "Adding a validated foreign key locks the table."
+                append = "
+
+Then add the foreign key in separate migrations."
+              else
+                headline = "Adding an index non-concurrently locks the table."
+              end
+
+              raise_error :add_reference,
+                headline: headline,
+                command: command_str(method, [table, reference, options]),
+                append: append
             end
-
-            raise_error :add_reference, command: command_str(method, [table, reference, options])
           end
         when :execute
           raise_error :execute, header: "Possibly dangerous operation"
@@ -347,19 +362,15 @@ Then add the NOT NULL constraint."
       StrongMigrations.helpers
     end
 
-    def raise_error(message_key, header: nil, **vars)
+    def raise_error(message_key, header: nil, append: nil, **vars)
       return unless StrongMigrations.check_enabled?(message_key, version: version)
 
       message = StrongMigrations.error_messages[message_key] || "Missing message"
+      message = message + append if append
 
       vars[:migration_name] = @migration.class.name
       vars[:migration_suffix] = "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]"
       vars[:base_model] = "ApplicationRecord"
-
-      # interpolate variables in appended code
-      if vars[:append]
-        vars[:append] = vars[:append].gsub(/%(?!{)/, "%%") % vars
-      end
 
       # escape % not followed by {
       message = message.gsub(/%(?!{)/, "%%") % vars if message.include?("%")

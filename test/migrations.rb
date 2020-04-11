@@ -64,6 +64,12 @@ class AddColumnDefault < TestMigration
   end
 end
 
+class AddColumnDefaultNotNull < TestMigration
+  def change
+    add_column :users, :nice, :boolean, default: true, null: false
+  end
+end
+
 class AddColumnDefaultSafe < TestMigration
   def change
     add_column :users, :nice, :boolean
@@ -269,6 +275,12 @@ end
 class AddReferenceDefault < TestMigration
   def change
     add_reference :users, :ip
+  end
+end
+
+class AddReferenceForeignKey < TestMigration
+  def change
+    add_reference :users, :device, foreign_key: true, index: false
   end
 end
 
