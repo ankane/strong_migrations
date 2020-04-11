@@ -2,7 +2,7 @@
 
 Catch unsafe migrations in development
 
-✓ Detects potentially dangerous operations<br />✓ Prevents them from running by default<br />✓ Provides instructions on safer ways to do what you want
+&nbsp;&nbsp;✓&nbsp;&nbsp;Detects potentially dangerous operations<br />&nbsp;&nbsp;✓&nbsp;&nbsp;Prevents them from running by default<br />&nbsp;&nbsp;✓&nbsp;&nbsp;Provides instructions on safer ways to do what you want
 
 Supports for PostgreSQL, MySQL, and MariaDB
 
