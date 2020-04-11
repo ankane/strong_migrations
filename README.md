@@ -2,7 +2,9 @@
 
 Catch unsafe migrations in development
 
-Strong Migrations detects potentially dangerous operations, prevents them from running by default, and provides instructions on safer ways to do what you want.
+✓ detects potentially dangerous operations
+✓ prevents them from running by default
+✓ provides instructions on safer ways to do what you want
 
 Supports for PostgreSQL, MySQL, and MariaDB
 
