@@ -569,20 +569,6 @@ end
 
 Certain methods like `execute` and `change_table` cannot be inspected and are prevented from running by default. Make sure what you’re doing is really safe and use this pattern.
 
-## Opt-in Checks
-
-Some operations rarely cause issues in practice, but can be checked if desired. Enable checks with:
-
-```ruby
-StrongMigrations.enable_check(:remove_index)
-```
-
-To start a check only after a specific migration, use:
-
-```ruby
-StrongMigrations.enable_check(:remove_index, start_after: 20170101000000)
-```
-
 ## Custom Checks
 
 Add your own custom checks with:
@@ -599,6 +585,20 @@ Use the `stop!` method to stop migrations.
 
 Note: Since `remove_column` always requires a `safety_assured` block, it’s not possible to add a custom check for `remove_column` operations.
 
+## Opt-in Checks
+
+Some operations rarely cause issues in practice, but can be checked if desired. Enable checks with:
+
+```ruby
+StrongMigrations.enable_check(:remove_index)
+```
+
+To start a check only after a specific migration, use:
+
+```ruby
+StrongMigrations.enable_check(:remove_index, start_after: 20170101000000)
+```
+
 ## Disable Checks
 
 Disable specific checks with:
@@ -609,41 +609,6 @@ StrongMigrations.disable_check(:add_index)
 
 Check the [source code](https://github.com/ankane/strong_migrations/blob/master/lib/strong_migrations.rb) for the list of keys.
 
-## Existing Migrations
-
-To mark migrations as safe that were created before installing this gem, create an initializer with:
-
-```ruby
-StrongMigrations.start_after = 20170101000000
-```
-
-Use the version from your latest migration.
-
-## Dangerous Tasks
-
-For safety, dangerous database tasks are disabled in production - `db:drop`, `db:reset`, `db:schema:load`, and `db:structure:load`. To get around this, use:
-
-```sh
-SAFETY_ASSURED=1 rails db:drop
-```
-
-## Faster Migrations
-
-Only dump the schema when adding a new migration. If you use Git, create an initializer with:
-
-```ruby
-ActiveRecord::Base.dump_schema_after_migration = Rails.env.development? &&
-  `git status db/migrate/ --porcelain`.present?
-```
-
-## Schema Sanity
-
-Columns can flip order in `db/schema.rb` when you have multiple developers. One way to prevent this is to [alphabetize them](https://www.pgrs.net/2008/03/12/alphabetize-schema-rb-columns/). Add to the end of your `Rakefile`:
-
-```ruby
-task "db:schema:dump": "strong_migrations:alphabetize_columns"
-```
-
 ## Custom Messages
 
 To customize specific messages, create an initializer with:
@@ -653,26 +618,6 @@ StrongMigrations.error_messages[:add_column_default] = "Your custom instructions
 ```
 
 Check the [source code](https://github.com/ankane/strong_migrations/blob/master/lib/strong_migrations.rb) for the list of keys.
-
-## Analyze Tables
-
-Analyze tables automatically (to update planner statistics) after an index is added. Create an initializer with:
-
-```ruby
-StrongMigrations.auto_analyze = true
-```
-
-## Target Version
-
-If your development database version is different from production, you can specify the production version so the right checks are run in development.
-
-```ruby
-StrongMigrations.target_postgresql_version = "10"
-StrongMigrations.target_mysql_version = "8.0.12"
-StrongMigrations.target_mariadb_version = "10.3.2"
-```
-
-For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
 
 ## Timeouts
 
@@ -693,6 +638,61 @@ ALTER ROLE myuser SET lock_timeout = '10s';
 ```
 
 Note: If you use PgBouncer in transaction mode, you must set timeouts on the database user.
+
+## Existing Migrations
+
+To mark migrations as safe that were created before installing this gem, create an initializer with:
+
+```ruby
+StrongMigrations.start_after = 20170101000000
+```
+
+Use the version from your latest migration.
+
+## Target Version
+
+If your development database version is different from production, you can specify the production version so the right checks are run in development.
+
+```ruby
+StrongMigrations.target_postgresql_version = "10"
+StrongMigrations.target_mysql_version = "8.0.12"
+StrongMigrations.target_mariadb_version = "10.3.2"
+```
+
+For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
+
+## Analyze Tables
+
+Analyze tables automatically (to update planner statistics) after an index is added. Create an initializer with:
+
+```ruby
+StrongMigrations.auto_analyze = true
+```
+
+## Faster Migrations
+
+Only dump the schema when adding a new migration. If you use Git, create an initializer with:
+
+```ruby
+ActiveRecord::Base.dump_schema_after_migration = Rails.env.development? &&
+  `git status db/migrate/ --porcelain`.present?
+```
+
+## Schema Sanity
+
+Columns can flip order in `db/schema.rb` when you have multiple developers. One way to prevent this is to [alphabetize them](https://www.pgrs.net/2008/03/12/alphabetize-schema-rb-columns/). Add to the end of your `Rakefile`:
+
+```ruby
+task "db:schema:dump": "strong_migrations:alphabetize_columns"
+```
+
+## Dangerous Tasks
+
+For safety, dangerous database tasks are disabled in production - `db:drop`, `db:reset`, `db:schema:load`, and `db:structure:load`. To get around this, use:
+
+```sh
+SAFETY_ASSURED=1 rails db:drop
+```
 
 ## Permissions
 
