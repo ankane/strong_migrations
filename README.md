@@ -280,7 +280,7 @@ end
 
 Note: In Postgres, `change_column_null` is still [not safe](#setting-not-null-on-an-existing-column) with this method.
 
-### Executing SQL Directly
+### Executing SQL directly
 
 Strong Migrations can’t ensure safety for directly executed SQL. Make really sure that what you’re doing is safe, then use:
 
