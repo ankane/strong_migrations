@@ -485,7 +485,7 @@ class AddPropertiesToUsers < ActiveRecord::Migration[6.0]
 end
 ```
 
-### Setting `NOT NULL` on an existing column
+### Setting NOT NULL on an existing column
 
 #### Bad
 
