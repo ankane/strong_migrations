@@ -20,30 +20,35 @@ gem 'strong_migrations'
 
 We highly recommend [setting timeouts](#timeouts) as well.
 
-## Operations
+If you have existing migrations, you can [mark them as safe](#existing-migrations).
 
-The following operations can cause downtime or errors:
+## Checks
 
-- [[+]](#removing-a-column) removing a column
-- [[+]](#adding-a-column-with-a-default-value) adding a column with a default value
-- [[+]](#backfilling-data) backfilling data
-- [[+]](#adding-an-index) adding an index non-concurrently
-- [[+]](#adding-a-reference) adding a reference
-- [[+]](#adding-a-foreign-key) adding a foreign key
-- [[+]](#renaming-or-changing-the-type-of-a-column) changing the type of a column
-- [[+]](#renaming-or-changing-the-type-of-a-column) renaming a column
-- [[+]](#renaming-a-table) renaming a table
-- [[+]](#creating-a-table-with-the-force-option) creating a table with the `force` option
-- [[+]](#setting-not-null-on-an-existing-column) setting `NOT NULL` on an existing column
-- [[+]](#adding-a-json-column) adding a `json` column
+Potentially dangerous operations:
 
-Optional checks:
+- [removing a column](#removing-a-column)
+- [adding a column with a default value](#adding-a-column-with-a-default-value)
+- [backfilling data](#backfilling-data)
+- [changing the type of a column](#renaming-or-changing-the-type-of-a-column)
+- [renaming a column](#renaming-or-changing-the-type-of-a-column)
+- [renaming a table](#renaming-a-table)
+- [creating a table with the `force` option](#creating-a-table-with-the-force-option)
+- [executing SQL directly](#executing-SQL-directly)
 
-- [[+]](#removing-an-index) removing an index non-concurrently
+Postgres-specific checks:
+
+- [adding an index non-concurrently](#adding-an-index)
+- [removing an index non-concurrently](#removing-an-index)
+- [adding a reference](#adding-a-reference)
+- [adding a foreign key](#adding-a-foreign-key)
+- [adding a `json` column](#adding-a-json-column)
+- [setting `NOT NULL` on an existing column](#setting-not-null-on-an-existing-column)
 
 Best practices:
 
-- [[+]](#keeping-non-unique-indexes-to-three-columns-or-less) keeping non-unique indexes to three columns or less
+- [keeping non-unique indexes to three columns or less](#keeping-non-unique-indexes-to-three-columns-or-less)
+
+You can also add [custom checks](#custom-checks) or [disable specific checks](#disable-checks).
 
 ### Removing a column
 
@@ -84,7 +89,7 @@ end
 
 ### Adding a column with a default value
 
-Note: This operation is safe in Postgres 11+, MySQL 8.0.12+, and MariaDB 10.3.2+
+This operation is safe in Postgres 11+, MySQL 8.0.12+, and MariaDB 10.3.2+
 
 #### Bad
 
@@ -146,132 +151,6 @@ class BackfillSomeColumn < ActiveRecord::Migration[6.0]
     User.unscoped.in_batches do |relation|
       relation.update_all some_column: "default_value"
       sleep(0.01) # throttle
-    end
-  end
-end
-```
-
-### Adding an index
-
-#### Bad
-
-In Postgres, adding an index non-concurrently locks the table.
-
-```ruby
-class AddSomeIndexToUsers < ActiveRecord::Migration[6.0]
-  def change
-    add_index :users, :some_column
-  end
-end
-```
-
-#### Good
-
-Add indexes concurrently.
-
-```ruby
-class AddSomeIndexToUsers < ActiveRecord::Migration[6.0]
-  disable_ddl_transaction!
-
-  def change
-    add_index :users, :some_column, algorithm: :concurrently
-  end
-end
-```
-
-If you forget `disable_ddl_transaction!`, the migration will fail. Also, note that indexes on new tables (those created in the same migration) don’t require this.
-
-With [gindex](https://github.com/ankane/gindex), you can generate an index migration instantly with:
-
-```sh
-rails g index table column
-```
-
-### Adding a reference
-
-#### Bad
-
-Rails adds an index non-concurrently to references by default, which is problematic for Postgres.
-
-```ruby
-class AddReferenceToUsers < ActiveRecord::Migration[6.0]
-  def change
-    add_reference :users, :city
-  end
-end
-```
-
-#### Good
-
-Make sure the index is added concurrently.
-
-```ruby
-class AddReferenceToUsers < ActiveRecord::Migration[6.0]
-  disable_ddl_transaction!
-
-  def change
-    add_reference :users, :city, index: {algorithm: :concurrently}
-  end
-end
-```
-
-### Adding a foreign key
-
-#### Bad
-
-In Postgres, new foreign keys are validated by default, which acquires a `ShareRowExclusiveLock` that can be [expensive on large tables](https://travisofthenorth.com/blog/2017/2/2/postgres-adding-foreign-keys-with-zero-downtime).
-
-```ruby
-class AddForeignKeyOnUsers < ActiveRecord::Migration[6.0]
-  def change
-    add_foreign_key :users, :orders
-  end
-end
-```
-
-#### Good
-
-Instead, validate it in a separate migration with a more agreeable `RowShareLock`. This approach is documented by Postgres to have “[the least impact on other work](https://www.postgresql.org/docs/current/sql-altertable.html).”
-
-For Rails 5.2+, use:
-
-```ruby
-class AddForeignKeyOnUsers < ActiveRecord::Migration[6.0]
-  def change
-    add_foreign_key :users, :orders, validate: false
-  end
-end
-```
-
-Then validate it in a separate migration.
-
-```ruby
-class ValidateForeignKeyOnUsers < ActiveRecord::Migration[6.0]
-  def change
-    validate_foreign_key :users, :orders
-  end
-end
-```
-
-For Rails < 5.2, use:
-
-```ruby
-class AddForeignKeyOnUsers < ActiveRecord::Migration[5.1]
-  def change
-    safety_assured do
-      execute 'ALTER TABLE "users" ADD CONSTRAINT "fk_rails_c1e9b98e31" FOREIGN KEY ("order_id") REFERENCES "orders" ("id") NOT VALID'
-    end
-  end
-end
-```
-
-Then validate it in a separate migration.
-
-```ruby
-class ValidateForeignKeyOnUsers < ActiveRecord::Migration[5.1]
-  def change
-    safety_assured do
-      execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "fk_rails_c1e9b98e31"'
     end
   end
 end
@@ -375,6 +254,228 @@ class CreateUsers < ActiveRecord::Migration[6.0]
 end
 ```
 
+### Using change_column_null with a default value
+
+#### Bad
+
+This generates a single `UPDATE` statement to set the default value.
+
+```ruby
+class ChangeSomeColumnNull < ActiveRecord::Migration[6.0]
+  def change
+    change_column_null :users, :some_column, false, "default_value"
+  end
+end
+```
+
+#### Good
+
+Backfill the column [safely](#backfilling-data). Then use:
+
+```ruby
+class ChangeSomeColumnNull < ActiveRecord::Migration[6.0]
+  def change
+    change_column_null :users, :some_column, false
+  end
+end
+```
+
+Note: In Postgres, `change_column_null` is still [not safe](#setting-not-null-on-an-existing-column) with this method.
+
+### Executing SQL Directly
+
+Strong Migrations can’t ensure safety for directly executed SQL. Make really sure that what you’re doing is safe, then use:
+
+```ruby
+class MySafeMigration < ActiveRecord::Migration[6.0]
+  def change
+    safety_assured { execute "ALTER TABLE ..." }
+  end
+end
+```
+
+### Adding an index
+
+#### Bad
+
+In Postgres, adding an index non-concurrently locks the table.
+
+```ruby
+class AddSomeIndexToUsers < ActiveRecord::Migration[6.0]
+  def change
+    add_index :users, :some_column
+  end
+end
+```
+
+#### Good
+
+Add indexes concurrently.
+
+```ruby
+class AddSomeIndexToUsers < ActiveRecord::Migration[6.0]
+  disable_ddl_transaction!
+
+  def change
+    add_index :users, :some_column, algorithm: :concurrently
+  end
+end
+```
+
+If you forget `disable_ddl_transaction!`, the migration will fail. Also, note that indexes on new tables (those created in the same migration) don’t require this.
+
+With [gindex](https://github.com/ankane/gindex), you can generate an index migration instantly with:
+
+```sh
+rails g index table column
+```
+
+### Removing an index
+
+Note: This check is [opt-in](#opt-in-checks).
+
+#### Bad
+
+In Postgres, removing an index non-concurrently locks the table for a brief period.
+
+```ruby
+class RemoveSomeIndexFromUsers < ActiveRecord::Migration[6.0]
+  def change
+    remove_index :users, :some_column
+  end
+end
+```
+
+#### Good
+
+Remove indexes concurrently.
+
+```ruby
+class RemoveSomeIndexFromUsers < ActiveRecord::Migration[6.0]
+  disable_ddl_transaction!
+
+  def change
+    remove_index :users, column: :some_column, algorithm: :concurrently
+  end
+end
+```
+
+### Adding a reference
+
+#### Bad
+
+Rails adds an index non-concurrently to references by default, which is problematic for Postgres.
+
+```ruby
+class AddReferenceToUsers < ActiveRecord::Migration[6.0]
+  def change
+    add_reference :users, :city
+  end
+end
+```
+
+#### Good
+
+Make sure the index is added concurrently.
+
+```ruby
+class AddReferenceToUsers < ActiveRecord::Migration[6.0]
+  disable_ddl_transaction!
+
+  def change
+    add_reference :users, :city, index: {algorithm: :concurrently}
+  end
+end
+```
+
+### Adding a foreign key
+
+#### Bad
+
+In Postgres, new foreign keys are validated by default, which acquires a `ShareRowExclusiveLock` that can be [expensive on large tables](https://travisofthenorth.com/blog/2017/2/2/postgres-adding-foreign-keys-with-zero-downtime).
+
+```ruby
+class AddForeignKeyOnUsers < ActiveRecord::Migration[6.0]
+  def change
+    add_foreign_key :users, :orders
+  end
+end
+```
+
+#### Good
+
+Instead, validate it in a separate migration with a more agreeable `RowShareLock`. This approach is documented by Postgres to have “[the least impact on other work](https://www.postgresql.org/docs/current/sql-altertable.html).”
+
+For Rails 5.2+, use:
+
+```ruby
+class AddForeignKeyOnUsers < ActiveRecord::Migration[6.0]
+  def change
+    add_foreign_key :users, :orders, validate: false
+  end
+end
+```
+
+Then validate it in a separate migration.
+
+```ruby
+class ValidateForeignKeyOnUsers < ActiveRecord::Migration[6.0]
+  def change
+    validate_foreign_key :users, :orders
+  end
+end
+```
+
+For Rails < 5.2, use:
+
+```ruby
+class AddForeignKeyOnUsers < ActiveRecord::Migration[5.1]
+  def change
+    safety_assured do
+      execute 'ALTER TABLE "users" ADD CONSTRAINT "fk_rails_c1e9b98e31" FOREIGN KEY ("order_id") REFERENCES "orders" ("id") NOT VALID'
+    end
+  end
+end
+```
+
+Then validate it in a separate migration.
+
+```ruby
+class ValidateForeignKeyOnUsers < ActiveRecord::Migration[5.1]
+  def change
+    safety_assured do
+      execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "fk_rails_c1e9b98e31"'
+    end
+  end
+end
+```
+
+### Adding a json column
+
+#### Bad
+
+In Postgres, there’s no equality operator for the `json` column type, which can cause errors for existing `SELECT DISTINCT` queries.
+
+```ruby
+class AddPropertiesToUsers < ActiveRecord::Migration[6.0]
+  def change
+    add_column :users, :properties, :json
+  end
+end
+```
+
+#### Good
+
+Use `jsonb` instead.
+
+```ruby
+class AddPropertiesToUsers < ActiveRecord::Migration[6.0]
+  def change
+    add_column :users, :properties, :jsonb
+  end
+end
+```
+
 ### Setting `NOT NULL` on an existing column
 
 #### Bad
@@ -417,105 +518,9 @@ end
 
 Note: This is not 100% the same as `NOT NULL` column constraint. Here’s a [good explanation](https://medium.com/doctolib/adding-a-not-null-constraint-on-pg-faster-with-minimal-locking-38b2c00c4d1c).
 
-### Using change_column_null with a default value
-
-#### Bad
-
-This generates a single `UPDATE` statement to set the default value.
-
-```ruby
-class ChangeSomeColumnNull < ActiveRecord::Migration[6.0]
-  def change
-    change_column_null :users, :some_column, false, "default_value"
-  end
-end
-```
-
-#### Good
-
-Backfill the column [safely](#backfilling-data). Then use:
-
-```ruby
-class ChangeSomeColumnNull < ActiveRecord::Migration[6.0]
-  def change
-    change_column_null :users, :some_column, false
-  end
-end
-```
-
-Note: In Postgres, `change_column_null` is still [not safe](#setting-not-null-on-an-existing-column) with this method.
-
-### Adding a json column
-
-#### Bad
-
-In Postgres, there’s no equality operator for the `json` column type, which can cause errors for existing `SELECT DISTINCT` queries.
-
-```ruby
-class AddPropertiesToUsers < ActiveRecord::Migration[6.0]
-  def change
-    add_column :users, :properties, :json
-  end
-end
-```
-
-#### Good
-
-Use `jsonb` instead.
-
-```ruby
-class AddPropertiesToUsers < ActiveRecord::Migration[6.0]
-  def change
-    add_column :users, :properties, :jsonb
-  end
-end
-```
-
-## Optional Checks
-
-Some operations rarely cause issues in practice, but can be checked if desired. Enable checks with:
-
-```ruby
-StrongMigrations.enable_check(:remove_index)
-```
-
-To start a check only after a specific migration, use:
-
-```ruby
-StrongMigrations.enable_check(:remove_index, start_after: 20170101000000)
-```
-
-### Removing an index
-
-#### Bad
-
-In Postgres, removing an index non-concurrently locks the table for a brief period.
-
-```ruby
-class RemoveSomeIndexFromUsers < ActiveRecord::Migration[6.0]
-  def change
-    remove_index :users, :some_column
-  end
-end
-```
-
-#### Good
-
-Remove indexes concurrently.
-
-```ruby
-class RemoveSomeIndexFromUsers < ActiveRecord::Migration[6.0]
-  disable_ddl_transaction!
-
-  def change
-    remove_index :users, column: :some_column, algorithm: :concurrently
-  end
-end
-```
-
-## Best Practices
-
 ### Keeping non-unique indexes to three columns or less
+
+*Best practice*
 
 #### Bad
 
@@ -556,6 +561,20 @@ end
 ```
 
 Certain methods like `execute` and `change_table` cannot be inspected and are prevented from running by default. Make sure what you’re doing is really safe and use this pattern.
+
+## Opt-in Checks
+
+Some operations rarely cause issues in practice, but can be checked if desired. Enable checks with:
+
+```ruby
+StrongMigrations.enable_check(:remove_index)
+```
+
+To start a check only after a specific migration, use:
+
+```ruby
+StrongMigrations.enable_check(:remove_index, start_after: 20170101000000)
+```
 
 ## Custom Checks
 
