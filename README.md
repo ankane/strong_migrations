@@ -400,6 +400,16 @@ class AddForeignKeyOnUsers < ActiveRecord::Migration[6.0]
 end
 ```
 
+or
+
+```ruby
+class AddReferenceToUsers < ActiveRecord::Migration[6.0]
+  def change
+    add_reference :users, :order, foreign_key: true
+  end
+end
+```
+
 #### Good
 
 Instead, validate it in a separate migration with a more agreeable `RowShareLock`. This approach is documented by Postgres to have “[the least impact on other work](https://www.postgresql.org/docs/current/sql-altertable.html).”
