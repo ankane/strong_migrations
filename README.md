@@ -18,7 +18,7 @@ Add this line to your application’s Gemfile:
 gem 'strong_migrations'
 ```
 
-If you have existing migrations, you can [mark them as safe](#existing-migrations). We highly recommend [setting timeouts](#timeouts) as well.
+We highly recommend [setting timeouts](#timeouts). You can [mark existing migrations as safe](#existing-migrations) as well.
 
 ## Checks
 
