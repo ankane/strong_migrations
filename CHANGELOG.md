@@ -1,4 +1,4 @@
-## 0.6.4 (unreleased)
+## 0.6.4 (2020-04-16)
 
 - Added check for `add_reference` with `foreign_key: true`
 
