@@ -1,3 +1,7 @@
+## 0.6.5 (unreleased)
+
+- Fixed deprecation warnings with Ruby 2.7
+
 ## 0.6.4 (2020-04-16)
 
 - Added check for `add_reference` with `foreign_key: true`
