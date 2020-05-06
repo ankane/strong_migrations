@@ -1,4 +1,4 @@
-## 0.6.5 (unreleased)
+## 0.6.5 (2020-05-06)
 
 - Fixed deprecation warnings with Ruby 2.7
 
