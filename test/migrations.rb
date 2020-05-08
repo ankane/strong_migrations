@@ -358,6 +358,12 @@ class CheckTimeouts < TestMigration
   end
 end
 
+class CheckLockTimeout < TestMigration
+  def change
+    safety_assured { execute "SELECT 1" }
+  end
+end
+
 class AddForeignKeySafely < TestMigration
   disable_ddl_transaction!
 

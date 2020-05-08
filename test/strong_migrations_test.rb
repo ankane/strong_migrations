@@ -310,6 +310,41 @@ class StrongMigrationsTest < Minitest::Test
     StrongMigrations.lock_timeout = nil
   end
 
+  def test_lock_timeout_limit
+    StrongMigrations.lock_timeout_limit = 10.seconds
+    StrongMigrations.lock_timeout = 20.seconds
+
+    assert_output(nil, /Lock timeout is longer than 10 seconds/) do
+      migrate CheckLockTimeout
+    end
+  ensure
+    StrongMigrations.lock_timeout_limit = nil
+    StrongMigrations.lock_timeout = nil
+  end
+
+  def test_lock_timeout_limit_postgresql
+    skip unless postgresql?
+
+    StrongMigrations.lock_timeout_limit = 10.seconds
+
+    # no warning
+    ActiveRecord::Base.connection.execute("SET lock_timeout = '100ms'")
+    _, stderr = capture_io do
+      migrate CheckLockTimeout
+    end
+    refute_match(/Lock timeout is longer than 10 seconds/, stderr)
+
+    # warning
+    ["1min", "1h", "1d"].each do |timeout|
+      ActiveRecord::Base.connection.execute("SET lock_timeout = '#{timeout}'")
+      assert_output(nil, /Lock timeout is longer than 10 seconds/) do
+        migrate CheckLockTimeout
+      end
+    end
+  ensure
+    StrongMigrations.lock_timeout_limit = nil
+  end
+
   private
 
   def with_start_after(start_after)

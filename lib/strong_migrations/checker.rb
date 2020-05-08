@@ -7,6 +7,7 @@ module StrongMigrations
       @new_tables = []
       @safe = false
       @timeouts_set = false
+      @lock_timeout_checked = false
     end
 
     def safety_assured
@@ -21,6 +22,7 @@ module StrongMigrations
 
     def perform(method, *args)
       set_timeouts
+      check_lock_timeout
 
       unless safe?
         case method
@@ -259,6 +261,7 @@ Then add the foreign key in separate migrations."
       result
     end
 
+    # TODO allow string timeouts in 0.7.0
     def set_timeouts
       if !@timeouts_set
         if StrongMigrations.statement_timeout
@@ -350,12 +353,52 @@ Then add the foreign key in separate migrations."
 
     def target_version(target_version)
       version =
-        if target_version && defined?(Rails) && (Rails.env.development? || Rails.env.test?)
+        if target_version && StrongMigrations.developer_env?
           target_version.to_s
         else
           yield
         end
       Gem::Version.new(version)
+    end
+
+    def check_lock_timeout
+      limit = StrongMigrations.lock_timeout_limit
+
+      if limit && !@lock_timeout_checked
+        if postgresql?
+          lock_timeout = connection.select_all("SHOW lock_timeout").first["lock_timeout"]
+          lock_timeout_sec = timeout_to_sec(lock_timeout)
+          if lock_timeout_sec == 0
+            warn "[strong_migrations] WARNING: No lock timeout set. This is dangerous."
+          elsif lock_timeout_sec > limit
+            warn "[strong_migrations] WARNING: Lock timeout is longer than #{limit} seconds: #{lock_timeout}. This is dangerous."
+          end
+        elsif mysql? || mariadb?
+          lock_timeout = connection.select_all("SHOW VARIABLES LIKE 'lock_wait_timeout'").first["Value"]
+          if lock_timeout.to_i > limit
+            warn "[strong_migrations] WARNING: Lock timeout is longer than #{limit} seconds: #{lock_timeout}. This is dangerous."
+          end
+        end
+        @lock_timeout_checked = true
+      end
+    end
+
+    def timeout_to_sec(timeout)
+      suffixes = {
+        "ms" => 1,
+        "s" => 1000,
+        "min" => 1000 * 60,
+        "h" => 1000 * 60 * 60,
+        "d" => 1000 * 60 * 60 * 24
+      }
+      timeout_ms = timeout.to_i
+      suffixes.each do |k, v|
+        if timeout.end_with?(k)
+          timeout_ms *= v
+          break
+        end
+      end
+      timeout_ms / 1000.0
     end
 
     def helpers?

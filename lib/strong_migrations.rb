@@ -19,6 +19,7 @@ module StrongMigrations
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
       :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
       :enabled_checks, :lock_timeout, :statement_timeout, :helpers
+    attr_writer :lock_timeout_limit
   end
   self.auto_analyze = false
   self.start_after = 0
@@ -229,6 +230,18 @@ end",
   }
   self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h
   self.helpers = false
+
+  # private
+  def self.developer_env?
+    defined?(Rails) && (Rails.env.development? || Rails.env.test?)
+  end
+
+  def self.lock_timeout_limit
+    unless defined?(@lock_timeout_limit)
+      @lock_timeout_limit = developer_env? ? false : 10
+    end
+    @lock_timeout_limit
+  end
 
   def self.add_check(&block)
     checks << block

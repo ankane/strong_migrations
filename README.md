@@ -18,7 +18,9 @@ Add this line to your application’s Gemfile:
 gem 'strong_migrations'
 ```
 
-We highly recommend [setting timeouts](#timeouts). You can [mark existing migrations as safe](#existing-migrations) as well.
+It’s extremely important to also set a [lock timeout](#timeouts).
+
+You can [mark existing migrations as safe](#existing-migrations) as well.
 
 ## Checks
 
@@ -621,7 +623,7 @@ Check the [source code](https://github.com/ankane/strong_migrations/blob/master/
 
 ## Timeouts
 
-It’s a good idea to set a long statement timeout and a short lock timeout for migrations. This way, migrations can run for a while, and if a migration can’t acquire a lock in a timely manner, other statements won’t be stuck behind it.
+Set a long statement timeout and a short lock timeout for migrations. This way, migrations can run for a while, and if a migration can’t acquire a lock in a timely manner, other statements won’t be stuck behind it.
 
 Create `config/initializers/strong_migrations.rb` with:
 

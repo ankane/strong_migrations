@@ -1,3 +1,7 @@
+## 0.6.6 (unreleased)
+
+- Added warnings for missing and long lock timeouts
+
 ## 0.6.5 (2020-05-06)
 
 - Fixed deprecation warnings with Ruby 2.7
