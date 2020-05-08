@@ -1,4 +1,4 @@
-## 0.6.6 (unreleased)
+## 0.6.6 (2020-05-08)
 
 - Added warnings for missing and long lock timeouts
 - Added install generator
