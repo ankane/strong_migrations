@@ -18,9 +18,11 @@ Add this line to your application’s Gemfile:
 gem 'strong_migrations'
 ```
 
-It’s extremely important to also set a [lock timeout](#timeouts).
+And run:
 
-You can [mark existing migrations as safe](#existing-migrations) as well.
+```sh
+rails generate strong_migrations:install
+```
 
 ## Checks
 
@@ -623,20 +625,20 @@ Check the [source code](https://github.com/ankane/strong_migrations/blob/master/
 
 ## Timeouts
 
-Set a long statement timeout and a short lock timeout for migrations. This way, migrations can run for a while, and if a migration can’t acquire a lock in a timely manner, other statements won’t be stuck behind it.
+It’s extremely important to set a short lock timeout for migrations. This way, if a migration can’t acquire a lock in a timely manner, other statements won’t be stuck behind it. We also recommend setting a long statement timeout so migrations can run for a while.
 
 Create `config/initializers/strong_migrations.rb` with:
 
 ```ruby
-StrongMigrations.statement_timeout = 1.hour
 StrongMigrations.lock_timeout = 10.seconds
+StrongMigrations.statement_timeout = 1.hour
 ```
 
 Or set the timeouts directly on the database user that runs migrations. For Postgres, use:
 
 ```sql
-ALTER ROLE myuser SET statement_timeout = '1h';
 ALTER ROLE myuser SET lock_timeout = '10s';
+ALTER ROLE myuser SET statement_timeout = '1h';
 ```
 
 Note: If you use PgBouncer in transaction mode, you must set timeouts on the database user.
@@ -653,7 +655,7 @@ Use the version from your latest migration.
 
 ## Target Version
 
-If your development database version is different from production, you can specify the production version so the right checks are run in development.
+If your development database version is different from production, you can specify the production version so the right checks run in development.
 
 ```ruby
 StrongMigrations.target_postgresql_version = "10"

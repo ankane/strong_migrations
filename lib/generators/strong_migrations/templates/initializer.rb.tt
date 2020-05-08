@@ -3,8 +3,8 @@ StrongMigrations.start_after = <%= start_after %>
 
 # Set timeouts
 # If you use PgBouncer in transaction mode, delete these lines and set timeouts on the database user
-StrongMigrations.statement_timeout = 1.hour
 StrongMigrations.lock_timeout = 10.seconds
+StrongMigrations.statement_timeout = 1.hour
 
 # Analyze tables automatically (to update planner statistics) after an index is added
 StrongMigrations.auto_analyze = true
