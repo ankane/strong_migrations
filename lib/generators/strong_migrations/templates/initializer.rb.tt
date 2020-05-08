@@ -1,0 +1,17 @@
+# Mark existing migrations as safe
+StrongMigrations.start_after = <%= start_after %>
+
+# Set timeouts
+# If you use PgBouncer in transaction mode, delete these lines and set timeouts on the database user
+StrongMigrations.statement_timeout = 1.hour
+StrongMigrations.lock_timeout = 10.seconds
+
+# Analyze tables automatically (to update planner statistics) after an index is added
+StrongMigrations.auto_analyze = true
+
+# Add custom checks
+# StrongMigrations.add_check do |method, args|
+#   if method == :add_index && args[0].to_s == "users"
+#     stop! "No more indexes on the users table"
+#   end
+# end

@@ -1,6 +1,7 @@
 ## 0.6.6 (unreleased)
 
 - Added warnings for missing and long lock timeouts
+- Added install generator
 
 ## 0.6.5 (2020-05-06)
 
