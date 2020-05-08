@@ -369,14 +369,14 @@ Then add the foreign key in separate migrations."
           lock_timeout = connection.select_all("SHOW lock_timeout").first["lock_timeout"]
           lock_timeout_sec = timeout_to_sec(lock_timeout)
           if lock_timeout_sec == 0
-            warn "[strong_migrations] WARNING: No lock timeout set. This is dangerous."
+            warn "[strong_migrations] DANGER: No lock timeout set"
           elsif lock_timeout_sec > limit
-            warn "[strong_migrations] WARNING: Lock timeout is longer than #{limit} seconds: #{lock_timeout}. This is dangerous."
+            warn "[strong_migrations] DANGER: Lock timeout is longer than #{limit} seconds: #{lock_timeout}"
           end
         elsif mysql? || mariadb?
           lock_timeout = connection.select_all("SHOW VARIABLES LIKE 'lock_wait_timeout'").first["Value"]
           if lock_timeout.to_i > limit
-            warn "[strong_migrations] WARNING: Lock timeout is longer than #{limit} seconds: #{lock_timeout}. This is dangerous."
+            warn "[strong_migrations] DANGER: Lock timeout is longer than #{limit} seconds: #{lock_timeout}"
           end
         end
         @lock_timeout_checked = true
