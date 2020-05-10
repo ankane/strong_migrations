@@ -21,6 +21,7 @@ gem 'strong_migrations'
 And run:
 
 ```sh
+bundle install
 rails generate strong_migrations:install
 ```
 
