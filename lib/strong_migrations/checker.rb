@@ -252,6 +252,7 @@ Then add the foreign key in separate migrations."
 
       if StrongMigrations.auto_analyze && direction == :up && method == :add_index
         if postgresql?
+          # TODO remove verbose in 0.7.0
           connection.execute "ANALYZE VERBOSE #{connection.quote_table_name(args[0].to_s)}"
         elsif mariadb? || mysql?
           connection.execute "ANALYZE TABLE #{connection.quote_table_name(args[0].to_s)}"
