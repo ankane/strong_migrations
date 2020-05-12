@@ -1,7 +1,7 @@
 # Mark existing migrations as safe
 StrongMigrations.start_after = <%= start_after %>
 
-# Set timeouts
+# Set timeouts for migrations
 # If you use PgBouncer in transaction mode, delete these lines and set timeouts on the database user
 StrongMigrations.lock_timeout = 10.seconds
 StrongMigrations.statement_timeout = 1.hour
