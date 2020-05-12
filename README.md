@@ -258,6 +258,8 @@ class CreateUsers < ActiveRecord::Migration[6.0]
 end
 ```
 
+If you intended to drop an existing table, run `drop_table` first.
+
 ### Using change_column_null with a default value
 
 #### Bad
