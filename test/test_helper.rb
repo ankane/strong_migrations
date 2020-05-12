@@ -78,8 +78,6 @@ StrongMigrations.add_check do |method, args|
   end
 end
 
-StrongMigrations.auto_analyze = true
-
 StrongMigrations.enable_helpers if ENV["HELPERS"]
 
 require_relative "migrations"

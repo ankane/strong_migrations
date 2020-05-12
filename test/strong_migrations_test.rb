@@ -345,6 +345,13 @@ class StrongMigrationsTest < Minitest::Test
     StrongMigrations.lock_timeout_limit = nil
   end
 
+  def test_auto_analyze
+    StrongMigrations.auto_analyze = true
+    assert_safe AddIndexSafetyAssured
+  ensure
+    StrongMigrations.auto_analyze = false
+  end
+
   private
 
   def with_start_after(start_after)
