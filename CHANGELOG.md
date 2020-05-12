@@ -1,3 +1,7 @@
+## 0.6.7 (unreleased)
+
+- Improved comments in initializer
+
 ## 0.6.6 (2020-05-08)
 
 - Added warnings for missing and long lock timeouts
