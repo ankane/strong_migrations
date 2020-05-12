@@ -42,7 +42,6 @@ Potentially dangerous operations:
 Postgres-specific checks:
 
 - [adding an index non-concurrently](#adding-an-index)
-- [removing an index non-concurrently](#removing-an-index)
 - [adding a reference](#adding-a-reference)
 - [adding a foreign key](#adding-a-foreign-key)
 - [adding a json column](#adding-a-json-column)
@@ -300,7 +299,7 @@ class ExecuteSQL < ActiveRecord::Migration[6.0]
 end
 ```
 
-### Adding an index
+### Adding an index non-concurrently
 
 #### Bad
 
@@ -334,36 +333,6 @@ With [gindex](https://github.com/ankane/gindex), you can generate an index migra
 
 ```sh
 rails g index table column
-```
-
-### Removing an index
-
-Note: This check is [opt-in](#opt-in-checks).
-
-#### Bad
-
-In Postgres, removing an index non-concurrently locks the table for a brief period.
-
-```ruby
-class RemoveSomeIndexFromUsers < ActiveRecord::Migration[6.0]
-  def change
-    remove_index :users, :some_column
-  end
-end
-```
-
-#### Good
-
-Remove indexes concurrently.
-
-```ruby
-class RemoveSomeIndexFromUsers < ActiveRecord::Migration[6.0]
-  disable_ddl_transaction!
-
-  def change
-    remove_index :users, column: :some_column, algorithm: :concurrently
-  end
-end
 ```
 
 ### Adding a reference
@@ -594,16 +563,12 @@ Note: Since `remove_column` always requires a `safety_assured` block, it’s not
 
 ## Opt-in Checks
 
-Some operations rarely cause issues in practice, but can be checked if desired. Enable checks with:
+### Removing an index non-concurrently
+
+Postgres supports removing indexes concurrently, but removing them non-concurrently shouldn’t be an issue for most applications. You can enable this check with:
 
 ```ruby
 StrongMigrations.enable_check(:remove_index)
-```
-
-To start a check only after a specific migration, use:
-
-```ruby
-StrongMigrations.enable_check(:remove_index, start_after: 20170101000000)
 ```
 
 ## Disable Checks
