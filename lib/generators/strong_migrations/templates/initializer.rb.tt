@@ -6,7 +6,8 @@ StrongMigrations.start_after = <%= start_after %>
 StrongMigrations.lock_timeout = 10.seconds
 StrongMigrations.statement_timeout = 1.hour
 
-# Analyze tables after indexes are added for improved query planning
+# Analyze tables after indexes are added
+# Outdated statistics can hurt performance of existing queries
 StrongMigrations.auto_analyze = true
 
 # Add custom checks
