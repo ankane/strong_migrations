@@ -250,6 +250,7 @@ Then add the foreign key in separate migrations."
 
       result = yield
 
+      # outdated statistics + a new index can hurt performance of existing queries
       if StrongMigrations.auto_analyze && direction == :up && method == :add_index
         if postgresql?
           # TODO remove verbose in 0.7.0
