@@ -41,7 +41,7 @@ Potentially dangerous operations:
 
 Postgres-specific checks:
 
-- [adding an index non-concurrently](#adding-an-index)
+- [adding an index non-concurrently](#adding-an-index-non-concurrently)
 - [adding a reference](#adding-a-reference)
 - [adding a foreign key](#adding-a-foreign-key)
 - [adding a json column](#adding-a-json-column)
