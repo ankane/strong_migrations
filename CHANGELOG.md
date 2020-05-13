@@ -1,3 +1,7 @@
+## 0.6.8 (unreleased)
+
+- `change_column_null` on a column with a `NOT NULL` constraint is safe in Postgres 12+
+
 ## 0.6.7 (2020-05-13)
 
 - Improved comments in initializer

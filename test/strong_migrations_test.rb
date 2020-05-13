@@ -257,15 +257,33 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_change_column_null
-    assert_unsafe ChangeColumnNull
+    if postgresql? || mysql? || mariadb?
+      assert_unsafe ChangeColumnNull
+    else
+      assert_safe ChangeColumnNull
+    end
   end
 
-  def test_change_column_null_no_default
-    if postgresql? || mysql? || mariadb?
-      assert_unsafe ChangeColumnNullNoDefault
-    else
-      assert_safe ChangeColumnNullNoDefault
-    end
+  def test_change_column_null_constraint
+    skip unless postgresql?
+
+    StrongMigrations.target_postgresql_version = 12
+    assert_safe ChangeColumnNullConstraint
+  ensure
+    StrongMigrations.target_postgresql_version = nil
+  end
+
+  def test_change_column_null_constraint_unvalidated
+    skip unless postgresql?
+
+    StrongMigrations.target_postgresql_version = 12
+    assert_unsafe ChangeColumnNullConstraintUnvalidated
+  ensure
+    StrongMigrations.target_postgresql_version = nil
+  end
+
+  def test_change_column_null_default
+    assert_unsafe ChangeColumnNullDefault
   end
 
   def test_add_foreign_key

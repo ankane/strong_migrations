@@ -196,12 +196,20 @@ Then add the foreign key in separate migrations."
           table, column, null, default = args
           if !null
             if postgresql?
-              # match https://github.com/nullobject/rein
-              constraint_name = "#{table}_#{column}_null"
+              safe = false
+              if postgresql_version >= Gem::Version.new("12")
+                # TODO likely need to quote the column in some situations
+                safe = constraints(table).any? { |c| c["def"] == "CHECK ((#{column} IS NOT NULL))" }
+              end
 
-              raise_error :change_column_null_postgresql,
-                add_constraint_code: constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column]),
-                validate_constraint_code: constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
+              unless safe
+                # match https://github.com/nullobject/rein
+                constraint_name = "#{table}_#{column}_null"
+
+                raise_error :change_column_null_postgresql,
+                  add_constraint_code: constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column]),
+                  validate_constraint_code: constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
+              end
             elsif mysql? || mariadb?
               raise_error :change_column_null_mysql
             elsif !default.nil?
@@ -402,6 +410,16 @@ Then add the foreign key in separate migrations."
       else
         timeout.to_i * 1000
       end
+    end
+
+    def constraints(table_name)
+      query = <<-SQL
+        SELECT conname AS name, pg_get_constraintdef(oid) AS def FROM pg_constraint
+        WHERE contype = 'c'
+          AND convalidated
+          AND conrelid = #{connection.quote(connection.quote_table_name(table_name))}::regclass
+      SQL
+      connection.select_all(query.squish).to_a
     end
 
     def raise_error(message_key, header: nil, append: nil, **vars)
