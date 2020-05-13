@@ -196,17 +196,12 @@ Then add the foreign key in separate migrations."
           table, column, null, default = args
           if !null
             if postgresql?
-              if helpers?
-                raise_error :change_column_null_postgresql_helper,
-                  command: command_str(:add_null_constraint_safely, [table, column])
-              else
-                # match https://github.com/nullobject/rein
-                constraint_name = "#{table}_#{column}_null"
+              # match https://github.com/nullobject/rein
+              constraint_name = "#{table}_#{column}_null"
 
-                raise_error :change_column_null_postgresql,
-                  add_constraint_code: constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column]),
-                  validate_constraint_code: constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
-              end
+              raise_error :change_column_null_postgresql,
+                add_constraint_code: constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column]),
+                validate_constraint_code: constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
             elsif mysql? || mariadb?
               raise_error :change_column_null_mysql
             elsif !default.nil?
@@ -222,10 +217,7 @@ Then add the foreign key in separate migrations."
           validate = options.fetch(:validate, true) || ActiveRecord::VERSION::STRING < "5.2"
 
           if postgresql? && validate
-            if helpers?
-              raise_error :add_foreign_key_helper,
-                command: command_str(:add_foreign_key_safely, [from_table, to_table, options])
-            elsif ActiveRecord::VERSION::STRING < "5.2"
+            if ActiveRecord::VERSION::STRING < "5.2"
               # fk name logic from rails
               primary_key = options[:primary_key] || "id"
               column = options[:column] || "#{to_table.to_s.singularize}_id"
@@ -409,10 +401,6 @@ Then add the foreign key in separate migrations."
       else
         timeout.to_i * 1000
       end
-    end
-
-    def helpers?
-      StrongMigrations.helpers
     end
 
     def raise_error(message_key, header: nil, append: nil, **vars)
