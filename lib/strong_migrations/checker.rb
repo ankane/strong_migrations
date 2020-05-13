@@ -255,7 +255,6 @@ Then add the foreign key in separate migrations."
       result
     end
 
-    # TODO allow string timeouts in 0.7.0
     def set_timeouts
       if !@timeouts_set
         if StrongMigrations.statement_timeout
