@@ -177,14 +177,14 @@ end
 class ChangeColumnNullConstraint < TestMigration
   def up
     safety_assured do
-      execute "ALTER TABLE users ADD CONSTRAINT test CHECK (name IS NOT NULL) NOT VALID"
-      execute "ALTER TABLE users VALIDATE CONSTRAINT test"
+      execute 'ALTER TABLE "users" ADD CONSTRAINT "test" CHECK ("name" IS NOT NULL) NOT VALID'
+      execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "test"'
     end
     change_column_null :users, :name, false
   end
 
   def down
-    execute "ALTER TABLE users DROP CONSTRAINT test"
+    execute 'ALTER TABLE "users" DROP CONSTRAINT "test"'
     change_column_null :users, :name, true
   end
 end
@@ -192,13 +192,13 @@ end
 class ChangeColumnNullConstraintUnvalidated < TestMigration
   def up
     safety_assured do
-      execute "ALTER TABLE users ADD CONSTRAINT test CHECK (name IS NOT NULL) NOT VALID"
+      execute 'ALTER TABLE "users" ADD CONSTRAINT "test" CHECK ("name" IS NOT NULL) NOT VALID'
     end
     change_column_null :users, :name, false
   end
 
   def down
-    execute "ALTER TABLE users DROP CONSTRAINT test"
+    execute 'ALTER TABLE "users" DROP CONSTRAINT "test"'
     change_column_null :users, :name, true
   end
 end
