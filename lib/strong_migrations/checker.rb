@@ -269,7 +269,7 @@ Then add the foreign key in separate migrations."
         if StrongMigrations.statement_timeout
           statement =
             if postgresql?
-              "SET statement_timeout TO #{connection.quote(StrongMigrations.statement_timeout.to_i * 1000)}"
+              "SET statement_timeout TO #{connection.quote(postgresql_timeout(StrongMigrations.statement_timeout))}"
             elsif mysql?
               "SET max_execution_time = #{connection.quote(StrongMigrations.statement_timeout.to_i * 1000)}"
             elsif mariadb?
@@ -284,7 +284,7 @@ Then add the foreign key in separate migrations."
         if StrongMigrations.lock_timeout
           statement =
             if postgresql?
-              "SET lock_timeout TO #{connection.quote(StrongMigrations.lock_timeout.to_i * 1000)}"
+              "SET lock_timeout TO #{connection.quote(postgresql_timeout(StrongMigrations.lock_timeout))}"
             elsif mysql? || mariadb?
               "SET lock_wait_timeout = #{connection.quote(StrongMigrations.lock_timeout)}"
             else
@@ -401,6 +401,14 @@ Then add the foreign key in separate migrations."
         end
       end
       timeout_ms / 1000.0
+    end
+
+    def postgresql_timeout(timeout)
+      if timeout.is_a?(String)
+        timeout
+      else
+        timeout.to_i * 1000
+      end
     end
 
     def helpers?

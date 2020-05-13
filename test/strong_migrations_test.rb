@@ -310,6 +310,21 @@ class StrongMigrationsTest < Minitest::Test
     StrongMigrations.lock_timeout = nil
   end
 
+  def test_timeouts_string
+    skip unless postgresql?
+
+    StrongMigrations.statement_timeout = "1h"
+    StrongMigrations.lock_timeout = "1d"
+
+    migrate CheckTimeouts
+
+    assert_equal "1h", $statement_timeout
+    assert_equal "1d", $lock_timeout
+  ensure
+    StrongMigrations.statement_timeout = nil
+    StrongMigrations.lock_timeout = nil
+  end
+
   def test_lock_timeout_limit
     StrongMigrations.lock_timeout_limit = 10.seconds
     StrongMigrations.lock_timeout = 20.seconds

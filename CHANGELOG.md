@@ -1,6 +1,7 @@
 ## 0.6.7 (unreleased)
 
 - Improved comments in initializer
+- Fixed string timeouts for Postgres
 
 ## 0.6.6 (2020-05-08)
 
