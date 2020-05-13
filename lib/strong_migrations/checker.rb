@@ -206,9 +206,15 @@ Then add the foreign key in separate migrations."
                 # match https://github.com/nullobject/rein
                 constraint_name = "#{table}_#{column}_null"
 
+                validate_constraint_code = String.new(constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name]))
+                if postgresql_version >= Gem::Version.new("12")
+                  validate_constraint_code << "\n    #{command_str(:change_column_null, [table, column, null])}"
+                  validate_constraint_code << "\n    #{constraint_str("ALTER TABLE %s DROP CONSTRAINT %s", [table, constraint_name])}"
+                end
+
                 raise_error :change_column_null_postgresql,
                   add_constraint_code: constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column]),
-                  validate_constraint_code: constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
+                  validate_constraint_code: validate_constraint_code
               end
             elsif mysql? || mariadb?
               raise_error :change_column_null_mysql
