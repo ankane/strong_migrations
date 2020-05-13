@@ -282,6 +282,15 @@ class StrongMigrationsTest < Minitest::Test
     StrongMigrations.target_postgresql_version = nil
   end
 
+  def test_change_column_null_constraint_before_12
+    skip unless postgresql?
+
+    StrongMigrations.target_postgresql_version = 11
+    assert_unsafe ChangeColumnNullConstraint
+  ensure
+    StrongMigrations.target_postgresql_version = nil
+  end
+
   def test_change_column_null_default
     assert_unsafe ChangeColumnNullDefault
   end
