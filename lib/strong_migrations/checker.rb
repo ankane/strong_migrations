@@ -377,8 +377,10 @@ Then add the foreign key in separate migrations."
       end
     end
 
+    # units: https://www.postgresql.org/docs/current/config-setting.html
     def timeout_to_sec(timeout)
       suffixes = {
+        "us" => 0.001,
         "ms" => 1,
         "s" => 1000,
         "min" => 1000 * 60,
