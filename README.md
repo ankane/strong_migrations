@@ -497,11 +497,17 @@ class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
     safety_assured do
       execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "users_some_column_null"'
     end
+
+    # in Postgres 12+, you can safely turn this into a traditional column constraint [master]
+    change_column_null :users, :some_column, false
+    safety_assured do
+      execute 'ALTER TABLE "users" DROP CONSTRAINT "users_some_column_null"'
+    end
   end
 end
 ```
 
-Note: This is not 100% the same as `NOT NULL` column constraint. Here’s a [good explanation](https://medium.com/doctolib/adding-a-not-null-constraint-on-pg-faster-with-minimal-locking-38b2c00c4d1c).
+Note: This is not 100% the same as `NOT NULL` column constraint before Postgres 12. Here’s a [good explanation](https://medium.com/doctolib/adding-a-not-null-constraint-on-pg-faster-with-minimal-locking-38b2c00c4d1c).
 
 ### Keeping non-unique indexes to three columns or less
 
