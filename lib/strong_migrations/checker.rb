@@ -379,7 +379,7 @@ Then add the foreign key in separate migrations."
 
     # units: https://www.postgresql.org/docs/current/config-setting.html
     def timeout_to_sec(timeout)
-      suffixes = {
+      units = {
         "us" => 0.001,
         "ms" => 1,
         "s" => 1000,
@@ -388,7 +388,7 @@ Then add the foreign key in separate migrations."
         "d" => 1000 * 60 * 60 * 24
       }
       timeout_ms = timeout.to_i
-      suffixes.each do |k, v|
+      units.each do |k, v|
         if timeout.end_with?(k)
           timeout_ms *= v
           break
