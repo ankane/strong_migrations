@@ -498,7 +498,7 @@ class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
       execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "users_some_column_null"'
     end
 
-    # in Postgres 12+, you can safely turn this into a traditional column constraint [master]
+    # in Postgres 12+, you can safely turn this into a traditional column constraint
     change_column_null :users, :some_column, false
     safety_assured do
       execute 'ALTER TABLE "users" DROP CONSTRAINT "users_some_column_null"'
