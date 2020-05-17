@@ -1,3 +1,7 @@
+## Unreleased
+
+- Added experimental support for safety checking raw SQL migrations on Postgres with the `inspect_sql_postgresql` option
+
 ## 0.6.8 (2020-05-13)
 
 - `change_column_null` on a column with a `NOT NULL` constraint is safe in Postgres 12+

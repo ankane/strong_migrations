@@ -191,7 +191,7 @@ Then add the foreign key in separate migrations."
             end
           end
         when :execute
-          raise_error :execute, header: "Possibly dangerous operation"
+          handle_execute(*args)
         when :change_column_null
           table, column, null, default = args
           if !null
@@ -426,6 +426,79 @@ Then add the foreign key in separate migrations."
           AND conrelid = #{connection.quote(connection.quote_table_name(table_name))}::regclass
       SQL
       connection.select_all(query.squish).to_a
+    end
+
+    def raise_execute_error(header = "Possibly dangerous operation")
+      raise_error :execute, header: header
+    end
+
+    def handle_execute(*args)
+      raise_execute_error unless StrongMigrations.inspect_sql_postgresql
+
+      sql = args.first
+      parsed_query = ::PgQuery.parse(sql)
+
+      alter_table_commands = alter_table_commands(parsed_query.tree)
+
+      alter_table_commands.each do |cmd|
+        check_alter_command_safety(cmd)
+      end
+    end
+
+    def alter_table_add_constraints(tree)
+      if tree.is_a? Array
+        tree.map do |i|
+          alter_table_add_constraints(i)
+        end
+      elsif tree.is_a? Hash
+        tree.map do |k, v|
+          if k == "AlterTableCmd"
+            v
+          elsif v.is_a?(Array) || v.is_a?(Hash)
+            alter_table_add_constraints(v)
+          end
+        end
+      end
+    end
+
+    def alter_table_commands(parse_tree)
+      result = []
+      traverse = ->(tree) do
+        if tree.is_a? Array
+          tree.map { |index| traverse.call(index) }
+        elsif tree.is_a? Hash
+          tree.each do |key, value|
+            if key == "AlterTableCmd"
+              p value
+              result << value
+            elsif value.is_a?(Array) || value.is_a?(Hash)
+              traverse.call(value)
+            end
+          end
+        end
+      end
+      traverse.call(parse_tree)
+      result
+    end
+
+    def check_alter_command_safety(cmd)
+      raise_execute_error unless add_constraint_command?(cmd)
+      raise_execute_error unless constraint_type_supports_not_valid?(cmd)
+      raise_execute_error unless skip_validation?(cmd)
+    end
+
+    def add_constraint_command?(cmd)
+      cmd["subtype"] == ::PgQuery::AT_AddConstraint
+    end
+
+    def constraint_type_supports_not_valid?(cmd)
+      [::PgQuery::CONSTR_TYPE_CHECK, ::PgQuery::CONSTR_TYPE_FOREIGN].include?(
+        cmd.dig("def", "Constraint", "contype")
+      )
+    end
+
+    def skip_validation?(cmd)
+      cmd.dig("def", "Constraint", "skip_validation") == true
     end
 
     def raise_error(message_key, header: nil, append: nil, **vars)

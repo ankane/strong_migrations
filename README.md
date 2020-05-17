@@ -676,6 +676,22 @@ SAFETY_ASSURED=1 rails db:drop
 
 We recommend using a [separate database user](https://ankane.org/postgres-users) for migrations when possible so you don’t need to grant your app user permission to alter tables.
 
+### Inspect SQL
+
+Experimental support for checking the safety of raw SQL migrations on Postgres. This opt-in feature can be enabled with:
+
+```
+StrongMigrations.inspect_sql_postgresql = true
+```
+
+If enabled, you must add the [`pg_query`](https://github.com/lfittl/pg_query) gem to your Gemfile and ensure that the gem is required.
+
+```
+gem "pg_query", "~> 1.2", require: true # Assuming this is in a group that you've asked Bundler to require
+```
+
+The only currently supported checks are adding foreign key and check constraints without the `NOT VALID` option. If the checker can't determine whether the SQL is safe, it will fall back to assuming it isn't.
+
 ## Additional Reading
 
 - [Rails Migrations with No Downtime](https://pedro.herokuapp.com/past/2011/7/13/rails_migrations_with_no_downtime/)

@@ -17,7 +17,7 @@ module StrongMigrations
   class << self
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
       :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
-      :enabled_checks, :lock_timeout, :statement_timeout
+      :enabled_checks, :lock_timeout, :statement_timeout, :inspect_sql_postgresql
     attr_writer :lock_timeout_limit
   end
   self.auto_analyze = false
@@ -234,6 +234,21 @@ end"
     else
       false
     end
+  end
+
+  private def pg_query_present?
+    # TODO: should this try and see if the gem is available to require, or just
+    # whether the constant is defined?
+    defined?(PgQuery)
+  end
+
+  def inspect_sql_postgresql=(enabled)
+    if enabled && !pg_query_present?
+      raise ArgumentError, <<~MSG
+        You must add the pg_query gem to your Gemfile and require it to enable inspect_sql_postgresql
+      MSG
+    end
+    @inspect_sql_postgresql = enabled
   end
 end
 

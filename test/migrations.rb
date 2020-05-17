@@ -215,6 +215,32 @@ class ExecuteArbitrarySQL < TestMigration
   end
 end
 
+class AddFkWithSqlSafely < TestMigration
+  def up
+    execute <<~SQL
+      ALTER TABLE "users"
+      ADD CONSTRAINT fk_users_safely FOREIGN KEY ("order_id") REFERENCES orders ("id") ON DELETE NO ACTION ON UPDATE NO ACTION NOT VALID
+    SQL
+  end
+
+
+  def down
+    execute <<~SQL
+      ALTER TABLE "users"
+      DROP CONSTRAINT fk_users_safely
+    SQL
+  end
+end
+
+class AddFkWithSqlUnsafely < TestMigration
+  def change
+    execute <<~SQL
+      ALTER TABLE "users"
+      ADD CONSTRAINT fk_users_unsafely FOREIGN KEY ("order_id") REFERENCES orders ("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+    SQL
+  end
+end
+
 class RenameColumn < TestMigration
   def change
     rename_column :users, :properties, :bad_name

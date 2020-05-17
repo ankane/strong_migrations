@@ -394,6 +394,18 @@ class StrongMigrationsTest < Minitest::Test
     StrongMigrations.auto_analyze = false
   end
 
+  def test_with_inspect_sql_enabled_add_fk_safely
+    with_inspect_sql_postgresql_enabled do
+      assert_safe AddFkWithSqlSafely
+    end
+  end
+
+  def test_with_inspect_sql_enabled_add_fk_unsafely
+    with_inspect_sql_postgresql_enabled do
+      assert_unsafe AddFkWithSqlUnsafely
+    end
+  end
+
   private
 
   def with_start_after(start_after)

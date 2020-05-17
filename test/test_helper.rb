@@ -1,5 +1,5 @@
 require "bundler/setup"
-Bundler.require(:default)
+Bundler.require(:default, :development)
 require "minitest/autorun"
 require "minitest/pride"
 require "active_record"
@@ -30,6 +30,14 @@ end
 
 def migration_version
   ActiveRecord.version.to_s.to_f
+end
+
+def with_inspect_sql_postgresql_enabled
+  original_setting = StrongMigrations.inspect_sql_postgresql
+  StrongMigrations.inspect_sql_postgresql = true
+  yield
+ensure
+  StrongMigrations.inspect_sql_postgresql = original_setting
 end
 
 TestMigration = ActiveRecord::Migration[migration_version]
