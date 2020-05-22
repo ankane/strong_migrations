@@ -394,6 +394,42 @@ class StrongMigrationsTest < Minitest::Test
     StrongMigrations.auto_analyze = false
   end
 
+  def test_check_down
+    migrate CheckDown
+    assert_safe CheckDown, direction: :down
+
+    migrate CheckDown
+    StrongMigrations.check_down = true
+    assert_unsafe CheckDown, direction: :down
+  ensure
+    StrongMigrations.check_down = false
+    migrate CheckDown, direction: :down
+  end
+
+  def test_check_down_change
+    skip unless postgresql?
+
+    migrate CheckDownChange
+    assert_safe CheckDownChange, direction: :down
+
+    migrate CheckDownChange
+    StrongMigrations.check_down = true
+    assert_unsafe CheckDownChange, direction: :down
+  ensure
+    StrongMigrations.check_down = false
+    migrate CheckDownChange, direction: :down
+  end
+
+  def test_check_down_change_safe
+    skip unless postgresql?
+
+    migrate CheckDownChangeSafe
+    StrongMigrations.check_down = true
+    assert_safe CheckDownChangeSafe, direction: :down
+  ensure
+    StrongMigrations.check_down = false
+  end
+
   private
 
   def with_start_after(start_after)
@@ -406,14 +442,18 @@ class StrongMigrationsTest < Minitest::Test
     end
   end
 
-  def assert_unsafe(migration, message = nil)
-    error = assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration) }
+  def assert_unsafe(migration, message = nil, **options)
+    error = assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration, **options) }
     puts error.message if ENV["VERBOSE"]
     assert_match message, error.message if message
   end
 
-  def assert_safe(migration)
-    assert migrate(migration, direction: :up)
-    assert migrate(migration, direction: :down)
+  def assert_safe(migration, direction: nil)
+    if direction
+      assert migrate(migration, direction: direction)
+    else
+      assert migrate(migration, direction: :up)
+      assert migrate(migration, direction: :down)
+    end
   end
 end

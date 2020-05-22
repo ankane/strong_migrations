@@ -314,7 +314,8 @@ Then add the foreign key in separate migrations."
     end
 
     def safe?
-      @safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) || direction == :down || version_safe?
+      @safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) ||
+        (direction == :down && !StrongMigrations.check_down) || version_safe?
     end
 
     def version_safe?

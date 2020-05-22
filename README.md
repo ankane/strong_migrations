@@ -587,6 +587,14 @@ StrongMigrations.disable_check(:add_index)
 
 Check the [source code](https://github.com/ankane/strong_migrations/blob/master/lib/strong_migrations.rb) for the list of keys.
 
+## Rollbacks [master]
+
+By default, checks are disabled when migrating down. Enable them with:
+
+```ruby
+StrongMigrations.check_down = true
+```
+
 ## Custom Messages
 
 To customize specific messages, create an initializer with:

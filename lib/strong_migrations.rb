@@ -17,7 +17,7 @@ module StrongMigrations
   class << self
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
       :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
-      :enabled_checks, :lock_timeout, :statement_timeout
+      :enabled_checks, :lock_timeout, :statement_timeout, :check_down
     attr_writer :lock_timeout_limit
   end
   self.auto_analyze = false
@@ -202,6 +202,7 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end"
   }
   self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h
+  self.check_down = false
 
   # private
   def self.developer_env?
