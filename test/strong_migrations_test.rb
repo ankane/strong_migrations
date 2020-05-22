@@ -412,7 +412,6 @@ class StrongMigrationsTest < Minitest::Test
     assert_safe CheckDownChange, direction: :down
 
     migrate CheckDownChange
-
     with_check_down do
       assert_unsafe CheckDownChange, direction: :down
     end
