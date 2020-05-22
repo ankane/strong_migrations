@@ -304,7 +304,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_foreign_key_safe
-    skip "Active Record 6.0.3 bug" if (mysql? || mariadb?) && ActiveRecord::VERSION::STRING == "6.0.3"
+    skip "Active Record 6.0.3 bug" if (mysql? || mariadb?) && ActiveRecord::VERSION::STRING.start_with?("6.0.3")
 
     if postgresql? && ActiveRecord::VERSION::STRING <= "5.2"
       assert_unsafe AddForeignKeySafe
