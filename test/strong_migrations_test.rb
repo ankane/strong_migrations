@@ -399,10 +399,9 @@ class StrongMigrationsTest < Minitest::Test
     assert_safe CheckDown, direction: :down
 
     migrate CheckDown
-    StrongMigrations.check_down = true
-    assert_unsafe CheckDown, direction: :down
-  ensure
-    StrongMigrations.check_down = false
+    with_check_down do
+      assert_unsafe CheckDown, direction: :down
+    end
     migrate CheckDown, direction: :down
   end
 
@@ -413,10 +412,10 @@ class StrongMigrationsTest < Minitest::Test
     assert_safe CheckDownChange, direction: :down
 
     migrate CheckDownChange
-    StrongMigrations.check_down = true
-    assert_unsafe CheckDownChange, direction: :down
-  ensure
-    StrongMigrations.check_down = false
+
+    with_check_down do
+      assert_unsafe CheckDownChange, direction: :down
+    end
     migrate CheckDownChange, direction: :down
   end
 
@@ -424,13 +423,19 @@ class StrongMigrationsTest < Minitest::Test
     skip unless postgresql?
 
     migrate CheckDownChangeSafe
-    StrongMigrations.check_down = true
-    assert_safe CheckDownChangeSafe, direction: :down
-  ensure
-    StrongMigrations.check_down = false
+    with_check_down do
+      assert_safe CheckDownChangeSafe, direction: :down
+    end
   end
 
   private
+
+  def with_check_down
+    StrongMigrations.check_down = true
+    yield
+  ensure
+    StrongMigrations.check_down = false
+  end
 
   def with_start_after(start_after)
     previous = StrongMigrations.start_after
