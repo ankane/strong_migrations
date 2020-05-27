@@ -729,6 +729,10 @@ SAFETY_ASSURED=1 rails db:drop
 
 We recommend using a [separate database user](https://ankane.org/postgres-users) for migrations when possible so you don’t need to grant your app user permission to alter tables.
 
+## Smaller Projects
+
+You probably don’t need this gem for smaller projects, as operations that are unsafe at scale can be perfectly safe on smaller, low-traffic tables.
+
 ## Additional Reading
 
 - [Rails Migrations with No Downtime](https://pedro.herokuapp.com/past/2011/7/13/rails_migrations_with_no_downtime/)
