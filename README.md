@@ -25,6 +25,8 @@ bundle install
 rails generate strong_migrations:install
 ```
 
+Strong Migrations sets a long statement timeout for migrations so you can set a [short statement timeout](#app-timeouts) for your application.
+
 ## Checks
 
 Potentially dangerous operations:
@@ -605,7 +607,7 @@ StrongMigrations.error_messages[:add_column_default] = "Your custom instructions
 
 Check the [source code](https://github.com/ankane/strong_migrations/blob/master/lib/strong_migrations.rb) for the list of keys.
 
-## Timeouts
+## Migration Timeouts
 
 It’s extremely important to set a short lock timeout for migrations. This way, if a migration can’t acquire a lock in a timely manner, other statements won’t be stuck behind it. We also recommend setting a long statement timeout so migrations can run for a while.
 
@@ -624,6 +626,45 @@ ALTER ROLE myuser SET statement_timeout = '1h';
 ```
 
 Note: If you use PgBouncer in transaction mode, you must set timeouts on the database user.
+
+## App Timeouts
+
+We recommend adding timeouts to `config/database.yml` to prevent connections from hanging and individual queries from taking up too many resources.
+
+For Postgres:
+
+```yml
+production:
+  connect_timeout: 5
+  variables:
+    statement_timeout: 15s
+```
+
+Note: If you use PgBouncer in transaction mode, you must set the statement timeout on the database user as shown above.
+
+For MySQL:
+
+```yml
+production:
+  connect_timeout: 5
+  read_timeout: 5
+  write_timeout: 5
+  variables:
+    max_execution_time: 15000 # ms
+```
+
+For MariaDB:
+
+```yml
+production:
+  connect_timeout: 5
+  read_timeout: 5
+  write_timeout: 5
+  variables:
+    max_statement_time: 15 # sec
+```
+
+For HTTP connections, Redis, and other services, check out [this guide](https://github.com/ankane/the-ultimate-guide-to-ruby-timeouts).
 
 ## Existing Migrations
 
