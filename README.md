@@ -629,7 +629,7 @@ Note: If you use PgBouncer in transaction mode, you must set timeouts on the dat
 
 ## App Timeouts
 
-We recommend adding timeouts to `config/database.yml` to prevent connections from hanging and individual queries from taking up too many resources.
+We recommend adding timeouts to `config/database.yml` to prevent connections from hanging and individual queries from taking up too many resources in controllers, jobs, the Rails console, and other places.
 
 For Postgres:
 
