@@ -638,9 +638,10 @@ production:
   connect_timeout: 5
   variables:
     statement_timeout: 15s
+    lock_timeout: 10s
 ```
 
-Note: If you use PgBouncer in transaction mode, you must set the statement timeout on the database user as shown above.
+Note: If you use PgBouncer in transaction mode, you must set the statement and lock timeouts on the database user as shown above.
 
 For MySQL:
 
@@ -651,6 +652,8 @@ production:
   write_timeout: 5
   variables:
     max_execution_time: 15000 # ms
+    lock_wait_timeout: 10 # sec
+
 ```
 
 For MariaDB:
@@ -662,6 +665,7 @@ production:
   write_timeout: 5
   variables:
     max_statement_time: 15 # sec
+    lock_wait_timeout: 10 # sec
 ```
 
 For HTTP connections, Redis, and other services, check out [this guide](https://github.com/ankane/the-ultimate-guide-to-ruby-timeouts).
