@@ -479,7 +479,7 @@ end
 
 #### Good
 
-Instead, add a constraint:
+Instead, add a constraint (this operation locks, but because of `NOT VALID` it will not do a table scan):
 
 ```ruby
 class SetSomeColumnNotNull < ActiveRecord::Migration[6.0]
@@ -491,7 +491,7 @@ class SetSomeColumnNotNull < ActiveRecord::Migration[6.0]
 end
 ```
 
-Then validate it in a separate migration.
+Then validate it in a separate migration (this operation will do a table scan, but will not lock).
 
 ```ruby
 class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
@@ -499,8 +499,21 @@ class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
     safety_assured do
       execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "users_some_column_null"'
     end
+  end
+end
+```
 
-    # in Postgres 12+, you can safely turn this into a traditional column constraint
+##### Safely specify NOT NULL (Postgres 12+ only)
+
+[Starting in Postgres 12](https://dba.stackexchange.com/a/268128/12659),
+you can leverage the validated constraint above to set the column `NOT NULL` without
+a table scan.
+
+Both operations will lock, and not do a table scan.
+
+```ruby
+class SetColumnNotNull < ActiveRecord::Migration[6.0]
+  def change
     change_column_null :users, :some_column, false
     safety_assured do
       execute 'ALTER TABLE "users" DROP CONSTRAINT "users_some_column_null"'
@@ -508,6 +521,7 @@ class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
   end
 end
 ```
+
 
 Note: This is not 100% the same as `NOT NULL` column constraint before Postgres 12. Here’s a [good explanation](https://medium.com/doctolib/adding-a-not-null-constraint-on-pg-faster-with-minimal-locking-38b2c00c4d1c).
 
