@@ -323,7 +323,7 @@ end
 
 #### Bad
 
-In Postgres, adding an index non-concurrently locks the table.
+In Postgres, adding an index non-concurrently blocks writes.
 
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration[6.0]
@@ -359,7 +359,7 @@ rails g index table column
 
 #### Bad
 
-Rails adds an index non-concurrently to references by default, which is problematic for Postgres.
+Rails adds an index non-concurrently to references by default, which blocks writes in Postgres.
 
 ```ruby
 class AddReferenceToUsers < ActiveRecord::Migration[6.0]
