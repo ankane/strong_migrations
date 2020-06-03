@@ -479,7 +479,7 @@ end
 
 #### Good
 
-Instead, add a constraint:
+Instead, add a check constraint:
 
 ```ruby
 class SetSomeColumnNotNull < ActiveRecord::Migration[6.0]
@@ -491,7 +491,7 @@ class SetSomeColumnNotNull < ActiveRecord::Migration[6.0]
 end
 ```
 
-Then validate it in a separate migration.
+Then validate it in a separate migration. A `NOT NULL` check constraint is [functionally equivalent](https://medium.com/doctolib/adding-a-not-null-constraint-on-pg-faster-with-minimal-locking-38b2c00c4d1c) to setting `NOT NULL` on the column, but it won’t show up in `schema.rb`. In Postgres 12+, once the check constraint is validated, you can safely set `NOT NULL` on the column and drop the check constraint.
 
 ```ruby
 class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
@@ -500,7 +500,7 @@ class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
       execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "users_some_column_null"'
     end
 
-    # in Postgres 12+, you can safely turn this into a traditional column constraint
+    # in Postgres 12+, you can then safely set NOT NULL on the column so it shows up in schema.rb
     change_column_null :users, :some_column, false
     safety_assured do
       execute 'ALTER TABLE "users" DROP CONSTRAINT "users_some_column_null"'
@@ -508,8 +508,6 @@ class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
   end
 end
 ```
-
-Note: This is not 100% the same as `NOT NULL` column constraint before Postgres 12. Here’s a [good explanation](https://medium.com/doctolib/adding-a-not-null-constraint-on-pg-faster-with-minimal-locking-38b2c00c4d1c).
 
 ### Keeping non-unique indexes to three columns or less
 
