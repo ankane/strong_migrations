@@ -27,6 +27,24 @@ rails generate strong_migrations:install
 
 Strong Migrations sets a long statement timeout for migrations so you can set a [short statement timeout](#app-timeouts) for your application.
 
+## How It Works
+
+When you run a migration that’s potentially dangerous, you’ll see an error message like:
+
+```txt
+=== Dangerous operation detected #strong_migrations ===
+
+Adding an index non-concurrently locks the table. Instead, use:
+
+class RemoveNameFromUsers < ActiveRecord::Migration[6.0]
+  disable_ddl_transaction!
+
+  def change
+    add_index :users, :name, algorithm: :concurrently
+  end
+end
+```
+
 ## Checks
 
 Potentially dangerous operations:
