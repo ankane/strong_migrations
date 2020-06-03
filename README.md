@@ -34,7 +34,7 @@ When you run a migration that’s potentially dangerous, you’ll see an error m
 ```txt
 === Dangerous operation detected #strong_migrations ===
 
-Adding an index non-concurrently locks the table. Instead, use:
+Adding an index non-concurrently blocks writes. Instead, use:
 
 class RemoveNameFromUsers < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!

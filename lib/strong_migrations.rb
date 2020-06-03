@@ -111,7 +111,7 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     add_index:
-"Adding an index non-concurrently locks the table. Instead, use:
+"Adding an index non-concurrently blocks writes. Instead, use:
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   disable_ddl_transaction!
@@ -122,7 +122,7 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     remove_index:
-"Removing an index non-concurrently locks the table. Instead, use:
+"Removing an index non-concurrently blocks writes. Instead, use:
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   disable_ddl_transaction!
