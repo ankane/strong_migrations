@@ -500,7 +500,7 @@ class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
       execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "users_some_column_null"'
     end
 
-    # in Postgres 12+, you can then safely set NOT NULL on the column so it shows up in schema.rb
+    # in Postgres 12+, you can then safely set NOT NULL on the column
     change_column_null :users, :some_column, false
     safety_assured do
       execute 'ALTER TABLE "users" DROP CONSTRAINT "users_some_column_null"'
