@@ -753,7 +753,8 @@ You probably don’t need this gem for smaller projects, as operations that are 
 
 - [Rails Migrations with No Downtime](https://pedro.herokuapp.com/past/2011/7/13/rails_migrations_with_no_downtime/)
 - [PostgreSQL at Scale: Database Schema Changes Without Downtime](https://medium.com/braintree-product-technology/postgresql-at-scale-database-schema-changes-without-downtime-20d3749ed680)
-- [InnoDB Online DDL Overview](https://mariadb.com/kb/en/innodb-online-ddl-overview/)
+- [MySQL Online DDL Performance and Concurrency](https://dev.mysql.com/doc/refman/8.0/en/innodb-online-ddl-performance.html)
+- [MariaDB InnoDB Online DDL Overview](https://mariadb.com/kb/en/innodb-online-ddl-overview/)
 
 ## Credits
 
