@@ -116,7 +116,7 @@ Note: This operation is safe in Postgres 11+, MySQL 8.0.12+, and MariaDB 10.3.2+
 
 #### Bad
 
-Adding a column with a default value to an existing table causes the entire table to be rewritten.
+Adding a column with a default value to an existing table causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and reads are blocked in MySQL and MariaDB.
 
 ```ruby
 class AddSomeColumnToUsers < ActiveRecord::Migration[6.0]
@@ -485,7 +485,7 @@ end
 
 #### Bad
 
-In Postgres, setting `NOT NULL` on an existing column requires an `AccessExclusiveLock`, which is expensive on large tables.
+In Postgres, setting `NOT NULL` on an existing column blocks reads and writes while the every row is checked.
 
 ```ruby
 class SetSomeColumnNotNull < ActiveRecord::Migration[6.0]
