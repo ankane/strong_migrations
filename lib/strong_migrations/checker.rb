@@ -100,7 +100,8 @@ Then add the NOT NULL constraint in separate migrations."
           end
 
           if type.to_s == "json" && postgresql?
-            raise_error :add_column_json
+            raise_error :add_column_json,
+              command: command_str("add_column", [table, column, :jsonb, options])
           end
         when :change_column
           table, column, type, options = args

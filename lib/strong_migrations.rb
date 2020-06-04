@@ -51,7 +51,13 @@ end",
 
     add_column_json:
 "There's no equality operator for the json column type, which can
-cause errors for existing SELECT DISTINCT queries. Use jsonb instead.",
+cause errors for existing SELECT DISTINCT queries. Use jsonb instead.
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{command}
+  end
+end",
 
     change_column:
 "Changing the type of an existing column requires the entire
