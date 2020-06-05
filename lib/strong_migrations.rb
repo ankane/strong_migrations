@@ -25,7 +25,7 @@ module StrongMigrations
   self.checks = []
   self.error_messages = {
     add_column_default:
-"Adding a column with a non-null default causes the entire table to be rewritten.
+"Adding a column with a non-null default blocks %{rewrite_blocks} while the table is rewritten.
 Instead, add the column without a default value, then change the default.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
@@ -50,8 +50,8 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     add_column_json:
-"There's no equality operator for the json column type, which can
-cause errors for existing SELECT DISTINCT queries. Use jsonb instead.
+"There's no equality operator for the json column type, which can cause errors for
+existing SELECT DISTINCT queries in your application. Use jsonb instead.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
@@ -60,8 +60,8 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     change_column:
-"Changing the type of an existing column requires the entire
-table and indexes to be rewritten. A safer approach is to:
+"Changing the type of an existing column blocks %{rewrite_blocks}
+while the table is rewritten. A safer approach is to:
 
 1. Create a new column
 2. Write to both columns
@@ -86,7 +86,8 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     rename_column:
-"Renaming a column that's in use will cause errors in your application. A safer approach is to:
+"Renaming a column that's in use will cause errors
+in your application. A safer approach is to:
 
 1. Create a new column
 2. Write to both columns
@@ -96,7 +97,8 @@ end",
 6. Drop the old column",
 
     rename_table:
-"Renaming a table that's in use will cause errors in your application. A safer approach is to:
+"Renaming a table that's in use will cause errors
+in your application. A safer approach is to:
 
 1. Create a new table. Don't forget to recreate indexes from the old table
 2. Write to both tables

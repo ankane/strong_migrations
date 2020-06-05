@@ -96,7 +96,8 @@ Then add the NOT NULL constraint in separate migrations."
               change_command: command_str("change_column_default", [table, column, default]),
               remove_command: command_str("remove_column", [table, column]),
               code: backfill_code(table, column, default),
-              append: append
+              append: append,
+              rewrite_blocks: rewrite_blocks
           end
 
           if type.to_s == "json" && postgresql?
@@ -149,7 +150,7 @@ Then add the NOT NULL constraint in separate migrations."
               end
             end
           end
-          raise_error :change_column unless safe
+          raise_error :change_column, rewrite_blocks: rewrite_blocks unless safe
         when :create_table
           table, options = args
           options ||= {}
@@ -472,6 +473,10 @@ Then add the foreign key in separate migrations."
       end
 
       "#{command} #{str_args.join(", ")}"
+    end
+
+    def rewrite_blocks
+      mysql? || mariadb? ? "writes" : "reads and writes"
     end
 
     def backfill_code(table, column, default)
