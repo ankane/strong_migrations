@@ -173,9 +173,8 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     change_column_null_postgresql:
-"Setting NOT NULL on a column requires an AccessExclusiveLock,
-which is expensive on large tables. Instead, use a constraint and
-validate it in a separate migration with a more agreeable RowShareLock.
+"Setting NOT NULL on an existing column blocks reads and writes while every row is checked.
+Instead, add a check constraint and validate it in a separate migration.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
