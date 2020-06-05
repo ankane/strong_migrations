@@ -77,7 +77,7 @@ You can also add [custom checks](#custom-checks) or [disable specific checks](#d
 
 #### Bad
 
-ActiveRecord caches database columns at runtime, so if you drop a column, it can cause exceptions until your app reboots.
+Active Record caches database columns at runtime, so if you drop a column, it can cause exceptions until your app reboots.
 
 ```ruby
 class RemoveSomeColumnFromUsers < ActiveRecord::Migration[6.0]
@@ -89,7 +89,7 @@ end
 
 #### Good
 
-1. Tell ActiveRecord to ignore the column from its cache
+1. Tell Active Record to ignore the column from its cache
 
   ```ruby
   class User < ApplicationRecord
@@ -149,7 +149,7 @@ See the next section for how to backfill.
 
 #### Bad
 
-Backfilling in the same transaction that alters a table keeps the table locked for the [duration of the backfill](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/).
+Active Record creates a transaction around each migration, and backfilling in the same transaction that alters a table keeps the table locked for the [duration of the backfill](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/).
 
 ```ruby
 class AddSomeColumnToUsers < ActiveRecord::Migration[6.0]
