@@ -25,7 +25,7 @@ module StrongMigrations
   self.checks = []
   self.error_messages = {
     add_column_default:
-"Adding a column with a non-null default blocks %{rewrite_blocks} while the table is rewritten.
+"Adding a column with a non-null default blocks %{rewrite_blocks} while the entire table is rewritten.
 Instead, add the column without a default value, then change the default.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
@@ -61,7 +61,7 @@ end",
 
     change_column:
 "Changing the type of an existing column blocks %{rewrite_blocks}
-while the table is rewritten. A safer approach is to:
+while the entire table is rewritten. A safer approach is to:
 
 1. Create a new column
 2. Write to both columns
