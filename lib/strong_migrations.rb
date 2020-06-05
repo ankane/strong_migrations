@@ -86,7 +86,7 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     rename_column:
-"Renaming a column that's in-use will cause errors in your application. A safer approach is to:
+"Renaming a column that's in use will cause errors in your application. A safer approach is to:
 
 1. Create a new column
 2. Write to both columns
@@ -96,7 +96,7 @@ end",
 6. Drop the old column",
 
     rename_table:
-"Renaming a table that's in-use will cause errors in your application. A safer approach is to:
+"Renaming a table that's in use will cause errors in your application. A safer approach is to:
 
 1. Create a new table. Don't forget to recreate indexes from the old table
 2. Write to both tables

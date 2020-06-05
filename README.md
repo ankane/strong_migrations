@@ -220,7 +220,7 @@ A safer approach is to:
 
 #### Bad
 
-Renaming a column that’s in-use will cause errors in your application.
+Renaming a column that’s in use will cause errors in your application.
 
 ```ruby
 class RenameSomeColumn < ActiveRecord::Migration[6.0]
@@ -243,7 +243,7 @@ A safer approach is to:
 
 ### Renaming a table
 
-Renaming a table that’s in-use will cause errors in your application.
+Renaming a table that’s in use will cause errors in your application.
 
 #### Bad
 
