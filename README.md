@@ -193,7 +193,7 @@ class ChangeSomeColumnType < ActiveRecord::Migration[6.0]
 end
 ```
 
-A few changes don’t require a table rewrite in Postgres:
+A few changes don’t require a table rewrite (and are safe) in Postgres:
 
 - Changing between `varchar` and `text` columns
 - Increasing the precision of a `decimal` or `numeric` column
