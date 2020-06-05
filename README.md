@@ -52,8 +52,8 @@ Potentially dangerous operations:
 - [removing a column](#removing-a-column)
 - [adding a column with a default value](#adding-a-column-with-a-default-value)
 - [backfilling data](#backfilling-data)
-- [changing the type of a column](#renaming-or-changing-the-type-of-a-column)
-- [renaming a column](#renaming-or-changing-the-type-of-a-column)
+- [changing the type of a column](#changing-the-type-of-a-column)
+- [renaming a column](#renaming-a-column)
 - [renaming a table](#renaming-a-table)
 - [creating a table with the force option](#creating-a-table-with-the-force-option)
 - [using change_column_null with a default value](#using-change_column_null-with-a-default-value)
@@ -179,19 +179,11 @@ class BackfillSomeColumn < ActiveRecord::Migration[6.0]
 end
 ```
 
-### Renaming or changing the type of a column
+### Changing the type of a column
 
 #### Bad
 
-```ruby
-class RenameSomeColumn < ActiveRecord::Migration[6.0]
-  def change
-    rename_column :users, :some_column, :new_name
-  end
-end
-```
-
-or
+Changing the type of a column causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and reads are blocked in MySQL and MariaDB.
 
 ```ruby
 class ChangeSomeColumnType < ActiveRecord::Migration[6.0]
@@ -201,7 +193,7 @@ class ChangeSomeColumnType < ActiveRecord::Migration[6.0]
 end
 ```
 
-A few changes are safe in Postgres:
+A few changes don’t require a table rewrite in Postgres:
 
 - Changing between `varchar` and `text` columns
 - Increasing the precision of a `decimal` or `numeric` column
@@ -212,6 +204,29 @@ And a few in MySQL and MariaDB:
 
 - Increasing the length of a `varchar` column from under 255 up to 255
 - Increasing the length of a `varchar` column over 255
+
+#### Good
+
+A safer approach is to:
+
+1. Create a new column
+2. Write to both columns
+3. Backfill data from the old column to the new column
+4. Move reads from the old column to the new column
+5. Stop writing to the old column
+6. Drop the old column
+
+### Renaming a column
+
+#### Bad
+
+```ruby
+class RenameSomeColumn < ActiveRecord::Migration[6.0]
+  def change
+    rename_column :users, :some_column, :new_name
+  end
+end
+```
 
 #### Good
 
@@ -753,7 +768,7 @@ You probably don’t need this gem for smaller projects, as operations that are 
 
 - [Rails Migrations with No Downtime](https://pedro.herokuapp.com/past/2011/7/13/rails_migrations_with_no_downtime/)
 - [PostgreSQL at Scale: Database Schema Changes Without Downtime](https://medium.com/braintree-product-technology/postgresql-at-scale-database-schema-changes-without-downtime-20d3749ed680)
-- [MySQL Online DDL Performance and Concurrency](https://dev.mysql.com/doc/refman/8.0/en/innodb-online-ddl-performance.html)
+- [An Overview of DDL Algorithms in MySQL](https://mydbops.wordpress.com/2020/03/04/an-overview-of-ddl-algorithms-in-mysql-covers-mysql-8/)
 - [MariaDB InnoDB Online DDL Overview](https://mariadb.com/kb/en/innodb-online-ddl-overview/)
 
 ## Credits
