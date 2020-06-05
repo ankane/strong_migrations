@@ -1,6 +1,7 @@
 ## 0.6.9 (unreleased)
 
 - Added `check_down` option
+- Improved error messages
 
 ## 0.6.8 (2020-05-13)
 
