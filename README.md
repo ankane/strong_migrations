@@ -149,7 +149,7 @@ See the next section for how to backfill.
 
 #### Bad
 
-Backfilling in the same transaction that alters a table locks the table for the [duration of the backfill](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/).
+Backfilling in the same transaction that alters a table keeps the table locked for the [duration of the backfill](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/).
 
 ```ruby
 class AddSomeColumnToUsers < ActiveRecord::Migration[6.0]
