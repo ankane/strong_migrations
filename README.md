@@ -243,9 +243,9 @@ A safer approach is to:
 
 ### Renaming a table
 
-Renaming a table that’s in use will cause errors in your application.
-
 #### Bad
+
+Renaming a table that’s in use will cause errors in your application.
 
 ```ruby
 class RenameUsersToCustomers < ActiveRecord::Migration[6.0]
