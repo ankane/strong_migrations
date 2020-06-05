@@ -112,11 +112,9 @@ end
 
 ### Adding a column with a default value
 
-Note: This operation is safe in Postgres 11+, MySQL 8.0.12+, and MariaDB 10.3.2+.
-
 #### Bad
 
-Adding a column with a default value to an existing table causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and reads are blocked in MySQL and MariaDB.
+In earlier versions of Postgres, MySQL, and MariaDB, adding a column with a default value to an existing table causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and reads are blocked in MySQL and MariaDB.
 
 ```ruby
 class AddSomeColumnToUsers < ActiveRecord::Migration[6.0]
@@ -125,6 +123,8 @@ class AddSomeColumnToUsers < ActiveRecord::Migration[6.0]
   end
 end
 ```
+
+In Postgres 11+, MySQL 8.0.12+, and MariaDB 10.3.2+, this no longer requires a table rewrite and is safe.
 
 #### Good
 
