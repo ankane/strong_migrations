@@ -727,14 +727,6 @@ Columns can flip order in `db/schema.rb` when you have multiple developers. One 
 task "db:schema:dump": "strong_migrations:alphabetize_columns"
 ```
 
-## Dangerous Tasks
-
-For safety, dangerous database tasks are disabled in production - `db:drop`, `db:reset`, `db:schema:load`, and `db:structure:load`. To get around this, use:
-
-```sh
-SAFETY_ASSURED=1 rails db:drop
-```
-
 ## Permissions
 
 We recommend using a [separate database user](https://ankane.org/postgres-users) for migrations when possible so you don’t need to grant your app user permission to alter tables.
