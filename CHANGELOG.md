@@ -3,6 +3,7 @@
 - Added `check_down` option
 - Added check for `validate_foreign_key`
 - Improved error messages
+- Made auto analyze less verbose in Postgres
 
 ## 0.6.8 (2020-05-13)
 
