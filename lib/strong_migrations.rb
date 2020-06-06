@@ -192,9 +192,9 @@ end",
 "Setting NOT NULL on an existing column is not safe with your database engine.",
 
     add_foreign_key:
-"New foreign keys are validated by default. This acquires an AccessExclusiveLock,
-which is expensive on large tables. Instead, validate it in a separate migration
-with a more agreeable RowShareLock.
+"Adding a foreign key blocks writes on both tables. Instead,
+add the foreign key without validating existing rows,
+then validate them in a separate migration.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change

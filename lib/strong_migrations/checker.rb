@@ -178,7 +178,7 @@ Then add the NOT NULL constraint in separate migrations."
               end
 
               if options.delete(:foreign_key)
-                headline = "Adding a validated foreign key locks the table."
+                headline = "Adding a foreign key blocks writes on both tables."
                 append = "
 
 Then add the foreign key in separate migrations."

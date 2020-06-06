@@ -406,7 +406,7 @@ end
 
 #### Bad
 
-In Postgres, new foreign keys are validated by default, which acquires a `ShareRowExclusiveLock` that can be [expensive on large tables](https://travisofthenorth.com/blog/2017/2/2/postgres-adding-foreign-keys-with-zero-downtime).
+In Postgres, adding a foreign key blocks writes on both tables.
 
 ```ruby
 class AddForeignKeyOnUsers < ActiveRecord::Migration[6.0]
@@ -428,7 +428,7 @@ end
 
 #### Good
 
-Instead, validate it in a separate migration with a more agreeable `RowShareLock`. This approach is documented by Postgres to have “[the least impact on other work](https://www.postgresql.org/docs/current/sql-altertable.html).”
+Add the foreign key without validating existing rows, then validate them in a separate migration.
 
 For Rails 5.2+, use:
 
@@ -440,7 +440,7 @@ class AddForeignKeyOnUsers < ActiveRecord::Migration[6.0]
 end
 ```
 
-Then validate it in a separate migration.
+Then:
 
 ```ruby
 class ValidateForeignKeyOnUsers < ActiveRecord::Migration[6.0]
@@ -462,7 +462,7 @@ class AddForeignKeyOnUsers < ActiveRecord::Migration[5.1]
 end
 ```
 
-Then validate it in a separate migration.
+Then:
 
 ```ruby
 class ValidateForeignKeyOnUsers < ActiveRecord::Migration[5.1]
