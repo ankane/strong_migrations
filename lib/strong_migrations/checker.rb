@@ -249,6 +249,10 @@ Then add the foreign key in separate migrations."
                 validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
             end
           end
+        when :validate_foreign_key
+          if postgresql? && writes_blocked?
+            raise_error :validate_foreign_key
+          end
         end
 
         StrongMigrations.checks.each do |check|
@@ -473,6 +477,19 @@ Then add the foreign key in separate migrations."
       end
 
       "#{command} #{str_args.join(", ")}"
+    end
+
+    def writes_blocked?
+      query = <<~SQL
+        SELECT
+          relation::regclass::text
+        FROM
+          pg_locks
+        WHERE
+          mode IN ('ShareRowExclusiveLock', 'AccessExclusiveLock') AND
+          pid = pg_backend_pid()
+      SQL
+      connection.select_all(query.squish).any?
     end
 
     def rewrite_blocks

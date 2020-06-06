@@ -206,7 +206,10 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
     %{validate_foreign_key_code}
   end
-end"
+end",
+
+    validate_foreign_key:
+"Validating a foreign key while writes are blocked is dangerous."
   }
   self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h
   self.check_down = false

@@ -1,6 +1,7 @@
-## 0.6.9 (unreleased)
+## 0.7.0 (unreleased)
 
 - Added `check_down` option
+- Added check for `validate_foreign_key`
 - Improved error messages
 
 ## 0.6.8 (2020-05-13)

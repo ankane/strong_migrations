@@ -313,6 +313,22 @@ class StrongMigrationsTest < Minitest::Test
     end
   end
 
+  def test_add_foreign_key_validate_same_transaction
+    skip "Active Record 6.0.3 bug" if ActiveRecord::VERSION::STRING.start_with?("6.0.3")
+
+    skip unless postgresql?
+
+    assert_unsafe AddForeignKeyValidateSameTransaction
+  end
+
+  def test_add_foreign_key_validate_no_transaction
+    skip "Active Record 6.0.3 bug" if ActiveRecord::VERSION::STRING.start_with?("6.0.3")
+
+    skip unless postgresql?
+
+    assert_safe AddForeignKeyValidateNoTransaction
+  end
+
   def test_custom
     assert_unsafe Custom, "Cannot add forbidden column"
   end

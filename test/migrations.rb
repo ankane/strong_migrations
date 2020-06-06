@@ -357,6 +357,22 @@ class AddForeignKeySafe < TestMigration
   end
 end
 
+class AddForeignKeyValidateSameTransaction < TestMigration
+  def change
+    add_foreign_key :users, :orders, validate: false
+    validate_foreign_key :users, :orders
+  end
+end
+
+class AddForeignKeyValidateNoTransaction < TestMigration
+  disable_ddl_transaction!
+
+  def change
+    add_foreign_key :users, :orders, validate: false
+    validate_foreign_key :users, :orders
+  end
+end
+
 class Custom < TestMigration
   def change
     add_column :users, :forbidden, :string
