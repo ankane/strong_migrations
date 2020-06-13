@@ -34,13 +34,18 @@ When you run a migration that’s potentially dangerous, you’ll see an error m
 ```txt
 === Dangerous operation detected #strong_migrations ===
 
-Adding an index non-concurrently blocks writes. Instead, use:
+Active Record caches attributes, which causes problems
+when removing columns. Be sure to ignore the column:
 
-class RemoveNameFromUsers < ActiveRecord::Migration[6.0]
-  disable_ddl_transaction!
+class User < ApplicationRecord
+  self.ignored_columns = ["name"]
+end
 
+Deploy the code, then wrap this step in a safety_assured { ... } block.
+
+class RemoveColumn < ActiveRecord::Migration[6.0]
   def change
-    add_index :users, :name, algorithm: :concurrently
+    safety_assured { remove_column :users, :name, :string }
   end
 end
 ```

@@ -70,7 +70,7 @@ while the entire table is rewritten. A safer approach is to:
 5. Stop writing to the old column
 6. Drop the old column",
 
-    remove_column: "Active Record caches attributes which causes problems
+    remove_column: "Active Record caches attributes, which causes problems
 when removing columns. Be sure to ignore the column%{column_suffix}:
 
 class %{model} < %{base_model}
