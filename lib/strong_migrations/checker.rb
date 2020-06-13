@@ -425,11 +425,16 @@ Then add the foreign key in separate migrations."
     end
 
     def constraints(table_name)
-      query = <<-SQL
-        SELECT conname AS name, pg_get_constraintdef(oid) AS def FROM pg_constraint
-        WHERE contype = 'c'
-          AND convalidated
-          AND conrelid = #{connection.quote(connection.quote_table_name(table_name))}::regclass
+      query = <<~SQL
+        SELECT
+          conname AS name,
+          pg_get_constraintdef(oid) AS def
+        FROM
+          pg_constraint
+        WHERE
+          contype = 'c' AND
+          convalidated AND
+          conrelid = #{connection.quote(connection.quote_table_name(table_name))}::regclass
       SQL
       connection.select_all(query.squish).to_a
     end
