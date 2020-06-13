@@ -274,6 +274,8 @@ Then add the foreign key in separate migrations."
       result
     end
 
+    private
+
     def set_timeouts
       if !@timeouts_set
         if StrongMigrations.statement_timeout
@@ -307,8 +309,6 @@ Then add the foreign key in separate migrations."
         @timeouts_set = true
       end
     end
-
-    private
 
     def connection
       @migration.connection
