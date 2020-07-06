@@ -400,7 +400,7 @@ With [gindex](https://github.com/ankane/gindex), you can generate an index migra
 rails g index table column
 ```
 
-### Adding a reference
+### Adding a foreign key reference
 
 #### Bad
 
@@ -420,10 +420,20 @@ Make sure the index is added concurrently.
 
 ```ruby
 class AddReferenceToUsers < ActiveRecord::Migration[6.0]
-  disable_ddl_transaction!
-
   def change
-    add_reference :users, :city, index: {algorithm: :concurrently}
+    add_reference :users, :city, index: false
+  end
+end
+
+class AddForeignKeyOnUsers < ActiveRecord::Migration[6.0]
+  def change
+    add_foreign_key :users, :orders, validate: false
+  end
+end
+
+class ValidateForeignKeyOnUsers < ActiveRecord::Migration[6.0]
+  def change
+    validate_foreign_key :users, :orders
   end
 end
 ```
