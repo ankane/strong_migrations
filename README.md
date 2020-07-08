@@ -208,7 +208,7 @@ A few changes don’t require a table rewrite (and are safe) in Postgres:
 And a few in MySQL and MariaDB:
 
 - Increasing the length limit of a `varchar` column from under 255 up to 255
-- Increasing the length limit of a `varchar` column over 255
+- Increasing the length limit of a `varchar` column from over 255 to the max limit
 
 #### Good
 
