@@ -139,6 +139,17 @@ class ChangeColumnVarcharRemoveLimit < TestMigration
   end
 end
 
+class ChangeColumnVarcharAddLimit < TestMigration
+  def up
+    change_column :users, :country, :string
+    change_column :users, :country, :string, limit: 20
+  end
+
+  def down
+    change_column :users, :country, :string, limit: 20
+  end
+end
+
 class ChangeColumnDecimalDecreasePrecision < TestMigration
   def up
     change_column :users, :credit_score, :decimal, precision: 9, scale: 5
