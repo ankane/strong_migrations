@@ -126,6 +126,11 @@ class StrongMigrationsTest < Minitest::Test
     assert_unsafe ChangeColumnVarcharDecreaseLimit
   end
 
+  def test_change_column_varchar_remove_limit
+    skip unless postgresql?
+    assert_safe ChangeColumnVarcharRemoveLimit
+  end
+
   def test_change_column_decimal_decrease_precision
     skip unless postgresql?
     assert_unsafe ChangeColumnDecimalDecreasePrecision
