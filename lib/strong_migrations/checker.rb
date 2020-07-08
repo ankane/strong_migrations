@@ -117,7 +117,12 @@ Then add the NOT NULL constraint in separate migrations."
               when "string"
                 # safe to increase limit or remove it
                 # not safe to decrease limit or add a limit
-                safe = sql_type == "character varying" && (!options[:limit] || (existing_column.limit && options[:limit] >= existing_column.limit))
+                case sql_type
+                when "character varying"
+                  safe = !options[:limit] || (existing_column.limit && options[:limit] >= existing_column.limit)
+                when "text"
+                  safe = !options[:limit]
+                end
               when "text"
                 # safe to change varchar to text (and text to text)
                 safe = ["character varying", "text"].include?(sql_type)
