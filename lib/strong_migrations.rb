@@ -209,7 +209,8 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     validate_foreign_key:
-"Validating a foreign key while writes are blocked is dangerous."
+"Validating a foreign key while writes are blocked is dangerous.
+Use disable_ddl_transaction! or a separate migration."
   }
   self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h
   self.check_down = false
