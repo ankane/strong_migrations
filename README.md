@@ -50,6 +50,11 @@ class RemoveColumn < ActiveRecord::Migration[6.0]
 end
 ```
 
+An operation is classified as dangerous if it either:
+
+- Blocks reads or writes for more than a few seconds (after a lock is acquired)
+- Has a good chance of causing application errors
+
 ## Checks
 
 Potentially dangerous operations:
