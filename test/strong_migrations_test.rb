@@ -123,11 +123,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_change_column_varchar_decrease_limit
-    if postgresql?
-      assert_safe ChangeColumnVarcharDecreaseLimit
-    elsif mysql? || mariadb?
-      assert_unsafe ChangeColumnVarcharDecreaseLimit
-    end
+    assert_unsafe ChangeColumnVarcharDecreaseLimit
   end
 
   def test_change_column_decimal_decrease_precision

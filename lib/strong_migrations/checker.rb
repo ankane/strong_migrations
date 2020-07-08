@@ -114,8 +114,12 @@ Then add the NOT NULL constraint in separate migrations."
             sql_type = existing_column.sql_type.split("(").first
             if postgresql?
               case type.to_s
-              when "string", "text"
-                # safe to change limit for varchar
+              when "string"
+                # safe to increase limit or remove it
+                # not safe to decrease limit or add a limit
+                safe = sql_type == "character varying" && (!options[:limit] || (existing_column.limit && options[:limit] >= existing_column.limit))
+              when "text"
+                # safe to change varchar to text (and text to text)
                 safe = ["character varying", "text"].include?(sql_type)
               when "numeric", "decimal"
                 # numeric and decimal are equivalent and can be used interchangably

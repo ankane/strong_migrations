@@ -200,7 +200,7 @@ end
 A few changes don’t require a table rewrite (and are safe) in Postgres:
 
 - Increasing the length limit of a `varchar` column (or removing the limit)
-- Changing between `varchar` and `text` columns
+- Changing a `varchar` column to a `text` column
 - Increasing the precision of a `decimal` or `numeric` column
 - Making a `decimal` or `numeric` column unconstrained
 - Changing between `timestamp` and `timestamptz` columns when session time zone is UTC in Postgres 12+

@@ -4,6 +4,7 @@
 - Added check for `validate_foreign_key`
 - Improved error messages
 - Made auto analyze less verbose in Postgres
+- Decreasing the length limit of a `varchar` column or adding a limit is not safe in Postgres
 - Removed safety checks for `db` rake tasks (Rails 5+ handles this)
 
 ## 0.6.8 (2020-05-13)
