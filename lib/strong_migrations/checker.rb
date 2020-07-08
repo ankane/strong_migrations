@@ -111,13 +111,13 @@ Then add the NOT NULL constraint in separate migrations."
           safe = false
           existing_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
           if existing_column
-            sql_type = existing_column.sql_type.split("(").first
+            existing_type = existing_column.sql_type.split("(").first
             if postgresql?
               case type.to_s
               when "string"
                 # safe to increase limit or remove it
                 # not safe to decrease limit or add a limit
-                case sql_type
+                case existing_type
                 when "character varying"
                   safe = !options[:limit] || (existing_column.limit && options[:limit] >= existing_column.limit)
                 when "text"
@@ -125,10 +125,10 @@ Then add the NOT NULL constraint in separate migrations."
                 end
               when "text"
                 # safe to change varchar to text (and text to text)
-                safe = ["character varying", "text"].include?(sql_type)
+                safe = ["character varying", "text"].include?(existing_type)
               when "numeric", "decimal"
                 # numeric and decimal are equivalent and can be used interchangably
-                safe = ["numeric", "decimal"].include?(sql_type) &&
+                safe = ["numeric", "decimal"].include?(existing_type) &&
                   (
                     (
                       # unconstrained
@@ -141,7 +141,7 @@ Then add the NOT NULL constraint in separate migrations."
                     )
                   )
               when "datetime", "timestamp", "timestamptz"
-                safe = ["timestamp without time zone", "timestamp with time zone"].include?(sql_type) &&
+                safe = ["timestamp without time zone", "timestamp with time zone"].include?(existing_type) &&
                   postgresql_version >= Gem::Version.new("12") &&
                   connection.select_all("SHOW timezone").first["TimeZone"] == "UTC"
               end
@@ -153,7 +153,7 @@ Then add the NOT NULL constraint in separate migrations."
                 # increased limit, but doesn't change number of length bytes
                 # 1-255 = 1 byte, 256-65532 = 2 bytes, 65533+ = too big for varchar
                 limit = options[:limit] || 255
-                safe = ["varchar"].include?(sql_type) &&
+                safe = ["varchar"].include?(existing_type) &&
                   limit >= existing_column.limit &&
                   (limit <= 255 || existing_column.limit > 255)
               end
