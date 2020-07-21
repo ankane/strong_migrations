@@ -192,7 +192,7 @@ end
 
 #### Bad
 
-Changing the type of a column causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and reads are blocked in MySQL and MariaDB.
+Changing the type of a column causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and writes are blocked in MySQL and MariaDB.
 
 ```ruby
 class ChangeSomeColumnType < ActiveRecord::Migration[6.0]
