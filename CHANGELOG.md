@@ -1,4 +1,4 @@
-## 0.7.0 (unreleased)
+## 0.7.0 (2020-07-22)
 
 - Added `check_down` option
 - Added check for `change_column` with `null: false`
