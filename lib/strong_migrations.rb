@@ -70,6 +70,9 @@ while the entire table is rewritten. A safer approach is to:
 5. Stop writing to the old column
 6. Drop the old column",
 
+    change_column_with_not_null:
+"Changing the type is safe, but setting NOT NULL is not.",
+
     remove_column: "Active Record caches attributes, which causes problems
 when removing columns. Be sure to ignore the column%{column_suffix}:
 

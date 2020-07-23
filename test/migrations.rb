@@ -211,6 +211,16 @@ class ChangeColumnTimestamps < TestMigration
   end
 end
 
+class ChangeColumnWithNotNull < TestMigration
+  def up
+    change_column :users, :country, :string, limit: 20, null: false
+  end
+
+  def down
+    change_column :users, :country, :string, limit: 20
+  end
+end
+
 class ChangeColumnNull < TestMigration
   def change
     change_column_null :users, :name, false

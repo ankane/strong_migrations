@@ -176,6 +176,10 @@ class StrongMigrationsTest < Minitest::Test
     StrongMigrations.target_postgresql_version = nil
   end
 
+  def test_change_column_with_not_null
+    assert_unsafe ChangeColumnWithNotNull
+  end
+
   def test_execute_arbitrary_sql
     assert_unsafe ExecuteArbitrarySQL
   end

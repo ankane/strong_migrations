@@ -159,6 +159,12 @@ Then add the NOT NULL constraint in separate migrations."
               end
             end
           end
+
+          # unsafe to set NOT NULL for safe types
+          if safe && existing_column.null && options[:null] == false
+            raise_error :change_column_with_not_null
+          end
+
           raise_error :change_column, rewrite_blocks: rewrite_blocks unless safe
         when :create_table
           table, options = args

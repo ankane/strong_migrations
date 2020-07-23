@@ -1,6 +1,7 @@
 ## 0.7.0 (unreleased)
 
 - Added `check_down` option
+- Added check for `change_column` with `null: false`
 - Added check for `validate_foreign_key`
 - Improved error messages
 - Made auto analyze less verbose in Postgres
