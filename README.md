@@ -45,7 +45,7 @@ Deploy the code, then wrap this step in a safety_assured { ... } block.
 
 class RemoveColumn < ActiveRecord::Migration[6.0]
   def change
-    safety_assured { remove_column :users, :name, :string }
+    safety_assured { remove_column :users, :name }
   end
 end
 ```
