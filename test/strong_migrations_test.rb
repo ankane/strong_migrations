@@ -58,7 +58,7 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_column_default
-    StrongMigrations.target_version = postgresql? ? "10" : (mysql? ? "8.0.11" : "10.3.1")
+    StrongMigrations.target_version = postgresql? ? 10 : (mysql? ? "8.0.11" : "10.3.1")
     assert_unsafe AddColumnDefault
   ensure
     StrongMigrations.target_version = nil
