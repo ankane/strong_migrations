@@ -1,4 +1,4 @@
-## 0.7.1 (unreleased)
+## 0.7.1 (2020-07-27)
 
 - Added `target_version` option to replace database-specific options
 
