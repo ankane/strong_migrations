@@ -58,45 +58,37 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def test_add_column_default
-    StrongMigrations.target_postgresql_version = "10"
-    StrongMigrations.target_mysql_version = "8.0.11"
-    StrongMigrations.target_mariadb_version = "10.3.1"
-    assert_unsafe AddColumnDefault
-  ensure
-    StrongMigrations.target_postgresql_version = nil
-    StrongMigrations.target_mysql_version = nil
-    StrongMigrations.target_mariadb_version = nil
-  end
-
-  def test_add_column_default_target_version
     StrongMigrations.target_version = postgresql? ? "10" : (mysql? ? "8.0.11" : "10.3.1")
     assert_unsafe AddColumnDefault
   ensure
     StrongMigrations.target_version = nil
   end
 
-  def test_add_column_default_not_null
+  def test_add_column_default_database_specific_versions
     StrongMigrations.target_postgresql_version = "10"
     StrongMigrations.target_mysql_version = "8.0.11"
     StrongMigrations.target_mariadb_version = "10.3.1"
-    assert_unsafe AddColumnDefaultNotNull, /Then add the NOT NULL constraint/
+    assert_unsafe AddColumnDefault
   ensure
     StrongMigrations.target_postgresql_version = nil
     StrongMigrations.target_mysql_version = nil
     StrongMigrations.target_mariadb_version = nil
   end
 
+  def test_add_column_default_not_null
+    StrongMigrations.target_version = postgresql? ? 10 : (mysql? ? "8.0.11" : "10.3.1")
+    assert_unsafe AddColumnDefaultNotNull, /Then add the NOT NULL constraint/
+  ensure
+    StrongMigrations.target_version = nil
+  end
+
   def test_add_column_default_safe_latest
     skip unless postgresql? || mysql? || mariadb?
 
-    StrongMigrations.target_postgresql_version = "11"
-    StrongMigrations.target_mysql_version = "8.0.12"
-    StrongMigrations.target_mariadb_version = "10.3.2"
+    StrongMigrations.target_version = postgresql? ? 11 : (mysql? ? "8.0.12" : "10.3.2")
     assert_safe AddColumnDefault
   ensure
-    StrongMigrations.target_postgresql_version = nil
-    StrongMigrations.target_mysql_version = nil
-    StrongMigrations.target_mariadb_version = nil
+    StrongMigrations.target_version = nil
   end
 
   def test_add_column_default_safe
@@ -175,12 +167,12 @@ class StrongMigrationsTest < Minitest::Test
 
   def test_change_column_timestamps
     skip unless postgresql?
-    StrongMigrations.target_postgresql_version = "12"
+    StrongMigrations.target_version = 12
     assert_safe ChangeColumnTimestamps
-    StrongMigrations.target_postgresql_version = "11"
+    StrongMigrations.target_version = 11
     assert_unsafe ChangeColumnTimestamps
   ensure
-    StrongMigrations.target_postgresql_version = nil
+    StrongMigrations.target_version = nil
   end
 
   def test_change_column_with_not_null
@@ -294,28 +286,28 @@ class StrongMigrationsTest < Minitest::Test
   def test_change_column_null_constraint
     skip unless postgresql?
 
-    StrongMigrations.target_postgresql_version = 12
+    StrongMigrations.target_version = 12
     assert_safe ChangeColumnNullConstraint
   ensure
-    StrongMigrations.target_postgresql_version = nil
+    StrongMigrations.target_version = nil
   end
 
   def test_change_column_null_constraint_unvalidated
     skip unless postgresql?
 
-    StrongMigrations.target_postgresql_version = 12
+    StrongMigrations.target_version = 12
     assert_unsafe ChangeColumnNullConstraintUnvalidated
   ensure
-    StrongMigrations.target_postgresql_version = nil
+    StrongMigrations.target_version = nil
   end
 
   def test_change_column_null_constraint_before_12
     skip unless postgresql?
 
-    StrongMigrations.target_postgresql_version = 11
+    StrongMigrations.target_version = 11
     assert_unsafe ChangeColumnNullConstraint
   ensure
-    StrongMigrations.target_postgresql_version = nil
+    StrongMigrations.target_version = nil
   end
 
   def test_change_column_null_default
