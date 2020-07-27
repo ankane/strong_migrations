@@ -707,10 +707,10 @@ Use the version from your latest migration.
 If your development database version is different from production, you can specify the production version so the right checks run in development.
 
 ```ruby
-StrongMigrations.target_postgresql_version = "10"
-StrongMigrations.target_mysql_version = "8.0.12"
-StrongMigrations.target_mariadb_version = "10.3.2"
+StrongMigrations.target_version = "10" # or 8.0.12, 10.3.2, etc
 ```
+
+The major version works well for Postgres, while the full version is recommended for MySQL and MariaDB.
 
 For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
 

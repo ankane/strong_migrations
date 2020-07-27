@@ -1,3 +1,7 @@
+## 0.7.1 (unreleased)
+
+- Added `target_version` option to replace database-specific options
+
 ## 0.7.0 (2020-07-22)
 
 - Added `check_down` option

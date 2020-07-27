@@ -68,6 +68,13 @@ class StrongMigrationsTest < Minitest::Test
     StrongMigrations.target_mariadb_version = nil
   end
 
+  def test_add_column_default_target_version
+    StrongMigrations.target_version = postgresql? ? "10" : (mysql? ? "8.0.11" : "10.3.1")
+    assert_unsafe AddColumnDefault
+  ensure
+    StrongMigrations.target_version = nil
+  end
+
   def test_add_column_default_not_null
     StrongMigrations.target_postgresql_version = "10"
     StrongMigrations.target_mysql_version = "8.0.11"

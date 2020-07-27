@@ -380,6 +380,7 @@ Then add the foreign key in separate migrations."
     end
 
     def target_version(target_version)
+      target_version ||= StrongMigrations.target_version
       version =
         if target_version && StrongMigrations.developer_env?
           target_version.to_s
