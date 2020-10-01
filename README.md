@@ -313,7 +313,7 @@ If you intend to drop an existing table, run `drop_table` first.
 
 #### Bad
 
-Setting `NOT NULL` on an existing column blocks reads and writes while the every row is checked.
+Setting `NOT NULL` on an existing column blocks reads and writes while every row is checked.
 
 ```ruby
 class SetSomeColumnNotNull < ActiveRecord::Migration[6.0]
