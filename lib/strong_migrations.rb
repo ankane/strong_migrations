@@ -93,7 +93,7 @@ end",
 in your application. A safer approach is to:
 
 1. Create a new column
-2. Write to both columns
+2. Write to both columns (example: https://stackoverflow.com/a/63304987)
 3. Backfill data from the old column to new column
 4. Move reads from the old column to the new column
 5. Stop writing to the old column
