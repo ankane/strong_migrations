@@ -442,7 +442,7 @@ class CheckTimeouts < TestMigration
       if postgresql?
         connection.select_all("SHOW statement_timeout").first["statement_timeout"]
       elsif mysql?
-        connection.select_all("SHOW VARIABLES LIKE 'max_execution_time'").first["Value"].to_i / 1000
+        connection.select_all("SHOW VARIABLES LIKE 'max_execution_time'").first["Value"].to_i / 1000.0
       else
         connection.select_all("SHOW VARIABLES LIKE 'max_statement_time'").first["Value"].to_f
       end
