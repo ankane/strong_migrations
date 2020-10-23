@@ -388,6 +388,8 @@ class StrongMigrationsTest < Minitest::Test
     StrongMigrations.statement_timeout = nil
   end
 
+  # designed for 0 case to prevent no timeout
+  # but can't test without statement timeout error
   def test_statement_timeout_float_ceil
     skip unless postgresql? || mysql?
 
