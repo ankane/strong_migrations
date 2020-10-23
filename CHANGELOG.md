@@ -1,3 +1,7 @@
+## 0.7.2 (unreleased)
+
+- Added support for float timeouts
+
 ## 0.7.1 (2020-07-27)
 
 - Added `target_version` option to replace database-specific options

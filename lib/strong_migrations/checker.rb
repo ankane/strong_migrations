@@ -298,7 +298,8 @@ Then add the foreign key in separate migrations."
             if postgresql?
               "SET statement_timeout TO #{connection.quote(postgresql_timeout(StrongMigrations.statement_timeout))}"
             elsif mysql?
-              "SET max_execution_time = #{connection.quote(StrongMigrations.statement_timeout.to_i * 1000)}"
+              # use ceil to prevent no timeout for values under 1 ms
+              "SET max_execution_time = #{connection.quote((StrongMigrations.statement_timeout.to_f * 1000).ceil)}"
             elsif mariadb?
               "SET max_statement_time = #{connection.quote(StrongMigrations.statement_timeout)}"
             else
@@ -404,6 +405,7 @@ Then add the foreign key in separate migrations."
           end
         elsif mysql? || mariadb?
           lock_timeout = connection.select_all("SHOW VARIABLES LIKE 'lock_wait_timeout'").first["Value"]
+          # lock timeout is an integer
           if lock_timeout.to_i > limit
             warn "[strong_migrations] DANGER: Lock timeout is longer than #{limit} seconds: #{lock_timeout}"
           end
@@ -436,7 +438,8 @@ Then add the foreign key in separate migrations."
       if timeout.is_a?(String)
         timeout
       else
-        timeout.to_i * 1000
+        # use ceil to prevent no timeout for values under 1 ms
+        (timeout.to_f * 1000).ceil
       end
     end
 

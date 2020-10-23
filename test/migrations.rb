@@ -444,7 +444,7 @@ class CheckTimeouts < TestMigration
       elsif mysql?
         connection.select_all("SHOW VARIABLES LIKE 'max_execution_time'").first["Value"].to_i / 1000
       else
-        connection.select_all("SHOW VARIABLES LIKE 'max_statement_time'").first["Value"].to_i
+        connection.select_all("SHOW VARIABLES LIKE 'max_statement_time'").first["Value"].to_f
       end
 
     $lock_timeout =
