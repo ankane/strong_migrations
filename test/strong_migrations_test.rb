@@ -388,6 +388,22 @@ class StrongMigrationsTest < Minitest::Test
     StrongMigrations.statement_timeout = nil
   end
 
+  def test_statement_timeout_float_ceil
+    skip unless postgresql? || mysql?
+
+    StrongMigrations.statement_timeout = 1.000001.seconds
+
+    migrate CheckTimeouts
+
+    if postgresql?
+      assert_equal "1001ms", $statement_timeout
+    else
+      assert_equal 1.001, $statement_timeout
+    end
+  ensure
+    StrongMigrations.statement_timeout = nil
+  end
+
   def test_lock_timeout_float
     skip unless postgresql?
 
