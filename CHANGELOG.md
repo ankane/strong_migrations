@@ -1,4 +1,4 @@
-## 0.7.2 (unreleased)
+## 0.7.2 (2020-10-25)
 
 - Added support for float timeouts
 
