@@ -5,6 +5,7 @@ require "active_support"
 require "strong_migrations/checker"
 require "strong_migrations/database_tasks"
 require "strong_migrations/migration"
+require "strong_migrations/migrator"
 require "strong_migrations/version"
 
 # integrations
@@ -257,6 +258,7 @@ end
 
 ActiveSupport.on_load(:active_record) do
   ActiveRecord::Migration.prepend(StrongMigrations::Migration)
+  ActiveRecord::Migrator.prepend(StrongMigrations::Migrator)
 
   if defined?(ActiveRecord::Tasks::DatabaseTasks)
     ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)

@@ -506,13 +506,14 @@ class StrongMigrationsTest < Minitest::Test
     end
   end
 
-  # does not retry yet
   def test_lock_timeout_retries
     with_lock_timeout_retries do
       error = assert_raises do
         migrate CheckLockTimeoutRetries
       end
       assert_lock_timeout error
+      # MySQL and MariaDB do not support DDL transactions
+      assert_equal (postgresql? ? 2 : 1), $migrate_attempts
     end
   end
 
@@ -522,6 +523,7 @@ class StrongMigrationsTest < Minitest::Test
         migrate CheckLockTimeoutRetriesNoTransaction
       end
       assert_lock_timeout error
+      assert_equal 1, $migrate_attempts
     end
   end
 
@@ -546,8 +548,9 @@ class StrongMigrationsTest < Minitest::Test
 
   def with_lock_timeout_retries
     StrongMigrations.lock_timeout = postgresql? ? 0.1 : 1
-    StrongMigrations.lock_timeout_retries = 2
+    StrongMigrations.lock_timeout_retries = 1
     StrongMigrations.lock_timeout_delay = 0
+    $migrate_attempts = 0
 
     connection = ActiveRecord::Base.connection_pool.checkout
     if postgresql?
@@ -579,8 +582,9 @@ class StrongMigrationsTest < Minitest::Test
   end
 
   def assert_unsafe(migration, message = nil, **options)
-    error = assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration, **options) }
+    error = assert_raises(StandardError) { migrate(migration, **options) }
     puts error.message if ENV["VERBOSE"]
+    assert_match "#strong_migrations", error.message
     assert_match message, error.message if message
   end
 

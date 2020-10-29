@@ -663,8 +663,6 @@ Set the delay between retries with:
 StrongMigrations.lock_timeout_delay = 3.seconds
 ```
 
-Note: Currently, statements inside of a transaction are not retried.
-
 ## App Timeouts
 
 We recommend adding timeouts to `config/database.yml` to prevent connections from hanging and individual queries from taking up too many resources in controllers, jobs, the Rails console, and other places.

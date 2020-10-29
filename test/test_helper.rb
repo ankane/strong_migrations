@@ -21,11 +21,13 @@ else
 end
 
 def migrate(migration, direction: :up)
-  if !migration.disable_ddl_transaction
-    ActiveRecord::Base.transaction { migration.migrate(direction) }
-  else
-    migration.migrate(direction)
+  ActiveRecord::SchemaMigration.delete_all
+  if direction == :down
+    migration.version ||= 1
+    ActiveRecord::SchemaMigration.create!(version: migration.version)
   end
+  args = ActiveRecord::VERSION::MAJOR >= 6 ? [ActiveRecord::SchemaMigration] : []
+  ActiveRecord::Migrator.new(direction, [migration], *args).migrate
   true
 end
 
@@ -35,6 +37,8 @@ end
 
 TestMigration = ActiveRecord::Migration[migration_version]
 TestSchema = ActiveRecord::Schema
+
+ActiveRecord::SchemaMigration.create_table
 
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users")
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS new_users")

@@ -508,6 +508,7 @@ end
 
 class CheckLockTimeoutRetries < TestMigration
   def change
+    $migrate_attempts += 1
     safety_assured { execute "SELECT COUNT(*) FROM users" }
   end
 end
@@ -516,6 +517,7 @@ class CheckLockTimeoutRetriesNoTransaction < TestMigration
   disable_ddl_transaction!
 
   def change
+    $migrate_attempts += 1
     safety_assured { execute "SELECT COUNT(*) FROM users" }
   end
 end
