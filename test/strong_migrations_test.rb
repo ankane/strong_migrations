@@ -368,8 +368,7 @@ class StrongMigrationsTest < Minitest::Test
       assert_equal 10, $lock_timeout
     end
   ensure
-    StrongMigrations.statement_timeout = nil
-    StrongMigrations.lock_timeout = nil
+    reset_timeouts
   end
 
   def test_statement_timeout_float
@@ -385,7 +384,7 @@ class StrongMigrationsTest < Minitest::Test
       assert_equal 0.5, $statement_timeout
     end
   ensure
-    StrongMigrations.statement_timeout = nil
+    reset_timeouts
   end
 
   # designed for 0 case to prevent no timeout
@@ -403,7 +402,7 @@ class StrongMigrationsTest < Minitest::Test
       assert_equal 1.001, $statement_timeout
     end
   ensure
-    StrongMigrations.statement_timeout = nil
+    reset_timeouts
   end
 
   def test_lock_timeout_float
@@ -415,7 +414,7 @@ class StrongMigrationsTest < Minitest::Test
 
     assert_equal "500ms", $lock_timeout
   ensure
-    StrongMigrations.lock_timeout = nil
+    reset_timeouts
   end
 
   def test_timeouts_string
@@ -429,8 +428,7 @@ class StrongMigrationsTest < Minitest::Test
     assert_equal "1h", $statement_timeout
     assert_equal "1d", $lock_timeout
   ensure
-    StrongMigrations.statement_timeout = nil
-    StrongMigrations.lock_timeout = nil
+    reset_timeouts
   end
 
   def test_lock_timeout_limit
@@ -442,7 +440,7 @@ class StrongMigrationsTest < Minitest::Test
     end
   ensure
     StrongMigrations.lock_timeout_limit = nil
-    StrongMigrations.lock_timeout = nil
+    reset_timeouts
   end
 
   def test_lock_timeout_limit_postgresql
@@ -539,6 +537,21 @@ class StrongMigrationsTest < Minitest::Test
     else
       assert migrate(migration, direction: :up)
       assert migrate(migration, direction: :down)
+    end
+  end
+
+  def reset_timeouts
+    StrongMigrations.lock_timeout = nil
+    StrongMigrations.statement_timeout = nil
+    if postgresql?
+      ActiveRecord::Base.connection.execute("RESET lock_timeout")
+      ActiveRecord::Base.connection.execute("RESET statement_timeout")
+    elsif mysql?
+      ActiveRecord::Base.connection.execute("SET max_execution_time = DEFAULT")
+      ActiveRecord::Base.connection.execute("SET lock_wait_timeout = DEFAULT")
+    elsif mariadb?
+      ActiveRecord::Base.connection.execute("SET max_statement_time = DEFAULT")
+      ActiveRecord::Base.connection.execute("SET lock_wait_timeout = DEFAULT")
     end
   end
 end
