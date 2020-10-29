@@ -14,16 +14,17 @@ end
 adapter = ENV["ADAPTER"] || "postgres"
 ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migrations_test")
 
-ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout) if ENV["VERBOSE"]
+if ENV["VERBOSE"]
+  ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout)
+else
+  ActiveRecord::Migration.verbose = false
+end
 
-def migrate(migration, direction: :up, transaction: nil)
-  transaction = !migration.disable_ddl_transaction if transaction.nil?
-  ActiveRecord::Migration.suppress_messages do
-    if transaction
-      ActiveRecord::Base.transaction { migration.migrate(direction) }
-    else
-      migration.migrate(direction)
-    end
+def migrate(migration, direction: :up)
+  if !migration.disable_ddl_transaction
+    ActiveRecord::Base.transaction { migration.migrate(direction) }
+  else
+    migration.migrate(direction)
   end
   true
 end
