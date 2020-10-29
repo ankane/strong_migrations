@@ -25,7 +25,7 @@ module StrongMigrations
   self.auto_analyze = false
   self.start_after = 0
   self.lock_timeout_retries = 0
-  self.lock_timeout_delay = 3
+  self.lock_timeout_delay = 3 # seconds
   self.checks = []
   self.error_messages = {
     add_column_default:

@@ -275,7 +275,12 @@ Then add the foreign key in separate migrations."
         end
       end
 
-      result = with_lock_timeout_retries(true) { yield }
+      result =
+        if StrongMigrations.lock_timeout_retries > 0 && !in_transaction?
+          with_lock_timeout_retries { yield }
+        else
+          yield
+        end
 
       # outdated statistics + a new index can hurt performance of existing queries
       if StrongMigrations.auto_analyze && direction == :up && method == :add_index
@@ -289,10 +294,7 @@ Then add the foreign key in separate migrations."
       result
     end
 
-    def with_lock_timeout_retries(statement = false)
-      return yield if StrongMigrations.lock_timeout_retries < 1
-      return yield if statement && in_transaction?
-
+    def with_lock_timeout_retries
       retries = 0
       begin
         yield
