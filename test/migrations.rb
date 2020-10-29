@@ -505,3 +505,17 @@ class CheckDownChangeSafe < TestMigration
     remove_index :users, column: :name, algorithm: :concurrently
   end
 end
+
+class CheckLockTimeoutRetries < TestMigration
+  def change
+    safety_assured { execute "SELECT COUNT(*) FROM users" }
+  end
+end
+
+class CheckLockTimeoutRetriesNoTransaction < TestMigration
+  disable_ddl_transaction!
+
+  def change
+    safety_assured { execute "SELECT COUNT(*) FROM users" }
+  end
+end

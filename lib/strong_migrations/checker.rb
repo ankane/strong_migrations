@@ -275,7 +275,7 @@ Then add the foreign key in separate migrations."
         end
       end
 
-      result = yield
+      result = with_lock_timeout_retries { yield }
 
       # outdated statistics + a new index can hurt performance of existing queries
       if StrongMigrations.auto_analyze && direction == :up && method == :add_index
@@ -526,6 +526,32 @@ Then add the foreign key in separate migrations."
 
     def new_table?(table)
       @new_tables.include?(table.to_s)
+    end
+
+    def with_lock_timeout_retries
+      return yield if StrongMigrations.lock_timeout_retries < 1 || in_transaction?
+
+      retries = 0
+      begin
+        yield
+      rescue ActiveRecord::StatementInvalid => e
+        # TODO use ActiveRecord::LockWaitTimeout when Active Record < 5.2 no longer supported
+        if lock_timeout_error?(e) && retries < StrongMigrations.lock_timeout_retries
+          retries += 1
+          @migration.say "Lock timeout. Retrying shortly..."
+          sleep StrongMigrations.lock_timeout_delay
+          retry
+        end
+        raise e
+      end
+    end
+
+    def in_transaction?
+      @migration.connection.open_transactions > 0
+    end
+
+    def lock_timeout_error?(e)
+      e.message.include?("canceling statement due to lock timeout") || e.message.include?("Lock wait timeout exceeded")
     end
   end
 end
