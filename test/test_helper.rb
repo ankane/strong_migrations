@@ -70,6 +70,21 @@ module Helpers
     ENV["ADAPTER"] == "mysql2" && ActiveRecord::Base.connection.try(:mariadb?)
   end
 
+  def assert_unsafe(migration, message = nil, **options)
+    error = assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration, **options) }
+    puts error.message if ENV["VERBOSE"]
+    assert_match message, error.message if message
+  end
+
+  def assert_safe(migration, direction: nil)
+    if direction
+      assert migrate(migration, direction: direction)
+    else
+      assert migrate(migration, direction: :up)
+      assert migrate(migration, direction: :down)
+    end
+  end
+
   def with_target_version(version)
     StrongMigrations.target_version = version
     yield
