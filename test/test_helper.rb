@@ -69,6 +69,13 @@ module Helpers
   def mariadb?
     ENV["ADAPTER"] == "mysql2" && ActiveRecord::Base.connection.try(:mariadb?)
   end
+
+  def with_target_version(version)
+    StrongMigrations.target_version = version
+    yield
+  ensure
+    StrongMigrations.target_version = nil
+  end
 end
 
 Minitest::Test.include(Helpers)
