@@ -69,6 +69,10 @@ module Helpers
   def mariadb?
     ENV["ADAPTER"] == "mysql2" && ActiveRecord::Base.connection.try(:mariadb?)
   end
+end
+
+class Minitest::Test
+  include Helpers
 
   def assert_unsafe(migration, message = nil, **options)
     error = assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration, **options) }
@@ -92,8 +96,6 @@ module Helpers
     StrongMigrations.target_version = nil
   end
 end
-
-Minitest::Test.include(Helpers)
 
 StrongMigrations.add_check do |method, args|
   if method == :add_column && args[1].to_s == "forbidden"
