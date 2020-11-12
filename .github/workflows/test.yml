@@ -1,36 +1,29 @@
-name: Test
+name: build
 on: [push, pull_request]
 jobs:
-  test:
+  build:
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
         - ruby: 2.7
           gemfile: Gemfile
-        # - ruby: 2.6
-        #   gemfile: test/gemfiles/activerecord52.gemfile
-        # - ruby: 2.5
-        #   gemfile: test/gemfiles/activerecord51.gemfile
-        # - ruby: 2.4
-        #   gemfile: test/gemfiles/activerecord50.gemfile
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres
-        ports: ['5432:5432']
-        env:
-          POSTGRES_DB: strong_migrations_test
-          POSTGRES_PASSWORD: postgres
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-      # mysql:
-      #   image: mysql
-      #   ports: ['3306:3306']
-      #   env:
-      #     MYSQL_ALLOW_EMPTY_PASSWORD: yes
-      #     MYSQL_DATABASE: strong_migrations_test
-      #   options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 5
+        - ruby: 2.6
+          gemfile: gemfiles/activerecord52.gemfile
+        - ruby: 2.5
+          gemfile: gemfiles/activerecord51.gemfile
+        - ruby: 2.4
+          gemfile: gemfiles/activerecord50.gemfile
+        # - ruby: 2.7
+        #   gemfile: Gemfile
+        #   adapter: mysql2
+        #   mysql: true
+        # - ruby: 2.7
+        #   gemfile: Gemfile
+        #   adapter: mysql2
+        #   mariadb: true
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:
@@ -40,10 +33,5 @@ jobs:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
     - run: bundle update
+    - uses: ankane/setup-postgres@v1
     - run: bundle exec rake test
-      env:
-        # MYSQL_HOST: 127.0.0.1
-        # MYSQL_USER: root
-        PGHOST: localhost
-        PGPASSWORD: postgres
-        PGUSER: postgres
