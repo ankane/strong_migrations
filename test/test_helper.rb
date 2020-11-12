@@ -12,7 +12,7 @@ module Rails
 end
 
 adapter = ENV["ADAPTER"] || "postgres"
-ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migrations_test")
+ActiveRecord::Base.establish_connection("#{adapter}://runner@localhost/strong_migrations_test")
 
 if ENV["VERBOSE"]
   ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout)
