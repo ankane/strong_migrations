@@ -34,4 +34,5 @@ jobs:
         bundler-cache: true
     - run: bundle update
     - uses: ankane/setup-postgres@v1
+    - run: createdb strong_migrations_test
     - run: bundle exec rake test
