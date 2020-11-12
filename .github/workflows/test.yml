@@ -52,4 +52,4 @@ jobs:
 
     - run: bundle exec rake test
       env:
-        ADAPTER: ${{ matrix.adapter }}
+        ADAPTER: ${{ matrix.adapter || 'postgresql' }}
