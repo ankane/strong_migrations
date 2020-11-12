@@ -10,12 +10,12 @@ jobs:
         include:
         - ruby: 2.7
           gemfile: Gemfile
-        - ruby: 2.6
-          gemfile: gemfiles/activerecord52.gemfile
-        - ruby: 2.5
-          gemfile: gemfiles/activerecord51.gemfile
-        - ruby: 2.4
-          gemfile: gemfiles/activerecord50.gemfile
+        # - ruby: 2.6
+        #   gemfile: gemfiles/activerecord52.gemfile
+        # - ruby: 2.5
+        #   gemfile: gemfiles/activerecord51.gemfile
+        # - ruby: 2.4
+        #   gemfile: gemfiles/activerecord50.gemfile
         # - ruby: 2.7
         #   gemfile: Gemfile
         #   adapter: mysql2
