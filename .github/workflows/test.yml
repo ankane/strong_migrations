@@ -35,4 +35,5 @@ jobs:
     - run: bundle update
     - uses: ankane/setup-postgres@v1
     - run: createdb strong_migrations_test
+    - run: cat /etc/postgresql/13/main/pg_hba.conf
     - run: bundle exec rake test
