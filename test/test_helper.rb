@@ -11,8 +11,8 @@ module Rails
   end
 end
 
-adapter = ENV["ADAPTER"] || "postgres"
-ActiveRecord::Base.establish_connection("#{adapter}://localhost/strong_migrations_test")
+$adapter = ENV["ADAPTER"] || "postgresql"
+ActiveRecord::Base.establish_connection(adapter: $adapter, database: "strong_migrations_test")
 
 if ENV["VERBOSE"]
   ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout)
@@ -59,15 +59,15 @@ migrate CreateUsers
 
 module Helpers
   def postgresql?
-    ENV["ADAPTER"].nil?
+    $adapter == "postgresql"
   end
 
   def mysql?
-    ENV["ADAPTER"] == "mysql2" && !ActiveRecord::Base.connection.try(:mariadb?)
+    $adapter == "mysql2" && !ActiveRecord::Base.connection.try(:mariadb?)
   end
 
   def mariadb?
-    ENV["ADAPTER"] == "mysql2" && ActiveRecord::Base.connection.try(:mariadb?)
+    $adapter == "mysql2" && ActiveRecord::Base.connection.try(:mariadb?)
   end
 end
 

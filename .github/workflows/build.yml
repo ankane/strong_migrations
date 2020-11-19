@@ -1,0 +1,51 @@
+name: build
+on: [push, pull_request]
+jobs:
+  build:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - ruby: 2.7
+          gemfile: Gemfile
+          postgres: true
+        - ruby: 2.6
+          gemfile: gemfiles/activerecord52.gemfile
+          postgres: true
+        - ruby: 2.5
+          gemfile: gemfiles/activerecord51.gemfile
+          postgres: true
+        - ruby: 2.4
+          gemfile: gemfiles/activerecord50.gemfile
+          postgres: true
+        - ruby: 2.7
+          gemfile: Gemfile
+          adapter: mysql2
+          mysql: true
+        - ruby: 2.7
+          gemfile: Gemfile
+          adapter: mysql2
+          mariadb: true
+    env:
+      BUNDLE_GEMFILE: ${{ matrix.gemfile }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
+    - if: ${{ matrix.postgres }}
+      uses: ankane/setup-postgres@v1
+    - if: ${{ matrix.postgres }}
+      run: createdb strong_migrations_test
+    - if: ${{ matrix.mysql }}
+      uses: ankane/setup-mysql@v1
+    - if: ${{ matrix.mariadb }}
+      uses: ankane/setup-mariadb@v1
+    - if: ${{ matrix.mysql || matrix.mariadb }}
+      run: mysqladmin create strong_migrations_test
+    - run: bundle exec rake test
+      env:
+        ADAPTER: ${{ matrix.adapter || 'postgresql' }}
