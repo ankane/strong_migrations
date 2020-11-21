@@ -184,8 +184,6 @@ Then add the NOT NULL constraint in separate migrations."
             bad_index = index_value && !concurrently_set
 
             if bad_index || options[:foreign_key]
-              columns = options[:polymorphic] ? [:"#{reference}_type", :"#{reference}_id"] : :"#{reference}_id"
-
               if index_value.is_a?(Hash)
                 options[:index] = options[:index].merge(algorithm: :concurrently)
               else
