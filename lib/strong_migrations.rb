@@ -2,6 +2,7 @@
 require "active_support"
 
 # modules
+require "strong_migrations/safe_methods"
 require "strong_migrations/checker"
 require "strong_migrations/database_tasks"
 require "strong_migrations/migration"
@@ -17,12 +18,14 @@ module StrongMigrations
   class << self
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
       :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
-      :enabled_checks, :lock_timeout, :statement_timeout, :check_down, :target_version
+      :enabled_checks, :lock_timeout, :statement_timeout, :check_down, :target_version,
+      :safe_by_default
     attr_writer :lock_timeout_limit
   end
   self.auto_analyze = false
   self.start_after = 0
   self.checks = []
+  self.safe_by_default = false
   self.error_messages = {
     add_column_default:
 "Adding a column with a non-null default blocks %{rewrite_blocks} while the entire table is rewritten.

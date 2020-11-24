@@ -1,3 +1,7 @@
+## 0.7.3 (unreleased)
+
+- Added `safe_by_default` option
+
 ## 0.7.2 (2020-10-25)
 
 - Added support for float timeouts

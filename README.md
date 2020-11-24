@@ -311,6 +311,8 @@ If you intend to drop an existing table, run `drop_table` first.
 
 ### Setting NOT NULL on an existing column
 
+:turtle: Safe by default available
+
 #### Bad
 
 Setting `NOT NULL` on an existing column blocks reads and writes while every row is checked.
@@ -373,6 +375,8 @@ end
 
 ### Adding an index non-concurrently
 
+:turtle: Safe by default available
+
 #### Bad
 
 In Postgres, adding an index non-concurrently blocks writes.
@@ -409,6 +413,8 @@ rails g index table column
 
 ### Adding a reference
 
+:turtle: Safe by default available
+
 #### Bad
 
 Rails adds an index non-concurrently to references by default, which blocks writes in Postgres.
@@ -436,6 +442,8 @@ end
 ```
 
 ### Adding a foreign key
+
+:turtle: Safe by default available
 
 #### Bad
 
@@ -574,6 +582,20 @@ end
 ```
 
 Certain methods like `execute` and `change_table` cannot be inspected and are prevented from running by default. Make sure what you’re doing is really safe and use this pattern.
+
+## Safe by Default [experimental]
+
+Make operations safe by default.
+
+- adding and removing an index
+- adding a foreign key
+- setting NOT NULL on an existing column
+
+Add to `config/initializers/strong_migrations.rb`:
+
+```ruby
+StrongMigrations.safe_by_default = true
+```
 
 ## Custom Checks
 

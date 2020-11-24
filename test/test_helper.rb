@@ -26,6 +26,7 @@ def migrate(migration, direction: :up)
   else
     migration.migrate(direction)
   end
+  puts "\n\n" if ENV["VERBOSE"]
   true
 end
 
@@ -39,6 +40,7 @@ TestSchema = ActiveRecord::Schema
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users")
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS new_users")
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS orders")
+ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS devices")
 
 class CreateUsers < TestMigration
   def change
@@ -52,6 +54,9 @@ class CreateUsers < TestMigration
     end
 
     create_table "orders" do |t|
+    end
+
+    create_table "devices" do |t|
     end
   end
 end

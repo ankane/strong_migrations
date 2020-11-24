@@ -3,6 +3,7 @@ module StrongMigrations
     def migrate(direction)
       strong_migrations_checker.direction = direction
       super
+      connection.begin_db_transaction if strong_migrations_checker.transaction_disabled
     end
 
     def method_missing(method, *args)
