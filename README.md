@@ -583,7 +583,9 @@ end
 
 Certain methods like `execute` and `change_table` cannot be inspected and are prevented from running by default. Make sure what you’re doing is really safe and use this pattern.
 
-## Safe by Default [experimental]
+## Safe by Default
+
+*Experimental*
 
 Make operations safe by default.
 
