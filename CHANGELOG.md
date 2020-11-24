@@ -1,4 +1,4 @@
-## 0.7.3 (unreleased)
+## 0.7.3 (2020-11-24)
 
 - Added `safe_by_default` option
 
