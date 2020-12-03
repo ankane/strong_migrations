@@ -1,8 +1,7 @@
 # Mark existing migrations as safe
 StrongMigrations.start_after = <%= start_after %>
 
-# Set timeouts for migrations
-# If you use PgBouncer in transaction mode, delete these lines and set timeouts on the database user
+# Set timeouts for migrations<%= pgbouncer_message %>
 StrongMigrations.lock_timeout = 10.seconds
 StrongMigrations.statement_timeout = 1.hour
 
@@ -19,4 +18,7 @@ StrongMigrations.auto_analyze = true
 #   if method == :add_index && args[0].to_s == "users"
 #     stop! "No more indexes on the users table"
 #   end
-# end
+# end<% if postgresql? %>
+
+# Make some operations safe by default (experimental)
+# StrongMigrations.safe_by_default = true<% end %>

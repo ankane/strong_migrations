@@ -13,8 +13,14 @@ module StrongMigrations
         Time.now.utc.strftime("%Y%m%d%H%M%S")
       end
 
+      def pgbouncer_message
+        if postgresql?
+          "\n# If you use PgBouncer in transaction mode, delete these lines and set timeouts on the database user"
+        end
+      end
+
       def target_version
-        case ActiveRecord::Base.connection_config[:adapter].to_s
+        case adapter
         when /mysql/
           # could try to connect to database and check for MariaDB
           # but this should be fine
@@ -22,6 +28,14 @@ module StrongMigrations
         else
           "10"
         end
+      end
+
+      def adapter
+        ActiveRecord::Base.connection_config[:adapter].to_s
+      end
+
+      def postgresql?
+        adapter =~ /postg/
       end
     end
   end
