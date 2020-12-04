@@ -20,5 +20,6 @@ StrongMigrations.auto_analyze = true
 #   end
 # end<% if postgresql? %>
 
-# Make some operations safe by default (experimental)
+# Make some operations safe by default
+# See https://github.com/ankane/strong_migrations#safe-by-default
 # StrongMigrations.safe_by_default = true<% end %>
