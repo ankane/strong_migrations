@@ -7,12 +7,12 @@ module StrongMigrations
     # TODO check if invalid index with expected name exists and remove if needed
     def safe_add_index(table, columns, options)
       disable_transaction
-      @migration.add_index(table, columns, options.merge(algorithm: :concurrently))
+      @migration.add_index(table, columns, **options.merge(algorithm: :concurrently))
     end
 
     def safe_remove_index(table, options)
       disable_transaction
-      @migration.remove_index(table, options.merge(algorithm: :concurrently))
+      @migration.remove_index(table, **options.merge(algorithm: :concurrently))
     end
 
     def safe_add_reference(table, reference, options)
