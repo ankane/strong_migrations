@@ -1,3 +1,8 @@
+## 0.7.4 (unreleased)
+
+- Added `safe_by_default` option to install generator
+- Fixed warnings with Active Record 6.1
+
 ## 0.7.3 (2020-11-24)
 
 - Added `safe_by_default` option
