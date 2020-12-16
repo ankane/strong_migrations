@@ -1,4 +1,4 @@
-## 0.7.4 (unreleased)
+## 0.7.4 (2020-12-16)
 
 - Added `safe_by_default` option to install generator
 - Fixed warnings with Active Record 6.1
