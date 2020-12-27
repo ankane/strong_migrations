@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - ruby: 2.7
+        - ruby: 3.0
           gemfile: Gemfile
           postgres: true
         - ruby: 2.7
@@ -23,11 +23,11 @@ jobs:
         - ruby: 2.4
           gemfile: gemfiles/activerecord50.gemfile
           postgres: true
-        - ruby: 2.7
+        - ruby: 3.0
           gemfile: Gemfile
           adapter: mysql2
           mysql: true
-        - ruby: 2.7
+        - ruby: 3.0
           gemfile: Gemfile
           adapter: mysql2
           mariadb: true
