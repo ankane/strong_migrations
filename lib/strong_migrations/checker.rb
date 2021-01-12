@@ -254,8 +254,9 @@ Then add the foreign key in separate migrations."
 
                 add_constraint_code =
                   if ar_version >= 6.1
-                    # TODO quote column when needed
-                    command_str(:add_check_constraint, [table, "#{column} IS NOT NULL", {name: constraint_name, validate: false}])
+                    # only quote when needed
+                    expr_column = column.to_s =~ /\A[a-z0-9_]+\z/ ? column : connection.quote_column_name(column)
+                    command_str(:add_check_constraint, [table, "#{expr_column} IS NOT NULL", {name: constraint_name, validate: false}])
                   else
                     safety_assured_str(add_code)
                   end
