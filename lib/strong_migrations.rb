@@ -216,6 +216,27 @@ end",
 
     validate_foreign_key:
 "Validating a foreign key while writes are blocked is dangerous.
+Use disable_ddl_transaction! or a separate migration.",
+
+    add_check_constraint:
+"Adding a check constraint key blocks writes while every row is checked. Instead,
+add the check constraint without validating existing rows,
+then validate them in a separate migration.
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{add_check_constraint_code}
+  end
+end
+
+class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{validate_check_constraint_code}
+  end
+end",
+
+    validate_check_constraint:
+"Validating a check constraint while writes are blocked is dangerous.
 Use disable_ddl_transaction! or a separate migration."
   }
   self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h

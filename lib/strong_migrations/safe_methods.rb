@@ -1,7 +1,7 @@
 module StrongMigrations
   module SafeMethods
     def safe_by_default_method?(method)
-      StrongMigrations.safe_by_default && [:add_index, :add_belongs_to, :add_reference, :remove_index, :add_foreign_key, :change_column_null].include?(method)
+      StrongMigrations.safe_by_default && [:add_index, :add_belongs_to, :add_reference, :remove_index, :add_foreign_key, :add_check_constraint, :change_column_null].include?(method)
     end
 
     # TODO check if invalid index with expected name exists and remove if needed
@@ -63,6 +63,19 @@ module StrongMigrations
         end
         dir.down do
           @migration.remove_foreign_key(from_table, to_table)
+        end
+      end
+    end
+
+    def safe_add_check_constraint(table, expression, add_options, validate_options)
+      @migration.reversible do |dir|
+        dir.up do
+          @migration.add_check_constraint(table, expression, **add_options)
+          disable_transaction
+          @migration.validate_check_constraint(table, **validate_options)
+        end
+        dir.down do
+          @migration.remove_check_constraint(table, expression, **add_options)
         end
       end
     end

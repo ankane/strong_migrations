@@ -32,6 +32,12 @@ class SafeByDefaultTest < Minitest::Test
     assert_safe AddForeignKey
   end
 
+  def test_add_check_constraint
+    skip unless check_constraints?
+
+    assert_safe AddCheckConstraint
+  end
+
   def test_change_column_null
     skip unless postgresql?
 

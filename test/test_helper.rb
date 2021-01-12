@@ -100,6 +100,10 @@ class Minitest::Test
   ensure
     StrongMigrations.target_version = nil
   end
+
+  def check_constraints?
+    postgresql? && ActiveRecord::VERSION::STRING >= "6.1"
+  end
 end
 
 StrongMigrations.add_check do |method, args|

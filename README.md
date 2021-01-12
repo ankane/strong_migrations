@@ -74,6 +74,7 @@ Postgres-specific checks:
 - [adding an index non-concurrently](#adding-an-index-non-concurrently)
 - [adding a reference](#adding-a-reference)
 - [adding a foreign key](#adding-a-foreign-key)
+- [adding a check constraint](#adding-a-check-constraint) [master]
 - [adding a json column](#adding-a-json-column)
 
 Best practices:
@@ -515,6 +516,44 @@ class ValidateForeignKeyOnUsers < ActiveRecord::Migration[5.1]
 end
 ```
 
+### Adding a check constraint
+
+:turtle: Safe by default available
+
+#### Bad
+
+In Postgres, adding a check constraint blocks writes while every row is checked.
+
+```ruby
+class AddCheckConstraint < ActiveRecord::Migration[6.1]
+  def change
+    add_check_constraint :users, "price > 0", name: "price_check"
+  end
+end
+```
+
+#### Good
+
+Add the check constraint without validating existing rows:
+
+```ruby
+class AddCheckConstraint < ActiveRecord::Migration[6.1]
+  def change
+    add_check_constraint :users, "price > 0", name: "price_check", validate: false
+  end
+end
+```
+
+Then validate them in a separate migration.
+
+```ruby
+class ValidateCheckConstraint < ActiveRecord::Migration[6.1]
+  def change
+    validate_check_constraint :users, name: "price_check"
+  end
+end
+```
+
 ### Adding a json column
 
 #### Bad
@@ -591,6 +630,7 @@ Make operations safe by default.
 
 - adding and removing an index
 - adding a foreign key
+- adding a check constraint [master]
 - setting NOT NULL on an existing column
 
 Add to `config/initializers/strong_migrations.rb`:

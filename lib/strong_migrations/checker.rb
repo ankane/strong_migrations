@@ -287,6 +287,25 @@ Then add the foreign key in separate migrations."
           if postgresql? && writes_blocked?
             raise_error :validate_foreign_key
           end
+        when :add_check_constraint
+          table, expression, options = args
+          options ||= {}
+
+          if postgresql? && options[:validate] != false && !new_table?(table)
+            add_options = options.merge(validate: false)
+            name = options[:name] || @migration.check_constraint_options(table, expression, options)[:name]
+            validate_options = {name: name}
+
+            return safe_add_check_constraint(table, expression, add_options, validate_options) if StrongMigrations.safe_by_default
+
+            raise_error :add_check_constraint,
+              add_check_constraint_code: command_str("add_check_constraint", [table, expression, add_options]),
+              validate_check_constraint_code: command_str("validate_check_constraint", [table, validate_options])
+          end
+        when :validate_check_constraint
+          if postgresql? && writes_blocked?
+            raise_error :validate_check_constraint
+          end
         end
 
         StrongMigrations.checks.each do |check|

@@ -1,3 +1,7 @@
+## 0.7.5 (unreleased)
+
+- Added checks for `add_check_constraint` and `validate_check_constraint`
+
 ## 0.7.4 (2020-12-16)
 
 - Added `safe_by_default` option to install generator
