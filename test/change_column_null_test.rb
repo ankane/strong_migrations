@@ -38,7 +38,7 @@ class ChangeColumnNullTest < Minitest::Test
   end
 
   def test_change_column_null_constraint_methods
-    skip unless postgresql?
+    skip unless postgresql? && check_constraints?
 
     with_target_version(12) do
       assert_safe ChangeColumnNullConstraintMethods
