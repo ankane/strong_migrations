@@ -328,10 +328,22 @@ end
 
 #### Good - Postgres
 
-Instead, add a check constraint:
+Instead, add a check constraint.
+
+For Rails 6.1, use:
 
 ```ruby
 class SetSomeColumnNotNull < ActiveRecord::Migration[6.1]
+  def change
+    add_check_constraint :users, "some_column IS NOT NULL", name: "users_some_column_null", validate: false
+  end
+end
+```
+
+For Rails < 6.1, use:
+
+```ruby
+class SetSomeColumnNotNull < ActiveRecord::Migration[6.0]
   def change
     safety_assured do
       execute 'ALTER TABLE "users" ADD CONSTRAINT "users_some_column_null" CHECK ("some_column" IS NOT NULL) NOT VALID'
@@ -342,8 +354,24 @@ end
 
 Then validate it in a separate migration. A `NOT NULL` check constraint is [functionally equivalent](https://medium.com/doctolib/adding-a-not-null-constraint-on-pg-faster-with-minimal-locking-38b2c00c4d1c) to setting `NOT NULL` on the column, but it won’t show up in `schema.rb`. In Postgres 12+, once the check constraint is validated, you can safely set `NOT NULL` on the column and drop the check constraint.
 
+For Rails 6.1, use:
+
 ```ruby
 class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.1]
+  def change
+    validate_check_constraint :users, name: "users_some_column_null"
+
+    # in Postgres 12+, you can then safely set NOT NULL on the column
+    change_column_null :users, :some_column, false
+    remove_check_constraint :users, name: "users_some_column_null"
+  end
+end
+```
+
+For Rails < 6.1, use:
+
+```ruby
+class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
   def change
     safety_assured do
       execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "users_some_column_null"'

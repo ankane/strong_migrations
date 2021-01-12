@@ -243,6 +243,21 @@ class ChangeColumnNullConstraint < TestMigration
   end
 end
 
+class ChangeColumnNullConstraintMethods < TestMigration
+  disable_ddl_transaction!
+
+  def up
+    add_check_constraint :users, "name IS NOT NULL", name: "test", validate: false
+    validate_check_constraint :users, name: "test"
+    change_column_null :users, :name, false
+    remove_check_constraint :users, name: "test"
+  end
+
+  def down
+    change_column_null :users, :name, true
+  end
+end
+
 class ChangeColumnNullConstraintUnvalidated < TestMigration
   def up
     safety_assured do

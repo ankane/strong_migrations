@@ -231,18 +231,37 @@ Then add the foreign key in separate migrations."
                 validate_code = constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
                 remove_code = constraint_str("ALTER TABLE %s DROP CONSTRAINT %s", [table, constraint_name])
 
-                validate_constraint_code = String.new(safety_assured_str(validate_code))
+                validate_constraint_code =
+                  if ActiveRecord::VERSION::STRING >= "6.1"
+                    String.new(command_str(:validate_check_constraint, [table, {name: constraint_name}]))
+                  else
+                    String.new(safety_assured_str(validate_code))
+                  end
+
                 if postgresql_version >= Gem::Version.new("12")
                   change_args = [table, column, null]
 
                   validate_constraint_code << "\n    #{command_str(:change_column_null, change_args)}"
-                  validate_constraint_code << "\n    #{safety_assured_str(remove_code)}"
+
+                  if ActiveRecord::VERSION::STRING >= "6.1"
+                    validate_constraint_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
+                  else
+                    validate_constraint_code << "\n    #{safety_assured_str(remove_code)}"
+                  end
                 end
 
                 return safe_change_column_null(add_code, validate_code, change_args, remove_code) if StrongMigrations.safe_by_default
 
+                add_constraint_code =
+                  if ActiveRecord::VERSION::STRING >= "6.1"
+                    # TODO quote column when needed
+                    command_str(:add_check_constraint, [table, "#{column} IS NOT NULL", {name: constraint_name, validate: false}])
+                  else
+                    safety_assured_str(add_code)
+                  end
+
                 raise_error :change_column_null_postgresql,
-                  add_constraint_code: safety_assured_str(add_code),
+                  add_constraint_code: add_constraint_code,
                   validate_constraint_code: validate_constraint_code
               end
             elsif mysql? || mariadb?
