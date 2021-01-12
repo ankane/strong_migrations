@@ -232,7 +232,7 @@ Then add the foreign key in separate migrations."
                 remove_code = constraint_str("ALTER TABLE %s DROP CONSTRAINT %s", [table, constraint_name])
 
                 validate_constraint_code =
-                  if ActiveRecord::VERSION::STRING >= "6.1"
+                  if ar_version >= 6.1
                     String.new(command_str(:validate_check_constraint, [table, {name: constraint_name}]))
                   else
                     String.new(safety_assured_str(validate_code))
@@ -243,7 +243,7 @@ Then add the foreign key in separate migrations."
 
                   validate_constraint_code << "\n    #{command_str(:change_column_null, change_args)}"
 
-                  if ActiveRecord::VERSION::STRING >= "6.1"
+                  if ar_version >= 6.1
                     validate_constraint_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
                   else
                     validate_constraint_code << "\n    #{safety_assured_str(remove_code)}"
@@ -253,7 +253,7 @@ Then add the foreign key in separate migrations."
                 return safe_change_column_null(add_code, validate_code, change_args, remove_code) if StrongMigrations.safe_by_default
 
                 add_constraint_code =
-                  if ActiveRecord::VERSION::STRING >= "6.1"
+                  if ar_version >= 6.1
                     # TODO quote column when needed
                     command_str(:add_check_constraint, [table, "#{column} IS NOT NULL", {name: constraint_name, validate: false}])
                   else
@@ -276,10 +276,10 @@ Then add the foreign key in separate migrations."
           options ||= {}
 
           # always validated before 5.2
-          validate = options.fetch(:validate, true) || ActiveRecord::VERSION::STRING < "5.2"
+          validate = options.fetch(:validate, true) || ar_version < 5.2
 
           if postgresql? && validate
-            if ActiveRecord::VERSION::STRING < "5.2"
+            if ar_version < 5.2
               # fk name logic from rails
               primary_key = options[:primary_key] || "id"
               column = options[:column] || "#{to_table.to_s.singularize}_id"
@@ -446,6 +446,10 @@ Then add the foreign key in separate migrations."
           yield
         end
       Gem::Version.new(version)
+    end
+
+    def ar_version
+      ActiveRecord::VERSION::STRING.to_f
     end
 
     def check_lock_timeout
