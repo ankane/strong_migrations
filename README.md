@@ -66,7 +66,7 @@ Potentially dangerous operations:
 - [renaming a column](#renaming-a-column)
 - [renaming a table](#renaming-a-table)
 - [creating a table with the force option](#creating-a-table-with-the-force-option)
-- [adding a check constraint](#adding-a-check-constraint) [master]
+- [adding a check constraint](#adding-a-check-constraint)
 - [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
 - [executing SQL directly](#executing-SQL-directly)
 
@@ -662,7 +662,7 @@ Make operations safe by default.
 
 - adding and removing an index
 - adding a foreign key
-- adding a check constraint [master]
+- adding a check constraint
 - setting NOT NULL on an existing column
 
 Add to `config/initializers/strong_migrations.rb`:

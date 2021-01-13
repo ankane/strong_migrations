@@ -1,4 +1,4 @@
-## 0.7.5 (unreleased)
+## 0.7.5 (2021-01-12)
 
 - Added checks for `add_check_constraint` and `validate_check_constraint`
 
