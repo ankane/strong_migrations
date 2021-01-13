@@ -350,7 +350,7 @@ end
 
 #### Good - MySQL and MariaDB
 
-[Let us know](https://github.com/ankane/strong_migrations/issues/new) if you have a safe way to do this.
+[Let us know](https://github.com/ankane/strong_migrations/issues/new) if you have a safe way to do this (check constraints can be added with `NOT ENFORCED`, but enforcing blocks writes).
 
 ### Setting NOT NULL on an existing column
 
