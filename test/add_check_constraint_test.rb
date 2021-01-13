@@ -11,7 +11,11 @@ class CheckConstraintTest < Minitest::Test
   end
 
   def test_add_check_constraint_safe
-    assert_safe AddCheckConstraintSafe
+    if postgresql?
+      assert_safe AddCheckConstraintSafe
+    else
+      assert_unsafe AddCheckConstraintSafe
+    end
   end
 
   def test_add_check_constraint_validate_same_transaction
@@ -19,7 +23,11 @@ class CheckConstraintTest < Minitest::Test
   end
 
   def test_add_check_constraint_validate_no_transaction
-    assert_safe AddCheckConstraintValidateNoTransaction
+    if postgresql?
+      assert_safe AddCheckConstraintValidateNoTransaction
+    else
+      assert_unsafe AddCheckConstraintValidateNoTransaction
+    end
   end
 
   def test_add_check_constraint_new_table

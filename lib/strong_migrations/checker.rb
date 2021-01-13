@@ -311,16 +311,20 @@ Then add the foreign key in separate migrations."
           table, expression, options = args
           options ||= {}
 
-          if postgresql? && options[:validate] != false && !new_table?(table)
-            add_options = options.merge(validate: false)
-            name = options[:name] || @migration.check_constraint_options(table, expression, options)[:name]
-            validate_options = {name: name}
+          if !new_table?(table)
+            if postgresql? && options[:validate] != false
+              add_options = options.merge(validate: false)
+              name = options[:name] || @migration.check_constraint_options(table, expression, options)[:name]
+              validate_options = {name: name}
 
-            return safe_add_check_constraint(table, expression, add_options, validate_options) if StrongMigrations.safe_by_default
+              return safe_add_check_constraint(table, expression, add_options, validate_options) if StrongMigrations.safe_by_default
 
-            raise_error :add_check_constraint,
-              add_check_constraint_code: command_str("add_check_constraint", [table, expression, add_options]),
-              validate_check_constraint_code: command_str("validate_check_constraint", [table, validate_options])
+              raise_error :add_check_constraint,
+                add_check_constraint_code: command_str("add_check_constraint", [table, expression, add_options]),
+                validate_check_constraint_code: command_str("validate_check_constraint", [table, validate_options])
+            elsif mysql? || mariadb?
+              raise_error :add_check_constraint_mysql
+            end
           end
         when :validate_check_constraint
           if postgresql? && writes_blocked?

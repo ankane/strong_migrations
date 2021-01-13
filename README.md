@@ -66,6 +66,7 @@ Potentially dangerous operations:
 - [renaming a column](#renaming-a-column)
 - [renaming a table](#renaming-a-table)
 - [creating a table with the force option](#creating-a-table-with-the-force-option)
+- [adding a check constraint](#adding-a-check-constraint) [master]
 - [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
 - [executing SQL directly](#executing-SQL-directly)
 
@@ -74,7 +75,6 @@ Postgres-specific checks:
 - [adding an index non-concurrently](#adding-an-index-non-concurrently)
 - [adding a reference](#adding-a-reference)
 - [adding a foreign key](#adding-a-foreign-key)
-- [adding a check constraint](#adding-a-check-constraint) [master]
 - [adding a json column](#adding-a-json-column)
 
 Best practices:
@@ -310,6 +310,48 @@ end
 
 If you intend to drop an existing table, run `drop_table` first.
 
+### Adding a check constraint
+
+:turtle: Safe by default available
+
+#### Bad
+
+Adding a check constraint blocks reads and writes in Postgres and blocks writes in MySQL and MariaDB while every row is checked.
+
+```ruby
+class AddCheckConstraint < ActiveRecord::Migration[6.1]
+  def change
+    add_check_constraint :users, "price > 0", name: "price_check"
+  end
+end
+```
+
+#### Good - Postgres
+
+Add the check constraint without validating existing rows:
+
+```ruby
+class AddCheckConstraint < ActiveRecord::Migration[6.1]
+  def change
+    add_check_constraint :users, "price > 0", name: "price_check", validate: false
+  end
+end
+```
+
+Then validate them in a separate migration.
+
+```ruby
+class ValidateCheckConstraint < ActiveRecord::Migration[6.1]
+  def change
+    validate_check_constraint :users, name: "price_check"
+  end
+end
+```
+
+#### Good - MySQL and MariaDB
+
+[Let us know](https://github.com/ankane/strong_migrations/issues/new) if you have a safe way to do this.
+
 ### Setting NOT NULL on an existing column
 
 :turtle: Safe by default available
@@ -540,44 +582,6 @@ class ValidateForeignKeyOnUsers < ActiveRecord::Migration[5.1]
     safety_assured do
       execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "fk_rails_c1e9b98e31"'
     end
-  end
-end
-```
-
-### Adding a check constraint
-
-:turtle: Safe by default available
-
-#### Bad
-
-In Postgres, adding a check constraint blocks reads and writes while every row is checked.
-
-```ruby
-class AddCheckConstraint < ActiveRecord::Migration[6.1]
-  def change
-    add_check_constraint :users, "price > 0", name: "price_check"
-  end
-end
-```
-
-#### Good
-
-Add the check constraint without validating existing rows:
-
-```ruby
-class AddCheckConstraint < ActiveRecord::Migration[6.1]
-  def change
-    add_check_constraint :users, "price > 0", name: "price_check", validate: false
-  end
-end
-```
-
-Then validate them in a separate migration.
-
-```ruby
-class ValidateCheckConstraint < ActiveRecord::Migration[6.1]
-  def change
-    validate_check_constraint :users, name: "price_check"
   end
 end
 ```

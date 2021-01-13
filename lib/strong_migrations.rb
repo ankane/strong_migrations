@@ -235,6 +235,9 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
+    add_check_constraint_mysql:
+"Adding a check constraint to an existing table is not safe with your database engine.",
+
     validate_check_constraint:
 "Validating a check constraint while writes are blocked is dangerous.
 Use disable_ddl_transaction! or a separate migration."

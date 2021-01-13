@@ -102,7 +102,7 @@ class Minitest::Test
   end
 
   def check_constraints?
-    postgresql? && ActiveRecord::VERSION::STRING >= "6.1"
+    ActiveRecord::VERSION::STRING >= "6.1"
   end
 end
 

@@ -33,7 +33,7 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_check_constraint
-    skip unless check_constraints?
+    skip unless postgresql?
 
     assert_safe AddCheckConstraint
   end
