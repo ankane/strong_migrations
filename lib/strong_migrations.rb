@@ -219,8 +219,8 @@ end",
 Use disable_ddl_transaction! or a separate migration.",
 
     add_check_constraint:
-"Adding a check constraint key blocks writes while every row is checked. Instead,
-add the check constraint without validating existing rows,
+"Adding a check constraint key blocks reads and writes while every row is checked.
+Instead, add the check constraint without validating existing rows,
 then validate them in a separate migration.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}

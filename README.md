@@ -550,7 +550,7 @@ end
 
 #### Bad
 
-In Postgres, adding a check constraint blocks writes while every row is checked.
+In Postgres, adding a check constraint blocks reads and writes while every row is checked.
 
 ```ruby
 class AddCheckConstraint < ActiveRecord::Migration[6.1]
