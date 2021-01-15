@@ -1,3 +1,7 @@
+## 0.7.6 (unreleased)
+
+- Fixed deprecation warning with Active Record 6.1
+
 ## 0.7.5 (2021-01-12)
 
 - Added checks for `add_check_constraint` and `validate_check_constraint`

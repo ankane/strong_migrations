@@ -31,7 +31,11 @@ module StrongMigrations
       end
 
       def adapter
-        ActiveRecord::Base.connection_config[:adapter].to_s
+        if ActiveRecord::VERSION::STRING.to_f >= 6.1
+          ActiveRecord::Base.connection_db_config.adapter.to_s
+        else
+          ActiveRecord::Base.connection_config[:adapter].to_s
+        end
       end
 
       def postgresql?
