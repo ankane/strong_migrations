@@ -50,6 +50,7 @@ class CreateUsers < TestMigration
       t.decimal :credit_score, precision: 10, scale: 5
       t.timestamp :deleted_at
       t.string :country, limit: 20
+      t.string :interval
       t.references :order
     end
 

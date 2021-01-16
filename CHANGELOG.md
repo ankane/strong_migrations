@@ -1,5 +1,6 @@
 ## 0.7.6 (unreleased)
 
+- Fixed `NOT NULL` constraint check for quoted columns
 - Fixed deprecation warning with Active Record 6.1
 
 ## 0.7.5 (2021-01-12)

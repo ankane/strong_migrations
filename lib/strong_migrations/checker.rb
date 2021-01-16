@@ -219,8 +219,7 @@ Then add the foreign key in separate migrations."
             if postgresql?
               safe = false
               if postgresql_version >= Gem::Version.new("12")
-                # TODO likely need to quote the column in some situations
-                safe = constraints(table).any? { |c| c["def"] == "CHECK ((#{column} IS NOT NULL))" }
+                safe = constraints(table).any? { |c| c["def"] == "CHECK ((#{column} IS NOT NULL))" || c["def"] == "CHECK ((#{connection.quote_column_name(column)} IS NOT NULL))" }
               end
 
               unless safe

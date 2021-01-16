@@ -278,6 +278,21 @@ class ChangeColumnNullDefault < TestMigration
   end
 end
 
+class ChangeColumnNullQuoted < TestMigration
+  def up
+    safety_assured do
+      execute 'ALTER TABLE "users" ADD CONSTRAINT "test" CHECK ("interval" IS NOT NULL) NOT VALID'
+      execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "test"'
+    end
+    change_column_null :users, :interval, false
+  end
+
+  def down
+    execute 'ALTER TABLE "users" DROP CONSTRAINT "test"'
+    change_column_null :users, :interval, true
+  end
+end
+
 class ExecuteArbitrarySQL < TestMigration
   def change
     execute 'SELECT CURRENT_TIMESTAMP'
