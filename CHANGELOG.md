@@ -1,4 +1,4 @@
-## 0.7.6 (unreleased)
+## 0.7.6 (2021-01-17)
 
 - Fixed `NOT NULL` constraint check for quoted columns
 - Fixed deprecation warning with Active Record 6.1
