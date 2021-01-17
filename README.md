@@ -656,8 +656,6 @@ Certain methods like `execute` and `change_table` cannot be inspected and are pr
 
 ## Safe by Default
 
-*Experimental*
-
 Make operations safe by default.
 
 - adding and removing an index
