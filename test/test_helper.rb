@@ -20,16 +20,6 @@ else
   ActiveRecord::Migration.verbose = false
 end
 
-def migrate(migration, direction: :up)
-  if !migration.disable_ddl_transaction
-    ActiveRecord::Base.transaction { migration.migrate(direction) }
-  else
-    migration.migrate(direction)
-  end
-  puts "\n\n" if ENV["VERBOSE"]
-  true
-end
-
 def migration_version
   ActiveRecord.version.to_s.to_f
 end
@@ -42,26 +32,23 @@ ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS new_users")
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS orders")
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS devices")
 
-class CreateUsers < TestMigration
-  def change
-    create_table "users" do |t|
-      t.string :name
-      t.string :city
-      t.decimal :credit_score, precision: 10, scale: 5
-      t.timestamp :deleted_at
-      t.string :country, limit: 20
-      t.string :interval
-      t.references :order
-    end
+ActiveRecord::Schema.define do
+  create_table "users" do |t|
+    t.string :name
+    t.string :city
+    t.decimal :credit_score, precision: 10, scale: 5
+    t.timestamp :deleted_at
+    t.string :country, limit: 20
+    t.string :interval
+    t.references :order
+  end
 
-    create_table "orders" do |t|
-    end
+  create_table "orders" do |t|
+  end
 
-    create_table "devices" do |t|
-    end
+  create_table "devices" do |t|
   end
 end
-migrate CreateUsers
 
 module Helpers
   def postgresql?
@@ -79,6 +66,16 @@ end
 
 class Minitest::Test
   include Helpers
+
+  def migrate(migration, direction: :up)
+    if !migration.disable_ddl_transaction
+      ActiveRecord::Base.transaction { migration.migrate(direction) }
+    else
+      migration.migrate(direction)
+    end
+    puts "\n\n" if ENV["VERBOSE"]
+    true
+  end
 
   def assert_unsafe(migration, message = nil, **options)
     error = assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration, **options) }
