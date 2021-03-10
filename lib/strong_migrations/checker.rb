@@ -23,8 +23,10 @@ module StrongMigrations
     end
 
     def perform(method, *args)
-      set_timeouts
-      check_lock_timeout
+      if !schema?
+        set_timeouts
+        check_lock_timeout
+      end
 
       if !safe? || safe_by_default_method?(method)
         case method
@@ -339,7 +341,7 @@ Then add the foreign key in separate migrations."
       result = yield
 
       # outdated statistics + a new index can hurt performance of existing queries
-      if StrongMigrations.auto_analyze && direction == :up && method == :add_index
+      if StrongMigrations.auto_analyze && !schema? && direction == :up && method == :add_index
         if postgresql?
           connection.execute "ANALYZE #{connection.quote_table_name(args[0].to_s)}"
         elsif mariadb? || mysql?
@@ -396,12 +398,16 @@ Then add the foreign key in separate migrations."
     end
 
     def safe?
-      @safe || ENV["SAFETY_ASSURED"] || @migration.is_a?(ActiveRecord::Schema) ||
+      @safe || ENV["SAFETY_ASSURED"] || schema? ||
         (direction == :down && !StrongMigrations.check_down) || version_safe?
     end
 
     def version_safe?
       version && version <= StrongMigrations.start_after
+    end
+
+    def schema?
+      @migration.is_a?(ActiveRecord::Schema)
     end
 
     def postgresql?

@@ -1,3 +1,7 @@
+## 0.7.7 (unreleased)
+
+- Removed timeouts and `auto_analyze` from schema load
+
 ## 0.7.6 (2021-01-17)
 
 - Fixed `NOT NULL` constraint check for quoted columns
