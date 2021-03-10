@@ -7,6 +7,8 @@ module StrongMigrations
     end
 
     def method_missing(method, *args)
+      return super if is_a?(ActiveRecord::Schema)
+
       strong_migrations_checker.perform(method, *args) do
         super
       end
