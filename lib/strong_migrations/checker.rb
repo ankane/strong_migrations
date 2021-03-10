@@ -342,11 +342,7 @@ Then add the foreign key in separate migrations."
 
       # outdated statistics + a new index can hurt performance of existing queries
       if StrongMigrations.auto_analyze && !schema? && direction == :up && method == :add_index
-        if postgresql?
-          connection.execute "ANALYZE #{connection.quote_table_name(args[0].to_s)}"
-        elsif mariadb? || mysql?
-          connection.execute "ANALYZE TABLE #{connection.quote_table_name(args[0].to_s)}"
-        end
+        analyze_table(args[0])
       end
 
       result
@@ -511,6 +507,14 @@ Then add the foreign key in separate migrations."
       else
         # use ceil to prevent no timeout for values under 1 ms
         (timeout.to_f * 1000).ceil
+      end
+    end
+
+    def analyze_table(table)
+      if postgresql?
+        connection.execute "ANALYZE #{connection.quote_table_name(table.to_s)}"
+      elsif mariadb? || mysql?
+        connection.execute "ANALYZE TABLE #{connection.quote_table_name(table.to_s)}"
       end
     end
 
