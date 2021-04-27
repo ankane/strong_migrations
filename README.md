@@ -153,6 +153,17 @@ class AddSomeColumnToUsers < ActiveRecord::Migration[6.1]
 end
 ```
 
+For Rails 5+, `:from` and `:to` can be used to make `change_column_default` command reversible.
+
+```ruby
+class AddSomeColumnToUsers < ActiveRecord::Migration[6.1]
+  def change
+    add_column :users, :some_column, :text
+    change_column_default :users, :some_column, from: nil, to: "default_value"
+  end
+end
+```
+
 See the next section for how to backfill.
 
 ### Backfilling data
