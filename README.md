@@ -818,7 +818,7 @@ StrongMigrations.auto_analyze = true
 
 ## Faster Migrations
 
-Only dump the schema when adding a new migration. If you use Git, add to your `Rakefile`:
+Only dump the schema when adding a new migration. If you use Git, add to the end of your `Rakefile`:
 
 ```rb
 task :faster_migrations do
