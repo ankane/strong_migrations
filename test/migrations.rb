@@ -397,6 +397,12 @@ class AddReferenceForeignKey < TestMigration
   end
 end
 
+class AddReferenceForeignKeyToTable < TestMigration
+  def change
+    add_reference :users, :device, foreign_key: {to_table: :users}, index: false
+  end
+end
+
 class AddReferenceConcurrently < TestMigration
   disable_ddl_transaction!
 

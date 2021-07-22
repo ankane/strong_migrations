@@ -30,7 +30,11 @@ module StrongMigrations
                 (ActiveRecord::Base.pluralize_table_names ? reference.to_s.pluralize : reference).to_sym
               end
 
-            @migration.add_foreign_key(table, name)
+            if reference
+              @migration.add_foreign_key(table, name, column: "#{reference}_id")
+            else
+              @migration.add_foreign_key(table, name)
+            end
           end
         end
         dir.down do

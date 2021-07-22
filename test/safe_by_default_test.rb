@@ -28,6 +28,10 @@ class SafeByDefaultTest < Minitest::Test
     assert_safe AddReferenceForeignKey
   end
 
+  def test_add_reference_foreign_key_to_table
+    assert_safe AddReferenceForeignKeyToTable
+  end
+
   def test_add_foreign_key
     assert_safe AddForeignKey
   end
