@@ -1,4 +1,4 @@
-## 0.7.8 (unreleased)
+## 0.7.8 (2021-08-03)
 
 - Fixed issue with `add_reference ..., foreign_key: {to_table: ...}` with `safe_by_default`
 
