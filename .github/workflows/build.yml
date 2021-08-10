@@ -9,27 +9,14 @@ jobs:
         include:
         - ruby: 3.0
           gemfile: Gemfile
-          postgres: true
         - ruby: 2.7
           gemfile: gemfiles/activerecord60.gemfile
-          postgres: true
         - ruby: 2.6
           gemfile: gemfiles/activerecord52.gemfile
-          postgres: true
         - ruby: 2.5
           gemfile: gemfiles/activerecord51.gemfile
-          postgres: true
         - ruby: 2.4
           gemfile: gemfiles/activerecord50.gemfile
-          postgres: true
-        - ruby: 3.0
-          gemfile: Gemfile
-          adapter: mysql2
-          mysql: true
-        - ruby: 3.0
-          gemfile: Gemfile
-          adapter: mysql2
-          mariadb: true
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:
@@ -38,18 +25,18 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
-    - if: ${{ matrix.postgres }}
-      uses: ankane/setup-postgres@v1
+
+    - uses: ankane/setup-postgres@v1
       with:
         database: strong_migrations_test
-    - if: ${{ matrix.mysql }}
-      uses: ankane/setup-mysql@v1
+    - run: ADAPTER=postgresql bundle exec rake test
+
+    - uses: ankane/setup-mysql@v1
       with:
         database: strong_migrations_test
-    - if: ${{ matrix.mariadb }}
-      uses: ankane/setup-mariadb@v1
+    - run: ADAPTER=mysql bundle exec rake test
+
+    - uses: ankane/setup-mariadb@v1
       with:
         database: strong_migrations_test
-    - run: bundle exec rake test
-      env:
-        ADAPTER: ${{ matrix.adapter || 'postgresql' }}
+    - run: ADAPTER=mysql bundle exec rake test
