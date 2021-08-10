@@ -2,4 +2,8 @@ source "https://rubygems.org"
 
 gemspec path: ".."
 
+gem "rake"
+gem "minitest", ">= 5"
 gem "activerecord", "~> 5.2.0"
+gem "pg"
+gem "mysql2"
