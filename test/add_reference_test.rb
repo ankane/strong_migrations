@@ -1,6 +1,12 @@
 require_relative "test_helper"
 
 class AddReferenceTest < Minitest::Test
+  def test_add_reference_without_enabled_tables
+    without_enabled_tables do
+      assert_safe AddReference
+    end
+  end
+
   def test_add_reference
     skip unless postgresql?
     assert_unsafe AddReference

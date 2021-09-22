@@ -99,10 +99,19 @@ class Minitest::Test
     StrongMigrations.target_version = nil
   end
 
+  def without_enabled_tables
+    StrongMigrations.enabled_tables = %i[]
+    yield
+  ensure
+    StrongMigrations.enabled_tables = %i[users]
+  end
+
   def check_constraints?
     ActiveRecord::VERSION::STRING >= "6.1"
   end
 end
+
+StrongMigrations.enabled_tables = %i[users]
 
 StrongMigrations.add_check do |method, args|
   if method == :add_column && args[1].to_s == "forbidden"

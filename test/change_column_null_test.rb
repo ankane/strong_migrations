@@ -1,6 +1,12 @@
 require_relative "test_helper"
 
 class ChangeColumnNullTest < Minitest::Test
+  def test_change_column_null_without_enabled_tables
+    without_enabled_tables do
+      assert_safe ChangeColumnNull
+    end
+  end
+
   def test_change_column_null
     if postgresql? || mysql? || mariadb?
       assert_unsafe ChangeColumnNull

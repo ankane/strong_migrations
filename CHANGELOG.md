@@ -1,3 +1,7 @@
+## 0.7.9 (2021-09-22)
+
+- Added `enabled_tables` option
+
 ## 0.7.8 (2021-08-03)
 
 - Fixed issue with `add_reference ..., foreign_key: {to_table: ...}` with `safe_by_default`

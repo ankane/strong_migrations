@@ -1,6 +1,12 @@
 require_relative "test_helper"
 
 class AddIndexTest < Minitest::Test
+  def test_add_index_without_enabled_tables
+    without_enabled_tables do
+      assert_safe AddIndex
+    end
+  end
+
   def test_add_index
     if postgresql?
       assert_unsafe AddIndex, <<~EOF

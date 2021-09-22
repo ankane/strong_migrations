@@ -1,6 +1,12 @@
 require_relative "test_helper"
 
 class AddForeignKeyTest < Minitest::Test
+  def test_add_foreign_key_without_enabled_tables
+    without_enabled_tables do
+      assert_safe AddForeignKey
+    end
+  end
+
   def test_add_foreign_key
     if postgresql?
       assert_unsafe AddForeignKey

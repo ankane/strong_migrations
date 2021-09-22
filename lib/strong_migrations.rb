@@ -19,12 +19,13 @@ module StrongMigrations
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
       :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
       :enabled_checks, :lock_timeout, :statement_timeout, :check_down, :target_version,
-      :safe_by_default
+      :safe_by_default, :enabled_tables
     attr_writer :lock_timeout_limit
   end
   self.auto_analyze = false
   self.start_after = 0
   self.checks = []
+  self.enabled_tables = []
   self.safe_by_default = false
   self.error_messages = {
     add_column_default:
@@ -269,8 +270,8 @@ Use disable_ddl_transaction! or a separate migration."
     enabled_checks.delete(check)
   end
 
-  def self.check_enabled?(check, version: nil)
-    if enabled_checks[check]
+  def self.check_enabled?(check, version: nil, table: nil)
+    if enabled_checks[check] && (enabled_tables.include?(table) || check == :execute)
       start_after = enabled_checks[check][:start_after] || StrongMigrations.start_after
       !version || version > start_after
     else

@@ -6,6 +6,12 @@ class CheckConstraintTest < Minitest::Test
     super
   end
 
+  def test_add_check_constraint_without_enabled_tables
+    without_enabled_tables do
+      assert_safe AddCheckConstraint
+    end
+  end
+
   def test_add_check_constraint
     assert_unsafe AddCheckConstraint
   end

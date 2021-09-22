@@ -1,6 +1,12 @@
 require_relative "test_helper"
 
 class AddColumnDefaultTest < Minitest::Test
+  def test_add_column_default_without_enabled_tables
+    without_enabled_tables do
+      assert_safe AddColumnDefault
+    end
+  end
+
   def test_add_column_default
     with_target_version(postgresql? ? 10 : (mysql? ? "8.0.11" : "10.3.1")) do
       assert_unsafe AddColumnDefault

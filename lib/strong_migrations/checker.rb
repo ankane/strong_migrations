@@ -52,23 +52,26 @@ module StrongMigrations
             model: args[0].to_s.classify,
             code: code,
             command: command_str(method, args),
-            column_suffix: columns.size > 1 ? "s" : ""
+            column_suffix: columns.size > 1 ? "s" : "",
+            table: args[0]
         when :change_table
-          raise_error :change_table, header: "Possibly dangerous operation"
+          raise_error :change_table, header: "Possibly dangerous operation", table: args[0]
         when :rename_table
-          raise_error :rename_table
+          raise_error :rename_table, table: args[0]
         when :rename_column
-          raise_error :rename_column
+          raise_error :rename_column, table: args[0]
         when :add_index
           table, columns, options = args
           options ||= {}
 
           if columns.is_a?(Array) && columns.size > 3 && !options[:unique]
-            raise_error :add_index_columns, header: "Best practice"
+            raise_error :add_index_columns, header: "Best practice", table: table
           end
           if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
             return safe_add_index(table, columns, options) if StrongMigrations.safe_by_default
-            raise_error :add_index, command: command_str("add_index", [table, columns, options.merge(algorithm: :concurrently)])
+            raise_error :add_index,
+              command: command_str("add_index", [table, columns, options.merge(algorithm: :concurrently)]),
+              table: table
           end
         when :remove_index
           table, options = args
@@ -79,7 +82,9 @@ module StrongMigrations
 
           if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
             return safe_remove_index(table, options) if StrongMigrations.safe_by_default
-            raise_error :remove_index, command: command_str("remove_index", [table, options.merge(algorithm: :concurrently)])
+            raise_error :remove_index,
+              command: command_str("remove_index", [table, options.merge(algorithm: :concurrently)]),
+              table: table
           end
         when :add_column
           table, column, type, options = args
@@ -101,12 +106,14 @@ Then add the NOT NULL constraint in separate migrations."
               remove_command: command_str("remove_column", [table, column]),
               code: backfill_code(table, column, default),
               append: append,
-              rewrite_blocks: rewrite_blocks
+              rewrite_blocks: rewrite_blocks,
+              table: table
           end
 
           if type.to_s == "json" && postgresql?
             raise_error :add_column_json,
-              command: command_str("add_column", [table, column, :jsonb, options])
+              command: command_str("add_column", [table, column, :jsonb, options]),
+              table: table
           end
         when :change_column
           table, column, type, options = args
@@ -166,15 +173,15 @@ Then add the NOT NULL constraint in separate migrations."
 
           # unsafe to set NOT NULL for safe types
           if safe && existing_column.null && options[:null] == false
-            raise_error :change_column_with_not_null
+            raise_error :change_column_with_not_null, table: table
           end
 
-          raise_error :change_column, rewrite_blocks: rewrite_blocks unless safe
+          raise_error :change_column, rewrite_blocks: rewrite_blocks, table: table unless safe
         when :create_table
           table, options = args
           options ||= {}
 
-          raise_error :create_table if options[:force]
+          raise_error :create_table, table: table if options[:force]
 
           # keep track of new tables of add_index check
           @new_tables << table.to_s
@@ -208,7 +215,8 @@ Then add the foreign key in separate migrations."
               raise_error :add_reference,
                 headline: headline,
                 command: command_str(method, [table, reference, options]),
-                append: append
+                append: append,
+                table: table
             end
           end
         when :execute
@@ -262,13 +270,14 @@ Then add the foreign key in separate migrations."
 
                 raise_error :change_column_null_postgresql,
                   add_constraint_code: add_constraint_code,
-                  validate_constraint_code: validate_constraint_code
+                  validate_constraint_code: validate_constraint_code,
+                  table: table
               end
             elsif mysql? || mariadb?
-              raise_error :change_column_null_mysql
+              raise_error :change_column_null_mysql, table: table
             elsif !default.nil?
               raise_error :change_column_null,
-                code: backfill_code(table, column, default)
+                code: backfill_code(table, column, default), table: table
             end
           end
         when :add_foreign_key
@@ -293,18 +302,20 @@ Then add the foreign key in separate migrations."
 
               raise_error :add_foreign_key,
                 add_foreign_key_code: safety_assured_str(add_code),
-                validate_foreign_key_code: safety_assured_str(validate_code)
+                validate_foreign_key_code: safety_assured_str(validate_code),
+                table: from_table
             else
               return safe_add_foreign_key(from_table, to_table, options) if StrongMigrations.safe_by_default
 
               raise_error :add_foreign_key,
                 add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options.merge(validate: false)]),
-                validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
+                validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table]),
+                table: from_table
             end
           end
         when :validate_foreign_key
           if postgresql? && writes_blocked?
-            raise_error :validate_foreign_key
+            raise_error :validate_foreign_key, table: args[0]
           end
         when :add_check_constraint
           table, expression, options = args
@@ -320,14 +331,15 @@ Then add the foreign key in separate migrations."
 
               raise_error :add_check_constraint,
                 add_check_constraint_code: command_str("add_check_constraint", [table, expression, add_options]),
-                validate_check_constraint_code: command_str("validate_check_constraint", [table, validate_options])
+                validate_check_constraint_code: command_str("validate_check_constraint", [table, validate_options]),
+                table: table
             elsif mysql? || mariadb?
-              raise_error :add_check_constraint_mysql
+              raise_error :add_check_constraint_mysql, table: table
             end
           end
         when :validate_check_constraint
           if postgresql? && writes_blocked?
-            raise_error :validate_check_constraint
+            raise_error :validate_check_constraint, table: args[0]
           end
         end
 
@@ -527,7 +539,7 @@ Then add the foreign key in separate migrations."
     end
 
     def raise_error(message_key, header: nil, append: nil, **vars)
-      return unless StrongMigrations.check_enabled?(message_key, version: version)
+      return unless StrongMigrations.check_enabled?(message_key, version: version, table: vars[:table]&.to_sym)
 
       message = StrongMigrations.error_messages[message_key] || "Missing message"
       message = message + append if append

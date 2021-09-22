@@ -1,6 +1,12 @@
 require_relative "test_helper"
 
 class RemoveColumnTest < Minitest::Test
+  def test_remove_column_without_enabled_tables
+    without_enabled_tables do
+      assert_safe RemoveColumn
+    end
+  end
+
   def test_remove_column
     assert_unsafe RemoveColumn
   end
