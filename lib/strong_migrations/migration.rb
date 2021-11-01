@@ -15,7 +15,8 @@ module StrongMigrations
     end
     ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
 
-    def safety_assured
+    def safety_assured(reason: nil)
+      raise StrongMigrations::Error, "Specify a reason to override safety checks" if reason.nil? && StrongMigrations.require_safety_reason
       strong_migrations_checker.safety_assured do
         yield
       end

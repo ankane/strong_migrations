@@ -43,6 +43,12 @@ class AddIndexSafetyAssured < TestMigration
   end
 end
 
+class AddIndexSafetyAssuredReason < TestMigration
+  def change
+    safety_assured(reason: "this table is unused") { add_index :users, :city, name: "no_boom" }
+  end
+end
+
 class AddIndexNewTable < TestMigration
   def change
     create_table "new_users" do |t|
