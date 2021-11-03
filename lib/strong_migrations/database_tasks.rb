@@ -1,7 +1,7 @@
 module StrongMigrations
   module DatabaseTasks
-    def migrate
-      super
+    def migrate(version = nil)
+      super(version)
     rescue => e
       if e.cause.is_a?(StrongMigrations::Error)
         # strip cause and clean backtrace
