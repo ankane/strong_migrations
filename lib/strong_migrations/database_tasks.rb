@@ -1,6 +1,6 @@
 module StrongMigrations
   module DatabaseTasks
-    def migrate
+    def migrate(*args)
       super
     rescue => e
       if e.cause.is_a?(StrongMigrations::Error)
