@@ -1,5 +1,6 @@
 module StrongMigrations
   module DatabaseTasks
+    # Active Record 7 adds version argument
     def migrate(*args)
       super
     rescue => e
