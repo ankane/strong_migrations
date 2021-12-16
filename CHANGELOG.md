@@ -1,4 +1,4 @@
-## 0.7.9 (unreleased)
+## 0.7.9 (2021-12-15)
 
 - Fixed error with multiple databases with Active Record 7
 
