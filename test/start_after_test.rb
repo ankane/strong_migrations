@@ -14,12 +14,8 @@ class StartAfterTest < Minitest::Test
   end
 
   def with_start_after(start_after)
-    previous = StrongMigrations.start_after
-    begin
-      StrongMigrations.start_after = start_after
+    StrongMigrations.stub(:start_after, start_after) do
       yield
-    ensure
-      StrongMigrations.start_after = previous
     end
   end
 end
