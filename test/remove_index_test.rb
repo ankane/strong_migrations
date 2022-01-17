@@ -1,7 +1,7 @@
 require_relative "test_helper"
 
 class RemoveIndexTest < Minitest::Test
-  def test_remove_index_concurrently
+  def test_concurrently
     skip unless postgresql?
     migrate AddIndexConcurrently
 
