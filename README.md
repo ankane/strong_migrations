@@ -15,7 +15,7 @@ Supports for PostgreSQL, MySQL, and MariaDB
 Add this line to your application’s Gemfile:
 
 ```ruby
-gem 'strong_migrations'
+gem "strong_migrations"
 ```
 
 And run:
