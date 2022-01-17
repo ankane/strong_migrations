@@ -27,13 +27,12 @@ end
 TestMigration = ActiveRecord::Migration[migration_version]
 TestSchema = ActiveRecord::Schema
 
-ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS users")
-ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS new_users")
-ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS orders")
-ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS devices")
-
 ActiveRecord::Schema.define do
-  create_table "users" do |t|
+  [:users, :new_users, :orders, :devices].each do |table|
+    drop_table(table) if table_exists?(table)
+  end
+
+  create_table :users do |t|
     t.string :name
     t.string :city
     t.decimal :credit_score, precision: 10, scale: 5
@@ -43,10 +42,10 @@ ActiveRecord::Schema.define do
     t.references :order
   end
 
-  create_table "orders" do |t|
+  create_table :orders do |t|
   end
 
-  create_table "devices" do |t|
+  create_table :devices do |t|
   end
 end
 
@@ -56,11 +55,11 @@ module Helpers
   end
 
   def mysql?
-    $adapter == "mysql2" && !ActiveRecord::Base.connection.try(:mariadb?)
+    $adapter == "mysql2" && !ActiveRecord::Base.connection.mariadb?
   end
 
   def mariadb?
-    $adapter == "mysql2" && ActiveRecord::Base.connection.try(:mariadb?)
+    $adapter == "mysql2" && ActiveRecord::Base.connection.mariadb?
   end
 end
 
