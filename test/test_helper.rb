@@ -68,7 +68,9 @@ class Minitest::Test
 
   def migrate(migration, direction: :up)
     if !migration.disable_ddl_transaction
-      ActiveRecord::Base.transaction { migration.migrate(direction) }
+      ActiveRecord::Base.transaction do
+        migration.migrate(direction)
+      end
     else
       migration.migrate(direction)
     end
@@ -77,7 +79,9 @@ class Minitest::Test
   end
 
   def assert_unsafe(migration, message = nil, **options)
-    error = assert_raises(StrongMigrations::UnsafeMigration) { migrate(migration, **options) }
+    error = assert_raises(StrongMigrations::UnsafeMigration) do
+      migrate(migration, **options)
+    end
     puts error.message if ENV["VERBOSE"]
     assert_match message, error.message if message
   end
