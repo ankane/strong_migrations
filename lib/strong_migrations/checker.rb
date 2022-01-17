@@ -86,8 +86,7 @@ module StrongMigrations
           options ||= {}
           default = options[:default]
 
-          if !default.nil? && !((postgresql? && postgresql_version >= Gem::Version.new("11")) || (mysql? && mysql_version >= Gem::Version.new("8.0.12")) || (mariadb? && mariadb_version >= Gem::Version.new("10.3.2")))
-
+          if !default.nil? && !add_column_default_safe?
             if options[:null] == false
               options = options.except(:null)
               append = "
@@ -579,6 +578,18 @@ Then add the foreign key in separate migrations."
 
     def new_table?(table)
       @new_tables.include?(table.to_s)
+    end
+
+    def add_column_default_safe?
+      if postgresql?
+        postgresql_version >= Gem::Version.new("11")
+      elsif mysql?
+        mysql_version >= Gem::Version.new("8.0.12")
+      elsif mariadb?
+        mariadb_version >= Gem::Version.new("10.3.2")
+      else
+        false
+      end
     end
   end
 end
