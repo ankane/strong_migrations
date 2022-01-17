@@ -1,7 +1,7 @@
 require_relative "test_helper"
 
 class ChangeColumnNullTest < Minitest::Test
-  def test_change_column_null
+  def test_basic
     if postgresql? || mysql? || mariadb?
       assert_unsafe ChangeColumnNull
     else
@@ -9,7 +9,7 @@ class ChangeColumnNullTest < Minitest::Test
     end
   end
 
-  def test_change_column_null_constraint
+  def test_constraint
     skip unless postgresql?
 
     with_target_version(12) do
@@ -17,7 +17,7 @@ class ChangeColumnNullTest < Minitest::Test
     end
   end
 
-  def test_change_column_null_constraint_unvalidated
+  def test_constraint_unvalidated
     skip unless postgresql?
 
     with_target_version(12) do
@@ -25,7 +25,7 @@ class ChangeColumnNullTest < Minitest::Test
     end
   end
 
-  def test_change_column_null_constraint_before_12
+  def test_constraint_before_12
     skip unless postgresql?
 
     with_target_version(11) do
@@ -33,11 +33,11 @@ class ChangeColumnNullTest < Minitest::Test
     end
   end
 
-  def test_change_column_null_default
+  def test_default
     assert_unsafe ChangeColumnNullDefault
   end
 
-  def test_change_column_null_constraint_methods
+  def test_constraint_methods
     skip unless postgresql? && check_constraints?
 
     with_target_version(12) do
@@ -45,7 +45,7 @@ class ChangeColumnNullTest < Minitest::Test
     end
   end
 
-  def test_change_column_null_quoted
+  def test_quoted
     skip unless postgresql?
 
     with_target_version(12) do

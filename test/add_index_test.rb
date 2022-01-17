@@ -1,7 +1,7 @@
 require_relative "test_helper"
 
 class AddIndexTest < Minitest::Test
-  def test_add_index
+  def test_non_concurrently
     if postgresql?
       assert_unsafe AddIndex, <<~EOF
         Adding an index non-concurrently blocks writes. Instead, use:
@@ -19,7 +19,7 @@ class AddIndexTest < Minitest::Test
     end
   end
 
-  def test_add_index_up
+  def test_up
     if postgresql?
       assert_unsafe AddIndexUp
     else
@@ -27,11 +27,11 @@ class AddIndexTest < Minitest::Test
     end
   end
 
-  def test_add_index_safety_assured
+  def test_safety_assured
     assert_safe AddIndexSafetyAssured
   end
 
-  def test_add_index_new_table
+  def test_new_table
     assert_safe AddIndexNewTable
   end
 
@@ -39,16 +39,16 @@ class AddIndexTest < Minitest::Test
     assert_safe AddIndexSchema
   end
 
-  def test_add_index_concurrently
+  def test_concurrently
     skip unless postgresql?
     assert_safe AddIndexConcurrently
   end
 
-  def test_add_index_columns
+  def test_columns
     assert_unsafe AddIndexColumns, /more than three columns/
   end
 
-  def test_add_index_columns_unique
+  def test_columns_unique
     skip unless postgresql?
     assert_safe AddIndexColumnsUnique
   end
