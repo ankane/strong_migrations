@@ -1,7 +1,7 @@
 require_relative "test_helper"
 
 class AddForeignKeyTest < Minitest::Test
-  def test_add_foreign_key
+  def test_basic
     if postgresql?
       assert_unsafe AddForeignKey
     else
@@ -9,13 +9,13 @@ class AddForeignKeyTest < Minitest::Test
     end
   end
 
-  def test_add_foreign_key_safe
+  def test_safe
     skip "Active Record 6.0.3 bug" if ar_bug? && (mysql? || mariadb?)
 
     assert_safe AddForeignKeySafe
   end
 
-  def test_add_foreign_key_validate_same_transaction
+  def test_validate_same_transaction
     skip "Active Record 6.0.3 bug" if ar_bug?
 
     skip unless postgresql?
@@ -23,7 +23,7 @@ class AddForeignKeyTest < Minitest::Test
     assert_unsafe AddForeignKeyValidateSameTransaction
   end
 
-  def test_add_foreign_key_validate_no_transaction
+  def test_validate_no_transaction
     skip "Active Record 6.0.3 bug" if ar_bug?
 
     skip unless postgresql?
