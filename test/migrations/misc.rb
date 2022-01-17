@@ -22,12 +22,6 @@ class RenameTable < TestMigration
   end
 end
 
-class SafeUp < TestMigration
-  def change
-    add_column :users, :email, :string
-  end
-end
-
 class CreateTableForce < TestMigration
   def change
     create_table "users", force: :cascade do |t|
