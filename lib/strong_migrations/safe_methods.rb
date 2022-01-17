@@ -56,21 +56,6 @@ module StrongMigrations
       end
     end
 
-    def safe_add_foreign_key_code(from_table, to_table, add_code, validate_code)
-      @migration.reversible do |dir|
-        dir.up do
-          @migration.safety_assured do
-            @migration.execute(add_code)
-            disable_transaction
-            @migration.execute(validate_code)
-          end
-        end
-        dir.down do
-          @migration.remove_foreign_key(from_table, to_table)
-        end
-      end
-    end
-
     def safe_add_check_constraint(table, expression, add_options, validate_options)
       @migration.reversible do |dir|
         dir.up do

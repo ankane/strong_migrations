@@ -100,7 +100,7 @@ class Minitest::Test
   end
 
   def check_constraints?
-    ActiveRecord::VERSION::STRING >= "6.1"
+    ActiveRecord::VERSION::STRING.to_f >= 6.1
   end
 end
 

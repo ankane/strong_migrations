@@ -275,32 +275,14 @@ Then add the foreign key in separate migrations."
           from_table, to_table, options = args
           options ||= {}
 
-          # always validated before 5.2
-          validate = options.fetch(:validate, true) || ar_version < 5.2
+          validate = options.fetch(:validate, true)
 
           if postgresql? && validate
-            if ar_version < 5.2
-              # fk name logic from rails
-              primary_key = options[:primary_key] || "id"
-              column = options[:column] || "#{to_table.to_s.singularize}_id"
-              hashed_identifier = Digest::SHA256.hexdigest("#{from_table}_#{column}_fk").first(10)
-              fk_name = options[:name] || "fk_rails_#{hashed_identifier}"
+            return safe_add_foreign_key(from_table, to_table, options) if StrongMigrations.safe_by_default
 
-              add_code = constraint_str("ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s) NOT VALID", [from_table, fk_name, column, to_table, primary_key])
-              validate_code = constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [from_table, fk_name])
-
-              return safe_add_foreign_key_code(from_table, to_table, add_code, validate_code) if StrongMigrations.safe_by_default
-
-              raise_error :add_foreign_key,
-                add_foreign_key_code: safety_assured_str(add_code),
-                validate_foreign_key_code: safety_assured_str(validate_code)
-            else
-              return safe_add_foreign_key(from_table, to_table, options) if StrongMigrations.safe_by_default
-
-              raise_error :add_foreign_key,
-                add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options.merge(validate: false)]),
-                validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
-            end
+            raise_error :add_foreign_key,
+              add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options.merge(validate: false)]),
+              validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
           end
         when :validate_foreign_key
           if postgresql? && writes_blocked?

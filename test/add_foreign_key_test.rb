@@ -12,17 +12,13 @@ class AddForeignKeyTest < Minitest::Test
   def test_add_foreign_key_safe
     skip "Active Record 6.0.3 bug" if (mysql? || mariadb?) && ActiveRecord::VERSION::STRING.start_with?("6.0.3")
 
-    if postgresql? && ActiveRecord::VERSION::STRING <= "5.2"
-      assert_unsafe AddForeignKeySafe
-    else
-      assert_safe AddForeignKeySafe
-    end
+    assert_safe AddForeignKeySafe
   end
 
   def test_add_foreign_key_validate_same_transaction
     skip "Active Record 6.0.3 bug" if ActiveRecord::VERSION::STRING.start_with?("6.0.3")
 
-    skip unless postgresql? && ActiveRecord::VERSION::STRING >= "5.2"
+    skip unless postgresql?
 
     assert_unsafe AddForeignKeyValidateSameTransaction
   end
@@ -30,7 +26,7 @@ class AddForeignKeyTest < Minitest::Test
   def test_add_foreign_key_validate_no_transaction
     skip "Active Record 6.0.3 bug" if ActiveRecord::VERSION::STRING.start_with?("6.0.3")
 
-    skip unless postgresql? && ActiveRecord::VERSION::STRING >= "5.2"
+    skip unless postgresql?
 
     assert_safe AddForeignKeyValidateNoTransaction
   end
