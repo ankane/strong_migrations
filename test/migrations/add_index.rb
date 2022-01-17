@@ -1,0 +1,60 @@
+class AddIndex < TestMigration
+  def change
+    add_index :users, :name
+    add_index :users, :city
+  end
+end
+
+class AddIndexUp < TestMigration
+  def self.up
+    add_index :users, :name
+  end
+
+  def self.down
+    remove_index :users, :name
+  end
+end
+
+class AddIndexConcurrently < TestMigration
+  disable_ddl_transaction!
+
+  def change
+    add_index :users, :name, algorithm: :concurrently
+  end
+end
+
+class AddIndexSafetyAssured < TestMigration
+  def change
+    safety_assured { add_index :users, :name, name: "boom" }
+  end
+end
+
+class AddIndexNewTable < TestMigration
+  def change
+    create_table "new_users" do |t|
+      t.string :name
+    end
+
+    add_index :new_users, :name
+  end
+end
+
+class AddIndexSchema < TestSchema
+  def change
+    add_index :users, :name, name: "boom2"
+  end
+end
+
+class AddIndexColumns < TestMigration
+  def change
+    add_index :users, [:name, :city, :state, :zip_code]
+  end
+end
+
+class AddIndexColumnsUnique < TestMigration
+  disable_ddl_transaction!
+
+  def change
+    add_index :users, :name, unique: true, algorithm: :concurrently
+  end
+end

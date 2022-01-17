@@ -110,4 +110,6 @@ StrongMigrations.add_check do |method, args|
   end
 end
 
-require_relative "migrations"
+Dir.glob("migrations/*.rb", base: __dir__).sort.each do |file|
+  require_relative file
+end
