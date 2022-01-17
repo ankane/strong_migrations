@@ -229,8 +229,10 @@ Then add the foreign key in separate migrations."
                 validate_code = constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
                 remove_code = constraint_str("ALTER TABLE %s DROP CONSTRAINT %s", [table, constraint_name])
 
+                constraint_methods = ar_version >= 6.1
+
                 validate_constraint_code =
-                  if ar_version >= 6.1
+                  if constraint_methods
                     String.new(command_str(:validate_check_constraint, [table, {name: constraint_name}]))
                   else
                     String.new(safety_assured_str(validate_code))
@@ -241,7 +243,7 @@ Then add the foreign key in separate migrations."
 
                   validate_constraint_code << "\n    #{command_str(:change_column_null, change_args)}"
 
-                  if ar_version >= 6.1
+                  if constraint_methods
                     validate_constraint_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
                   else
                     validate_constraint_code << "\n    #{safety_assured_str(remove_code)}"
@@ -251,7 +253,7 @@ Then add the foreign key in separate migrations."
                 return safe_change_column_null(add_code, validate_code, change_args, remove_code) if StrongMigrations.safe_by_default
 
                 add_constraint_code =
-                  if ar_version >= 6.1
+                  if constraint_methods
                     # only quote when needed
                     expr_column = column.to_s =~ /\A[a-z0-9_]+\z/ ? column : connection.quote_column_name(column)
                     command_str(:add_check_constraint, [table, "#{expr_column} IS NOT NULL", {name: constraint_name, validate: false}])
