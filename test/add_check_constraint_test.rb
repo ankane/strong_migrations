@@ -1,16 +1,16 @@
 require_relative "test_helper"
 
-class CheckConstraintTest < Minitest::Test
+class AddCheckConstraintTest < Minitest::Test
   def setup
     skip unless check_constraints?
     super
   end
 
-  def test_add_check_constraint
+  def test_basic
     assert_unsafe AddCheckConstraint
   end
 
-  def test_add_check_constraint_safe
+  def test_safe
     if postgresql?
       assert_safe AddCheckConstraintSafe
     else
@@ -18,11 +18,11 @@ class CheckConstraintTest < Minitest::Test
     end
   end
 
-  def test_add_check_constraint_validate_same_transaction
+  def test_validate_same_transaction
     assert_unsafe AddCheckConstraintValidateSameTransaction
   end
 
-  def test_add_check_constraint_validate_no_transaction
+  def test_validate_no_transaction
     if postgresql?
       assert_safe AddCheckConstraintValidateNoTransaction
     else
@@ -30,11 +30,11 @@ class CheckConstraintTest < Minitest::Test
     end
   end
 
-  def test_add_check_constraint_new_table
+  def test_new_table
     assert_safe AddCheckConstraintNewTable
   end
 
-  def test_add_check_constraint_name
+  def test_name
     assert_unsafe AddCheckConstraintName
   end
 end
