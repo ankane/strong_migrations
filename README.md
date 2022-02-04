@@ -119,7 +119,7 @@ end
   ```
 
 4. Deploy and run migration
-5. Remove the line added in step 1.
+5. Remove the line added in step 1
 
 ### Adding a column with a default value
 
