@@ -10,7 +10,7 @@ module StrongMigrations
       return super if is_a?(ActiveRecord::Schema)
 
       # Active Record 7.0.2+ versioned schema
-      return super if ActiveRecord::VERSION::MAJOR >= 7 && self.class.name.nil?
+      return super if defined?(ActiveRecord::Schema::Definition) && is_a?(ActiveRecord::Schema::Definition)
 
       strong_migrations_checker.perform(method, *args) do
         super

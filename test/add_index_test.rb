@@ -39,6 +39,16 @@ class AddIndexTest < Minitest::Test
     assert_safe AddIndexSchema
   end
 
+  def test_versioned_schema
+    skip if ActiveRecord::VERSION::MAJOR < 7
+
+    # use define like db/schema.rb
+    ActiveRecord::Schema[migration_version].define do
+      add_index :users, :name, name: "boom2"
+      remove_index :users, name: "boom2"
+    end
+  end
+
   def test_concurrently
     skip unless postgresql?
     assert_safe AddIndexConcurrently
