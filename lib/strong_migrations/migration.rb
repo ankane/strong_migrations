@@ -9,8 +9,8 @@ module StrongMigrations
     def method_missing(method, *args)
       return super if is_a?(ActiveRecord::Schema)
 
-      # Rails 7.0.2+ versioned schema
-      return super if self.class.name.nil?
+      # Active Record 7.0.2+ versioned schema
+      return super if ActiveRecord::VERSION::MAJOR >= 7 && self.class.name.nil?
 
       strong_migrations_checker.perform(method, *args) do
         super
