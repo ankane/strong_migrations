@@ -40,7 +40,7 @@ class AddIndexTest < Minitest::Test
   end
 
   def test_versioned_schema
-    skip if ActiveRecord::VERSION::MAJOR < 7
+    skip if ActiveRecord.version < Gem::Version.new("7.0.2")
 
     # use define like db/schema.rb
     ActiveRecord::Schema[migration_version].define do
