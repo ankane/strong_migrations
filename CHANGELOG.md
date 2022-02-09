@@ -1,5 +1,6 @@
 ## 0.8.0 (unreleased)
 
+- Fixed error with versioned schema with Active Record 7.0.2+
 - Dropped support for Ruby < 2.6 and Active Record < 5.2
 
 ## 0.7.9 (2021-12-15)
