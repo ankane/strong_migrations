@@ -1,6 +1,7 @@
 ## 0.8.0 (unreleased)
 
-- Dropped support for Ruby < 2.6 and Active Record < 5.2
+- Dropped support for Ruby < 2.6 and Active Record < 6.1
+- Added support for Rails-version-specific schema dumps
 
 ## 0.7.9 (2021-12-15)
 

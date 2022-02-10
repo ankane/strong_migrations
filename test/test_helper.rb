@@ -1,20 +1,20 @@
-require "bundler/setup"
+require 'bundler/setup'
 Bundler.require(:default)
-require "minitest/autorun"
-require "minitest/pride"
-require "active_record"
+require 'minitest/autorun'
+require 'minitest/pride'
+require 'active_record'
 
 # needed for target_version
 module Rails
   def self.env
-    ActiveSupport::StringInquirer.new("test")
+    ActiveSupport::StringInquirer.new('test')
   end
 end
 
-$adapter = ENV["ADAPTER"] || "postgresql"
-ActiveRecord::Base.establish_connection(adapter: $adapter, database: "strong_migrations_test")
+$adapter = ENV['ADAPTER'] || 'postgresql'
+ActiveRecord::Base.establish_connection(adapter: $adapter, database: 'strong_migrations_test')
 
-if ENV["VERBOSE"]
+if ENV['VERBOSE']
   ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout)
 else
   ActiveRecord::Migration.verbose = false
@@ -24,11 +24,19 @@ def migration_version
   ActiveRecord.version.to_s.to_f
 end
 
-TestMigration = ActiveRecord::Migration[migration_version]
-TestSchema = ActiveRecord::Schema
+def active_record_schema_class
+  @active_record_schema_class ||= if Object.const_defined?('ActiveRecord::Schema::Definition')
+                                    ActiveRecord::Schema
+                                  else
+                                    ActiveRecord::Schema[migration_version]
+                                  end
+end
 
-ActiveRecord::Schema.define do
-  [:users, :new_users, :orders, :devices].each do |table|
+TestMigration = ActiveRecord::Migration[migration_version]
+TestSchema = active_record_schema_class
+
+active_record_schema_class.define do
+  %i[users new_users orders devices].each do |table|
     drop_table(table) if table_exists?(table)
   end
 
@@ -51,15 +59,15 @@ end
 
 module Helpers
   def postgresql?
-    $adapter == "postgresql"
+    $adapter == 'postgresql'
   end
 
   def mysql?
-    $adapter == "mysql2" && !ActiveRecord::Base.connection.mariadb?
+    $adapter == 'mysql2' && !ActiveRecord::Base.connection.mariadb?
   end
 
   def mariadb?
-    $adapter == "mysql2" && ActiveRecord::Base.connection.mariadb?
+    $adapter == 'mysql2' && ActiveRecord::Base.connection.mariadb?
   end
 end
 
@@ -74,7 +82,7 @@ class Minitest::Test
     else
       migration.migrate(direction)
     end
-    puts "\n\n" if ENV["VERBOSE"]
+    puts "\n\n" if ENV['VERBOSE']
     true
   end
 
@@ -82,7 +90,7 @@ class Minitest::Test
     error = assert_raises(StrongMigrations::UnsafeMigration) do
       migrate(migration, **options)
     end
-    puts error.message if ENV["VERBOSE"]
+    puts error.message if ENV['VERBOSE']
     assert_match message, error.message if message
   end
 
@@ -108,11 +116,9 @@ class Minitest::Test
 end
 
 StrongMigrations.add_check do |method, args|
-  if method == :add_column && args[1].to_s == "forbidden"
-    stop! "Cannot add forbidden column"
-  end
+  stop! 'Cannot add forbidden column' if method == :add_column && args[1].to_s == 'forbidden'
 end
 
-Dir.glob("migrations/*.rb", base: __dir__).sort.each do |file|
+Dir.glob('migrations/*.rb', base: __dir__).sort.each do |file|
   require_relative file
 end

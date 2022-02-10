@@ -7,7 +7,7 @@ module StrongMigrations
     end
 
     def method_missing(method, *args)
-      return super if is_a?(ActiveRecord::Schema)
+      return super if schema_migration?
 
       strong_migrations_checker.perform(method, *args) do
         super
@@ -26,6 +26,13 @@ module StrongMigrations
     end
 
     private
+
+    def schema_migration?
+      is_a?(ActiveRecord::Schema) || (
+        Object.const_defined?('ActiveRecord::Schema::Definition') &&
+          is_a?(ActiveRecord::Schema::Definition)
+      )
+    end
 
     def strong_migrations_checker
       @strong_migrations_checker ||= StrongMigrations::Checker.new(self)
