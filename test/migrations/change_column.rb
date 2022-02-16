@@ -77,67 +77,61 @@ end
 
 class ChangeColumnTextToVarcharLimit < TestMigration
   def up
-    change_column :users, :country, :text
-    change_column :users, :country, :string, limit: 20
+    change_column :users, :description, :string, limit: 20
   end
 
   def down
-    change_column :users, :country, :string, limit: 20
+    change_column :users, :description, :text
   end
 end
 
 class ChangeColumnTextToVarcharNoLimit < TestMigration
   def up
-    change_column :users, :country, :text
-    change_column :users, :country, :string
+    change_column :users, :description, :string
   end
 
   def down
-    change_column :users, :country, :string, limit: 20
+    change_column :users, :description, :text
   end
 end
 
 class ChangeColumnTextToCitext < TestMigration
   def up
-    add_column :users, :postal_code, :text
-    change_column :users, :postal_code, :citext
+    change_column :users, :description, :citext
   end
 
   def down
-    remove_column :users, :postal_code
+    change_column :users, :description, :text
   end
 end
 
 class ChangeColumnCitextToText < TestMigration
   def up
-    add_column :users, :postal_code, :citext
-    change_column :users, :postal_code, :text
+    change_column :users, :code, :text
   end
 
   def down
-    remove_column :users, :postal_code
+    change_column :users, :code, :citext
   end
 end
 
 class ChangeColumnCitextToVarcharLimit < TestMigration
   def up
-    add_column :users, :postal_code, :citext
-    change_column :users, :postal_code, :string, limit: 20
+    change_column :users, :code, :string, limit: 20
   end
 
   def down
-    remove_column :users, :postal_code
+    change_column :users, :code, :citext
   end
 end
 
 class ChangeColumnCitextToVarcharNoLimit < TestMigration
   def up
-    add_column :users, :postal_code, :citext
-    change_column :users, :postal_code, :string
+    change_column :users, :code, :string
   end
 
   def down
-    remove_column :users, :postal_code
+    change_column :users, :code, :citext
   end
 end
 

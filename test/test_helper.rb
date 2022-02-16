@@ -41,6 +41,8 @@ ActiveRecord::Schema.define do
     t.timestamp :deleted_at
     t.string :country, limit: 20
     t.string :interval
+    t.text :description
+    t.citext :code if $adapter == "postgresql"
     t.references :order
   end
 
