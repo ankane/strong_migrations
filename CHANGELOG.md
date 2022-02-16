@@ -3,6 +3,7 @@
 - Changing between `text` and `citext` is safe in Postgres
 - Changing a `varchar` column to a `citext` column is safe in Postgres
 - Changing a `citext` column to a `varchar` column with no length limit is safe in Postgres
+- Increasing the precision of an `interval` column is safe in Postgres
 - Decreasing the precision of a `timestamp` or `timestamptz` column is not safe in Postgres
 
 ## 0.8.0 (2022-02-09)

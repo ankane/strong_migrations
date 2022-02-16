@@ -154,6 +154,13 @@ Then add the NOT NULL constraint in separate migrations."
                   precision >= existing_precision &&
                   postgresql_version >= Gem::Version.new("12") &&
                   connection.select_all("SHOW timezone").first["TimeZone"] == "UTC"
+              when "interval"
+                # https://wiki.postgresql.org/wiki/What%27s_new_in_PostgreSQL_9.2#Reduce_ALTER_TABLE_rewrites
+                # Active Record uses precision before limit
+                precision = options[:precision] || options[:limit] || 6
+                existing_precision = existing_column.precision || existing_column.limit || 6
+
+                safe = existing_type == "interval" && precision >= existing_precision
               end
             elsif mysql? || mariadb?
               case type.to_s
