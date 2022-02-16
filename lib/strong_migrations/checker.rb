@@ -302,7 +302,7 @@ Then add the foreign key in separate migrations."
                 raise_error :change_column_null_mysql_too_old
               end
 
-              unless mysql_strict_mode
+              unless strict_mode?
                 raise_error :change_column_null_mysql
               end
 
@@ -660,8 +660,8 @@ Then add the foreign key in separate migrations."
       end
     end
 
-    def mysql_sql_modes
-      @mysql_sql_modes ||= begin
+    def sql_modes
+      @sql_modes ||= begin
         if StrongMigrations.target_sql_mode
           StrongMigrations.target_sql_mode.split(",")
         else
@@ -670,8 +670,8 @@ Then add the foreign key in separate migrations."
       end
     end
 
-    def mysql_strict_mode
-      mysql_sql_modes.include?("STRICT_ALL_TABLES") || mysql_sql_modes.include?("STRICT_TRANS_TABLES")
+    def strict_mode?
+      sql_modes.include?("STRICT_ALL_TABLES") || sql_modes.include?("STRICT_TRANS_TABLES")
     end
   end
 end
