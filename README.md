@@ -210,6 +210,7 @@ A few changes don’t require a table rewrite (and are safe) in Postgres:
 - Changing a `varchar` column to a `text` or `citext` column
 - Changing a `text` column to a `varchar` column with no length limit or a `citext` column
 - Changing a `citext` column to a `text` column or a `varchar` column with no length limit [unreleased]
+- Changing a `cidr` column to an `inet` column [unreleased]
 - Increasing the precision of a `decimal`, `numeric`, `timestamp`, `timestamptz`, `time` or `interval` column
 - Making a `decimal` or `numeric` column unconstrained
 - Changing between `timestamp` and `timestamptz` columns when session time zone is UTC in Postgres 12+

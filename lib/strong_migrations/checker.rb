@@ -174,6 +174,8 @@ Then add the NOT NULL constraint in separate migrations."
                 existing_precision = existing_column.precision || existing_column.limit || 6
 
                 safe = existing_type == "interval" && precision >= existing_precision
+              when "inet"
+                safe = existing_type == "cidr"
               end
             elsif mysql? || mariadb?
               case type.to_s

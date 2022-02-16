@@ -304,6 +304,28 @@ class ChangeColumnIntervalDecreasePrecision < TestMigration
   end
 end
 
+class ChangeColumnCidrToInet < TestMigration
+  def up
+    add_column :users, :ip, :cidr
+    change_column :users, :ip, :inet
+  end
+
+  def down
+    remove_column :users, :ip
+  end
+end
+
+class ChangeColumnInetToCidr < TestMigration
+  def up
+    add_column :users, :ip, :inet
+    change_column :users, :ip, :cidr
+  end
+
+  def down
+    remove_column :users, :ip
+  end
+end
+
 class ChangeColumnWithNotNull < TestMigration
   def up
     change_column :users, :country, :string, limit: 20, null: false

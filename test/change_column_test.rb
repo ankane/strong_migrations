@@ -167,6 +167,18 @@ class ChangeColumnTest < Minitest::Test
     assert_unsafe ChangeColumnIntervalDecreasePrecision
   end
 
+  def test_cidr_to_inet
+    skip unless postgresql?
+    assert_safe ChangeColumnCidrToInet
+  end
+
+  # cidr most restrictive than inet
+  # https://www.postgresql.org/docs/14/datatype-net-types.html#DATATYPE-INET-VS-CIDR
+  def test_inet_to_cidr
+    skip unless postgresql?
+    assert_unsafe ChangeColumnInetToCidr
+  end
+
   def test_with_not_null
     assert_unsafe ChangeColumnWithNotNull
   end
