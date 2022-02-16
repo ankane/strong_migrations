@@ -99,6 +99,16 @@ class ChangeColumnTest < Minitest::Test
     end
   end
 
+  def test_timestamps_non_utc
+    skip unless postgresql?
+
+    with_target_version(12) do
+      with_time_zone do
+        assert_unsafe ChangeColumnTimestamps
+      end
+    end
+  end
+
   def test_timestamps_unsafe
     skip unless postgresql?
 
@@ -109,5 +119,12 @@ class ChangeColumnTest < Minitest::Test
 
   def test_with_not_null
     assert_unsafe ChangeColumnWithNotNull
+  end
+
+  def with_time_zone
+    ActiveRecord::Base.connection.execute("SET timezone = 'America/Los_Angeles'")
+    yield
+  ensure
+    ActiveRecord::Base.connection.execute("SET timezone = 'UTC'")
   end
 end
