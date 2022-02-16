@@ -489,7 +489,9 @@ Then add the foreign key in separate migrations."
       return if defined?(@version_checked)
 
       if postgresql?
-        check_version("PostgreSQL", postgresql_version, "9.6")
+        # postgresql_version only returns major versions for simplicity
+        # once min version hits 10 in 0.9.0, this will be more useful
+        check_version("PostgreSQL", postgresql_version, "9")
       elsif mysql?
         check_version("MySQL", mysql_version, "5.7")
       elsif mariadb?
