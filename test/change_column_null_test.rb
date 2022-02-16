@@ -86,10 +86,16 @@ class ChangeColumnNullTest < Minitest::Test
       "10.0.0"
     end
 
-    StrongMigrations.target_mysql_sql_modes = []
-    with_target_version(version) do
-      assert_unsafe ChangeColumnNull
+    with_target_sql_mode("") do
+      with_target_version(version) do
+        assert_unsafe ChangeColumnNull
+      end
     end
-    StrongMigrations.target_mysql_sql_modes = nil
+  end
+
+  def with_target_sql_mode(sql_mode)
+    StrongMigrations.stub(:target_sql_mode, sql_mode) do
+      yield
+    end
   end
 end

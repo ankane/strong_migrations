@@ -1,5 +1,6 @@
 ## 0.8.1 (unreleased)
 
+- Added `target_sql_mode` option
 - Added warning for unsupported database versions
 - Changing between `text` and `citext` is safe in Postgres
 - Changing a `varchar` column to a `citext` column is safe in Postgres

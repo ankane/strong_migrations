@@ -1,5 +1,3 @@
-require "set"
-
 module StrongMigrations
   class Checker
     include SafeMethods
@@ -663,12 +661,13 @@ Then add the foreign key in separate migrations."
     end
 
     def mysql_sql_modes
-      sql_modes = if StrongMigrations.target_mysql_sql_modes
-        StrongMigrations.target_mysql_sql_modes
-      else
-        @sql_modes ||= connection.select_all("SELECT @@SESSION.sql_mode").first["@@SESSION.sql_mode"].split(",")
+      @mysql_sql_modes ||= begin
+        if StrongMigrations.target_sql_mode
+          StrongMigrations.target_sql_mode.split(",")
+        else
+          connection.select_all("SELECT @@SESSION.sql_mode").first["@@SESSION.sql_mode"].split(",")
+        end
       end
-      Set.new(sql_modes)
     end
 
     def mysql_strict_mode

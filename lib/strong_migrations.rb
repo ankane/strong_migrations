@@ -19,7 +19,7 @@ module StrongMigrations
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
       :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
       :enabled_checks, :lock_timeout, :statement_timeout, :check_down, :target_version,
-      :safe_by_default, :target_mysql_sql_modes
+      :safe_by_default, :target_sql_mode
     attr_writer :lock_timeout_limit
   end
   self.auto_analyze = false
