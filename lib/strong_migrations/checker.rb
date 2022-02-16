@@ -23,6 +23,7 @@ module StrongMigrations
     end
 
     def perform(method, *args)
+      check_version_supported
       set_timeouts
       check_lock_timeout
 
@@ -480,6 +481,27 @@ Then add the foreign key in separate migrations."
           end
         end
         @lock_timeout_checked = true
+      end
+    end
+
+    # TODO raise error in 0.9.0
+    def check_version_supported
+      return if defined?(@version_checked)
+
+      if postgresql?
+        check_version("PostgreSQL", postgresql_version, "9.6")
+      elsif mysql?
+        check_version("MySQL", mysql_version, "5.7")
+      elsif mariadb?
+        check_version("MariaDB", mariadb_version, "10.1")
+      end
+
+      @version_checked = true
+    end
+
+    def check_version(database, version, min_version)
+      if version < Gem::Version.new(min_version)
+        warn "[strong_migrations] #{database} version (#{version}) not supported in this version of Strong Migrations (#{StrongMigrations::VERSION})"
       end
     end
 

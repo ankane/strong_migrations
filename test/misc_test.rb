@@ -25,4 +25,14 @@ class MiscTest < Minitest::Test
   def test_custom
     assert_unsafe Custom, "Cannot add forbidden column"
   end
+
+  # TODO raise error in 0.9.0
+  def test_unsupported_version
+    _, stderr = capture_io do
+      with_target_version(1) do
+        assert_unsafe ExecuteArbitrarySQL
+      end
+    end
+    assert_match "version (1) not supported", stderr
+  end
 end

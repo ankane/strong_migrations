@@ -1,5 +1,6 @@
 ## 0.8.1 (unreleased)
 
+- Added warning for unsupported database versions
 - Changing between `text` and `citext` is safe in Postgres
 - Changing a `varchar` column to a `citext` column is safe in Postgres
 - Changing a `citext` column to a `varchar` column with no length limit is safe in Postgres
