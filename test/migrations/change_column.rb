@@ -14,6 +14,16 @@ class ChangeColumnVarcharToText < TestMigration
   end
 end
 
+class ChangeColumnVarcharToCitext < TestMigration
+  def up
+    change_column :users, :name, :citext
+  end
+
+  def down
+    change_column :users, :name, :string
+  end
+end
+
 class ChangeColumnVarcharIncreaseLimit < TestMigration
   def up
     change_column :users, :country, :string, limit: 21

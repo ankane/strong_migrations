@@ -10,6 +10,11 @@ class ChangeColumnTest < Minitest::Test
     assert_safe ChangeColumnVarcharToText
   end
 
+  def test_varchar_to_citext
+    skip unless postgresql?
+    assert_safe ChangeColumnVarcharToCitext
+  end
+
   def test_varchar_increase_limit
     assert_safe ChangeColumnVarcharIncreaseLimit
   end
