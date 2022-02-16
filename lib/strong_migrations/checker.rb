@@ -124,12 +124,18 @@ Then add the NOT NULL constraint in separate migrations."
                 case existing_type
                 when "character varying"
                   safe = !options[:limit] || (existing_column.limit && options[:limit] >= existing_column.limit)
-                when "text", "citext"
+                when "text"
                   safe = !options[:limit]
+                when "citext"
+                  safe = !options[:limit] && !indexed?(table, column)
                 end
-              when "text", "citext"
+              when "text"
                 # safe to change varchar to text (and text to text)
-                safe = ["character varying", "text", "citext"].include?(existing_type)
+                safe =
+                  ["character varying", "text"].include?(existing_type) ||
+                  (existing_type == "citext" && !indexed?(table, column))
+              when "citext"
+                safe = ["character varying", "text"].include?(existing_type) && !indexed?(table, column)
               when "varbit"
                 # increasing length limit or removing the limit is safe
                 # but there doesn't seem to be a way to set/modify it
@@ -674,6 +680,11 @@ Then add the foreign key in separate migrations."
 
     def strict_mode?
       sql_modes.include?("STRICT_ALL_TABLES") || sql_modes.include?("STRICT_TRANS_TABLES")
+    end
+
+    # TODO test expression indexes
+    def indexed?(table, column)
+      connection.indexes(table).any? { |i| i.columns.include?(column.to_s) }
     end
   end
 end
