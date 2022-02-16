@@ -1,5 +1,6 @@
 ## 0.8.1 (unreleased)
 
+- Setting `NOT NULL` on an existing column is safe in MySQL 5.6+ and MariaDB 10.0+ with strict mode enabled
 - Added `target_sql_mode` option
 - Added warning for unsupported database versions
 - Changing between `text` and `citext` is safe in Postgres
