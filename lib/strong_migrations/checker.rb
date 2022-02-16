@@ -307,12 +307,10 @@ Then add the foreign key in separate migrations."
               unless strict_mode?
                 raise_error :change_column_null_mysql
               end
+            end
 
-              unless default.nil?
-                raise_error :change_column_null,
-                  code: backfill_code(table, column, default)
-              end
-            elsif !default.nil?
+            # TODO confirm safety in Postgres
+            if !postgresql? && !default.nil?
               raise_error :change_column_null,
                 code: backfill_code(table, column, default)
             end
