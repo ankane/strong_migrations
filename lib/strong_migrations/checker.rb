@@ -114,7 +114,7 @@ Then add the NOT NULL constraint in separate migrations."
           safe = false
           existing_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
           if existing_column
-            existing_type = existing_column.sql_type.split("(").first
+            existing_type = existing_column.sql_type.sub(/\(\d+(,\d+)?\)/, "")
             if postgresql?
               case type.to_s
               when "string"
@@ -144,7 +144,14 @@ Then add the NOT NULL constraint in separate migrations."
                     )
                   )
               when "datetime", "timestamp", "timestamptz"
+                # precision for datetime
+                # limit for timestamp, timestamptz
+                precision = (type.to_s == "datetime" ? options[:precision] : options[:limit]) || 6
+                existing_precision = existing_column.limit || existing_column.precision || 6
+
+                # TODO only check Postgres version and timezone if changing type
                 safe = ["timestamp without time zone", "timestamp with time zone"].include?(existing_type) &&
+                  precision >= existing_precision &&
                   postgresql_version >= Gem::Version.new("12") &&
                   connection.select_all("SHOW timezone").first["TimeZone"] == "UTC"
               end

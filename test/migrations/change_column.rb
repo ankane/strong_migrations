@@ -174,6 +174,81 @@ class ChangeColumnTimestamps < TestMigration
   end
 end
 
+class ChangeColumnDatetimeIncreasePrecision < TestMigration
+  def up
+    add_column :users, :joined_at, :datetime, precision: 0
+    change_column :users, :joined_at, :datetime, precision: 3
+    change_column :users, :joined_at, :datetime, precision: 6
+    change_column :users, :joined_at, :datetime
+    change_column :users, :joined_at, :datetime, precision: 6
+  end
+
+  def down
+    remove_column :users, :joined_at
+  end
+end
+
+class ChangeColumnDatetimeDecreasePrecision < TestMigration
+  def up
+    add_column :users, :joined_at, :datetime
+    change_column :users, :joined_at, :datetime, precision: 3
+  end
+
+  def down
+    remove_column :users, :joined_at
+  end
+end
+
+class ChangeColumnTimestampIncreaseLimit < TestMigration
+  def up
+    add_column :users, :joined_at, :timestamp, limit: 0
+    change_column :users, :joined_at, :timestamp, limit: 3
+    change_column :users, :joined_at, :timestamp, limit: 6
+    change_column :users, :joined_at, :timestamp
+    change_column :users, :joined_at, :timestamp, limit: 6
+  end
+
+  def down
+    remove_column :users, :joined_at
+  end
+end
+
+class ChangeColumnTimestampDecreaseLimit < TestMigration
+  def up
+    add_column :users, :joined_at, :timestamp
+    change_column :users, :joined_at, :timestamp, limit: 3
+  end
+
+  def down
+    remove_column :users, :joined_at
+  end
+end
+
+class ChangeColumnTimestamptzIncreaseLimit < TestMigration
+  def up
+    add_column :users, :joined_at, :timestamptz, limit: 0
+    change_column :users, :joined_at, :timestamptz, limit: 3
+    change_column :users, :joined_at, :timestamptz, limit: 6
+    change_column :users, :joined_at, :timestamptz
+    change_column :users, :joined_at, :timestamptz, limit: 6
+  end
+
+  def down
+    remove_column :users, :joined_at
+  end
+end
+
+class ChangeColumnTimestamptzDecreaseLimit < TestMigration
+  def up
+    add_column :users, :joined_at, :timestamptz
+    change_column :users, :joined_at, :timestamptz, limit: 3
+  end
+
+  def down
+    remove_column :users, :joined_at
+  end
+end
+
 class ChangeColumnWithNotNull < TestMigration
   def up
     change_column :users, :country, :string, limit: 20, null: false
