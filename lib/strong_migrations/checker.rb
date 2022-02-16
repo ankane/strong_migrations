@@ -123,7 +123,7 @@ Then add the NOT NULL constraint in separate migrations."
                 case existing_type
                 when "character varying"
                   safe = !options[:limit] || (existing_column.limit && options[:limit] >= existing_column.limit)
-                when "text"
+                when "text", "citext"
                   safe = !options[:limit]
                 end
               when "text"

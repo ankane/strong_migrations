@@ -119,6 +119,28 @@ class ChangeColumnCitextToText < TestMigration
   end
 end
 
+class ChangeColumnCitextToVarcharLimit < TestMigration
+  def up
+    add_column :users, :postal_code, :citext
+    change_column :users, :postal_code, :string, limit: 20
+  end
+
+  def down
+    remove_column :users, :postal_code
+  end
+end
+
+class ChangeColumnCitextToVarcharNoLimit < TestMigration
+  def up
+    add_column :users, :postal_code, :citext
+    change_column :users, :postal_code, :string
+  end
+
+  def down
+    remove_column :users, :postal_code
+  end
+end
+
 class ChangeColumnDecimalDecreasePrecision < TestMigration
   def up
     change_column :users, :credit_score, :decimal, precision: 9, scale: 5
