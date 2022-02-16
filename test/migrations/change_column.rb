@@ -254,6 +254,31 @@ class ChangeColumnTimestamptzDecreaseLimit < TestMigration
   end
 end
 
+class ChangeColumnTimeIncreasePrecision < TestMigration
+  def up
+    add_column :users, :opens_at, :time, precision: 0
+    change_column :users, :opens_at, :time, precision: 3
+    change_column :users, :opens_at, :time, precision: 6
+    change_column :users, :opens_at, :time
+    change_column :users, :opens_at, :time, precision: 6
+  end
+
+  def down
+    remove_column :users, :opens_at
+  end
+end
+
+class ChangeColumnTimeDecreasePrecision < TestMigration
+  def up
+    add_column :users, :opens_at, :time
+    change_column :users, :opens_at, :time, precision: 3
+  end
+
+  def down
+    remove_column :users, :opens_at
+  end
+end
+
 class ChangeColumnIntervalIncreasePrecision < TestMigration
   def up
     add_column :users, :duration, :interval, precision: 0

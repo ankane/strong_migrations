@@ -147,6 +147,16 @@ class ChangeColumnTest < Minitest::Test
     assert_unsafe ChangeColumnTimestamptzDecreaseLimit
   end
 
+  def test_time_increase_precision
+    skip unless postgresql?
+    assert_safe ChangeColumnTimeIncreasePrecision
+  end
+
+  def test_time_decrease_precision
+    skip unless postgresql?
+    assert_unsafe ChangeColumnTimeDecreasePrecision
+  end
+
   def test_interval_increase_precision
     skip unless postgresql?
     assert_safe ChangeColumnIntervalIncreasePrecision
