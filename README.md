@@ -217,7 +217,7 @@ Type | Safe Changes
 `string` | Increasing or removing `:limit`, changing to `text` or `citext`
 `text` | Changing to `citext`, changing to `string` with no `:limit`
 `time` | Increasing or removing `:precision`
-`timestamptz` | Increasing or removing `:precision`, changing to `datetime` when session time zone is UTC in Postgres 12+
+`timestamptz` | Increasing or removing `:limit`, changing to `datetime` when session time zone is UTC in Postgres 12+
 
 And a few in MySQL and MariaDB:
 
