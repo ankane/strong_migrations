@@ -19,7 +19,7 @@ module StrongMigrations
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
       :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
       :enabled_checks, :lock_timeout, :statement_timeout, :check_down, :target_version,
-      :safe_by_default
+      :safe_by_default, :target_mysql_sql_modes
     attr_writer :lock_timeout_limit
   end
   self.auto_analyze = false
@@ -194,8 +194,13 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
-    change_column_null_mysql:
-"Setting NOT NULL on an existing column is not safe with your database engine.",
+    change_column_null_mysql_too_old:
+"MySQL or MariaDB is too old and does not support online DDL.
+Setting NOT NULL on an existing column without online DDL is not safe.",
+
+    change_column_null_mysql_non_strict_mode:
+"MySQL or MariaDB is not in strict mode and does not support online DDL.
+Setting NOT NULL on an existing column without online DDL is not safe.",
 
     add_foreign_key:
 "Adding a foreign key blocks writes on both tables. Instead,

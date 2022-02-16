@@ -1,3 +1,5 @@
+require "set"
+
 module StrongMigrations
   class Checker
     include SafeMethods
@@ -293,7 +295,23 @@ Then add the foreign key in separate migrations."
                   validate_constraint_code: validate_constraint_code
               end
             elsif mysql? || mariadb?
-              raise_error :change_column_null_mysql
+              # does not support online DDL
+              if mysql? && mysql_version < Gem::Version.new("5.6")
+                raise_error :change_column_null_mysql_too_old
+              end
+
+              if mariadb? && mariadb_version < Gem::Version.new("10.0")
+                raise_error :change_column_null_mysql_too_old
+              end
+
+              unless mysql_strict_mode
+                raise_error :change_column_null_mysql_non_strict_mode
+              end
+
+              unless default.nil?
+                raise_error :change_column_null,
+                  code: backfill_code(table, column, default)
+              end
             elsif !default.nil?
               raise_error :change_column_null,
                 code: backfill_code(table, column, default)
@@ -642,6 +660,19 @@ Then add the foreign key in separate migrations."
       else
         false
       end
+    end
+
+    def mysql_sql_modes
+      sql_modes = if StrongMigrations.target_mysql_sql_modes
+        StrongMigrations.target_mysql_sql_modes
+      else
+        @sql_modes ||= connection.select_all("SELECT @@SESSION.sql_mode").first["@@SESSION.sql_mode"].split(",")
+      end
+      Set.new(sql_modes)
+    end
+
+    def mysql_strict_mode
+      mysql_sql_modes.include?("STRICT_ALL_TABLES") || mysql_sql_modes.include?("STRICT_TRANS_TABLES")
     end
   end
 end

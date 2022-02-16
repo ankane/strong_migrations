@@ -358,7 +358,7 @@ end
 
 :turtle: Safe by default available
 
-#### Bad
+#### Bad - Postgres
 
 Setting `NOT NULL` on an existing column blocks reads and writes while every row is checked.
 
@@ -432,7 +432,8 @@ end
 
 #### Good - MySQL and MariaDB
 
-[Let us know](https://github.com/ankane/strong_migrations/issues/new) if you have a safe way to do this.
+Using online DDL feature, we can set `NOT NULL` on an existing column without locking.
+MySQL 5.6 or later and MariaDB 10.0 or later support online DDL.
 
 ### Executing SQL directly
 
