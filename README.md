@@ -209,21 +209,21 @@ A few changes don’t require a table rewrite and are safe in Postgres:
 Type | Safe Changes
 --- | ---
 `cidr` | Changing to `inet`
-`citext` | Changing to `text`, changing to `string` with no limit
-`datetime` | Increasing or removing precision, changing to `timestamptz` when session time zone is UTC in Postgres 12+
-`decimal` | Increasing precision at same scale, making unconstrained
-`interval` | Increasing or removing precision
-`numeric` | Increasing precision at same scale, making unconstrained
-`string` | Increasing or removing limit, changing to `text` or `citext`
-`text` | Changing to `citext`, changing to `string` with no limit
-`time` | Increasing or removing precision
-`timestamptz` | Increasing or removing precision, changing to `datetime` when session time zone is UTC in Postgres 12+
+`citext` | Changing to `text`, changing to `string` with no `:limit`
+`datetime` | Increasing or removing `:precision`, changing to `timestamptz` when session time zone is UTC in Postgres 12+
+`decimal` | Increasing `:precision` at same `:scale`, removing `:precision` and `:scale`
+`interval` | Increasing or removing `:precision`
+`numeric` | Increasing `:precision` at same `:scale`, removing `:precision` and `:scale`
+`string` | Increasing or removing `:limit`, changing to `text` or `citext`
+`text` | Changing to `citext`, changing to `string` with no `:limit`
+`time` | Increasing or removing `:precision`
+`timestamptz` | Increasing or removing `:precision`, changing to `datetime` when session time zone is UTC in Postgres 12+
 
 And a few in MySQL and MariaDB:
 
 Type | Safe Changes
 --- | ---
-`string` | Increasing the limit from under 255 up to 255, increasing the limit from over 255 to the max limit
+`string` | Increasing `:limit` from under 255 up to 255, increasing `:limit` from over 255 to the max
 
 #### Good
 
