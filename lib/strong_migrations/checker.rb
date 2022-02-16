@@ -303,7 +303,7 @@ Then add the foreign key in separate migrations."
               end
 
               unless mysql_strict_mode
-                raise_error :change_column_null_mysql_non_strict_mode
+                raise_error :change_column_null_mysql
               end
 
               unless default.nil?

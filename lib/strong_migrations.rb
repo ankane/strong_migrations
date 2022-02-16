@@ -195,12 +195,10 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     change_column_null_mysql_too_old:
-"MySQL or MariaDB is too old and does not support online DDL.
-Setting NOT NULL on an existing column without online DDL is not safe.",
+"Setting NOT NULL on an existing column is not safe with this version of your database engine.",
 
-    change_column_null_mysql_non_strict_mode:
-"MySQL or MariaDB is not in strict mode and does not support online DDL.
-Setting NOT NULL on an existing column without online DDL is not safe.",
+    change_column_null_mysql:
+"Setting NOT NULL on an existing column is not safe without strict mode enabled.",
 
     add_foreign_key:
 "Adding a foreign key blocks writes on both tables. Instead,
