@@ -662,7 +662,7 @@ Then add the foreign key in separate migrations."
 
     def sql_modes
       @sql_modes ||= begin
-        if StrongMigrations.target_sql_mode
+        if StrongMigrations.target_sql_mode && StrongMigrations.developer_env?
           StrongMigrations.target_sql_mode.split(",")
         else
           connection.select_all("SELECT @@SESSION.sql_mode").first["@@SESSION.sql_mode"].split(",")
