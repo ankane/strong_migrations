@@ -159,6 +159,9 @@ Then add the NOT NULL constraint in separate migrations."
                 existing_precision = existing_column.precision || existing_column.limit || 6
 
                 safe = existing_type == "time without time zone" && precision >= existing_precision
+              when "timetz"
+                # increasing precision is safe
+                # but there doesn't seem to be a way to set/modify it
               when "interval"
                 # https://wiki.postgresql.org/wiki/What%27s_new_in_PostgreSQL_9.2#Reduce_ALTER_TABLE_rewrites
                 # Active Record uses precision before limit
