@@ -28,6 +28,8 @@ TestMigration = ActiveRecord::Migration[migration_version]
 TestSchema = ActiveRecord::Schema
 
 ActiveRecord::Schema.define do
+  enable_extension "citext" if $adapter == "postgresql"
+
   [:users, :new_users, :orders, :devices].each do |table|
     drop_table(table) if table_exists?(table)
   end

@@ -212,6 +212,7 @@ A few changes don’t require a table rewrite (and are safe) in Postgres:
 - Increasing the precision of a `decimal` or `numeric` column
 - Making a `decimal` or `numeric` column unconstrained
 - Changing between `timestamp` and `timestamptz` columns when session time zone is UTC in Postgres 12+
+- Changing between `text` and `citext` columns [unreleased]
 
 And a few in MySQL and MariaDB:
 

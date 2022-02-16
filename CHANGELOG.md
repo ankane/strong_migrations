@@ -1,3 +1,7 @@
+## 0.8.1 (unreleased)
+
+- Changing between `text` and `citext` is safe in Postgres
+
 ## 0.8.0 (2022-02-09)
 
 - Fixed error with versioned schema with Active Record 7.0.2+

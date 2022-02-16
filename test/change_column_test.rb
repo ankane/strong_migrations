@@ -46,6 +46,16 @@ class ChangeColumnTest < Minitest::Test
     assert_unsafe ChangeColumnVarcharAddLimit
   end
 
+  def test_text_to_citext
+    skip unless postgresql?
+    assert_safe ChangeColumnTextToCitext
+  end
+
+  def test_citext_to_text
+    skip unless postgresql?
+    assert_safe ChangeColumnCitextToText
+  end
+
   def test_decimal_decrease_precision
     skip unless postgresql?
     assert_unsafe ChangeColumnDecimalDecreasePrecision
