@@ -294,10 +294,12 @@ Then add the foreign key in separate migrations."
               end
             elsif mysql? || mariadb?
               # does not support online DDL
+              # TODO remove in 0.9.0
               if mysql? && mysql_version < Gem::Version.new("5.6")
                 raise_error :change_column_null_mysql_too_old
               end
 
+              # TODO remove in 0.9.0
               if mariadb? && mariadb_version < Gem::Version.new("10.0")
                 raise_error :change_column_null_mysql_too_old
               end
