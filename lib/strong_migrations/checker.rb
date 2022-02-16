@@ -126,11 +126,9 @@ Then add the NOT NULL constraint in separate migrations."
                 when "text", "citext"
                   safe = !options[:limit]
                 end
-              when "text"
+              when "text", "citext"
                 # safe to change varchar to text (and text to text)
                 safe = ["character varying", "text", "citext"].include?(existing_type)
-              when "citext"
-                safe = ["text", "character varying"].include?(existing_type)
               when "numeric", "decimal"
                 # numeric and decimal are equivalent and can be used interchangably
                 safe = ["numeric", "decimal"].include?(existing_type) &&
