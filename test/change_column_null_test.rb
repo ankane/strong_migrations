@@ -80,15 +80,15 @@ class ChangeColumnNullTest < Minitest::Test
   def test_mysql_non_strict_mode
     skip unless mysql? || mariadb?
 
-    with_target_sql_mode("") do
+    without_strict_mode do
       with_target_version(mysql? ? "5.6.0" : "10.0.0") do
         assert_unsafe ChangeColumnNull
       end
     end
   end
 
-  def with_target_sql_mode(sql_mode)
-    StrongMigrations.stub(:target_sql_mode, sql_mode) do
+  def without_strict_mode
+    StrongMigrations.stub(:target_sql_mode, "") do
       yield
     end
   end
