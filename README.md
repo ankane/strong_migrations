@@ -208,11 +208,11 @@ A few changes don’t require a table rewrite (and are safe) in Postgres:
 
 - Increasing the length limit of a `varchar` column (or removing the limit)
 - Changing a `varchar` column to a `text` or `citext` column
-- Changing a `text` column to a `varchar` column with no length limit
+- Changing a `text` column to a `varchar` column with no length limit or a `citext` column
+- Changing a `citext` column to a `text` column [unreleased]
 - Increasing the precision of a `decimal` or `numeric` column
 - Making a `decimal` or `numeric` column unconstrained
 - Changing between `timestamp` and `timestamptz` columns when session time zone is UTC in Postgres 12+
-- Changing between `text` and `citext` columns [unreleased]
 
 And a few in MySQL and MariaDB:
 
