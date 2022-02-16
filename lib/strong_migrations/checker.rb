@@ -129,6 +129,10 @@ Then add the NOT NULL constraint in separate migrations."
               when "text", "citext"
                 # safe to change varchar to text (and text to text)
                 safe = ["character varying", "text", "citext"].include?(existing_type)
+              when "varbit"
+                # increasing length limit or removing the limit is safe
+                # but there doesn't seem to be a way to set/modify it
+                # https://wiki.postgresql.org/wiki/What%27s_new_in_PostgreSQL_9.2#Reduce_ALTER_TABLE_rewrites
               when "numeric", "decimal"
                 # numeric and decimal are equivalent and can be used interchangably
                 safe = ["numeric", "decimal"].include?(existing_type) &&
