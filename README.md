@@ -431,7 +431,17 @@ end
 
 #### Good - MySQL and MariaDB
 
-[Let us know](https://github.com/ankane/strong_migrations/issues/new) if you have a safe way to do this.
+MySQL 5.6 or later [supports online DDL for making a column NOT NULL](https://dev.mysql.com/doc/refman/8.0/en/innodb-online-ddl-operations.html#online-ddl-column-operations). To make sure the ALTER TABLE is online DDL, we can specify `ALGORITHM=INPLACE, LOCK=NONE`. If the DDL cannot perform online, it returns an error such as `ALGORITHM=INPLACE is not supported. Reason: Cannot change column type INPLACE.`
+
+```ruby
+class SetSomeColumnNotNull < ActiveRecord::Migration[7.0]
+  def change
+    safety_assured do
+      execute "ALTER TABLE users MODIFY COLUMN some_column data_type NOT NULL, ALGORITHM=INPLACE, LOCK=NONE"
+    end
+  end
+end
+```
 
 ### Executing SQL directly
 
