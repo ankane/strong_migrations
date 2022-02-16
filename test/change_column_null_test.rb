@@ -80,14 +80,8 @@ class ChangeColumnNullTest < Minitest::Test
   def test_mysql_non_strict_mode
     skip unless mysql? || mariadb?
 
-    version = if mysql?
-      "5.6.0"
-    elsif mariadb?
-      "10.0.0"
-    end
-
     with_target_sql_mode("") do
-      with_target_version(version) do
+      with_target_version(mysql? ? "5.6.0" : "10.0.0") do
         assert_unsafe ChangeColumnNull
       end
     end
