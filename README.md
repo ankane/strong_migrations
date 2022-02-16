@@ -211,9 +211,9 @@ Type | Safe Changes
 `cidr` | Changing to `inet`
 `citext` | Changing to `text`, changing to `string` with no limit
 `datetime` | Increasing or removing precision, changing to `timestamptz` when session time zone is UTC in Postgres 12+
-`decimal` | Increasing precision at the same scale, making unconstrained
+`decimal` | Increasing precision at same scale, making unconstrained
 `interval` | Increasing or removing precision
-`numeric` | Increasing precision at the same scale, making unconstrained
+`numeric` | Increasing precision at same scale, making unconstrained
 `string` | Increasing or removing limit, changing to `text` or `citext`
 `text` | Changing to `citext`, changing to `string` with no limit
 `time` | Increasing or removing precision
