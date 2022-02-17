@@ -30,38 +30,38 @@ module StrongMigrations
         # TODO better pattern
         # see checks.rb for methods
         case method
-        when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
-          check_remove_column(method, args)
-        when :change_table
-          check_change_table
-        when :rename_table
-          check_rename_table
-        when :rename_column
-          check_rename_column
-        when :add_index
-          check_add_index(args)
-        when :remove_index
-          check_remove_index(args)
-        when :add_column
-          check_add_column(args)
-        when :change_column
-          check_change_column(args)
-        when :create_table
-          check_create_table(args)
-        when :add_reference, :add_belongs_to
-          check_add_reference(method, args)
-        when :execute
-          check_execute
-        when :change_column_null
-          check_change_column_null(args)
-        when :add_foreign_key
-          check_add_foreign_key(args)
-        when :validate_foreign_key
-          check_validate_foreign_key
         when :add_check_constraint
           check_add_check_constraint(args)
+        when :add_column
+          check_add_column(args)
+        when :add_foreign_key
+          check_add_foreign_key(args)
+        when :add_index
+          check_add_index(args)
+        when :add_reference, :add_belongs_to
+          check_add_reference(method, args)
+        when :change_column
+          check_change_column(args)
+        when :change_column_null
+          check_change_column_null(args)
+        when :change_table
+          check_change_table
+        when :create_table
+          check_create_table(args)
+        when :execute
+          check_execute
+        when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
+          check_remove_column(method, args)
+        when :remove_index
+          check_remove_index(args)
+        when :rename_column
+          check_rename_column
+        when :rename_table
+          check_rename_table
         when :validate_check_constraint
           check_validate_check_constraint
+        when :validate_foreign_key
+          check_validate_foreign_key
         end
 
         # custom checks

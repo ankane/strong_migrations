@@ -3,124 +3,24 @@ module StrongMigrations
   module Checks
     private
 
-    def check_change_table
-      raise_error :change_table, header: "Possibly dangerous operation"
-    end
-
-    def check_rename_table
-      raise_error :rename_table
-    end
-
-    def check_rename_column
-      raise_error :rename_column
-    end
-
-    def check_execute
-      raise_error :execute, header: "Possibly dangerous operation"
-    end
-
-    def check_validate_foreign_key
-      if postgresql? && adapter.writes_blocked?
-        raise_error :validate_foreign_key
-      end
-    end
-
-    def check_validate_check_constraint
-      if postgresql? && adapter.writes_blocked?
-        raise_error :validate_check_constraint
-      end
-    end
-
-    def check_create_table(args)
-      table, options = args
+    def check_add_check_constraint(args)
+      table, expression, options = args
       options ||= {}
 
-      raise_error :create_table if options[:force]
+      if !new_table?(table)
+        if postgresql? && options[:validate] != false
+          add_options = options.merge(validate: false)
+          name = options[:name] || @migration.check_constraint_options(table, expression, options)[:name]
+          validate_options = {name: name}
 
-      # keep track of new tables of add_index check
-      @new_tables << table.to_s
-    end
+          throw :safe, safe_add_check_constraint(table, expression, add_options, validate_options) if StrongMigrations.safe_by_default
 
-    def check_add_foreign_key(args)
-      from_table, to_table, options = args
-      options ||= {}
-
-      validate = options.fetch(:validate, true)
-
-      # unlike add_index, we don't make an exception here for new tables
-      #
-      # with add_index, it's fine to lock a new table even after inserting data
-      # since the table won't be in use by the application
-      #
-      # with add_foreign_key, this would cause issues since it locks the referenced table
-      #
-      # it's okay to allow if the table is empty, but not a fan of data-dependent checks,
-      # since the data in production could be different from development
-      #
-      # note: adding foreign_keys with create_table is fine
-      # since the table is always guaranteed to be empty
-      if postgresql? && validate
-        throw :safe, safe_add_foreign_key(from_table, to_table, options) if StrongMigrations.safe_by_default
-
-        raise_error :add_foreign_key,
-          add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options.merge(validate: false)]),
-          validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
-      end
-    end
-
-    def check_remove_column(method, args)
-      columns =
-        case method
-        when :remove_timestamps
-          ["created_at", "updated_at"]
-        when :remove_column
-          [args[1].to_s]
-        when :remove_columns
-          args[1..-1].map(&:to_s)
-        else
-          options = args[2] || {}
-          reference = args[1]
-          cols = []
-          cols << "#{reference}_type" if options[:polymorphic]
-          cols << "#{reference}_id"
-          cols
+          raise_error :add_check_constraint,
+            add_check_constraint_code: command_str("add_check_constraint", [table, expression, add_options]),
+            validate_check_constraint_code: command_str("validate_check_constraint", [table, validate_options])
+        elsif mysql? || mariadb?
+          raise_error :add_check_constraint_mysql
         end
-
-      code = "self.ignored_columns = #{columns.inspect}"
-
-      raise_error :remove_column,
-        model: args[0].to_s.classify,
-        code: code,
-        command: command_str(method, args),
-        column_suffix: columns.size > 1 ? "s" : ""
-    end
-
-    def check_add_index(args)
-      table, columns, options = args
-      options ||= {}
-
-      if columns.is_a?(Array) && columns.size > 3 && !options[:unique]
-        raise_error :add_index_columns, header: "Best practice"
-      end
-
-      # safe to add non-concurrently to new tables (even after inserting data)
-      # since the table won't be in use by the application
-      if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
-        throw :safe, safe_add_index(table, columns, options) if StrongMigrations.safe_by_default
-        raise_error :add_index, command: command_str("add_index", [table, columns, options.merge(algorithm: :concurrently)])
-      end
-    end
-
-    def check_remove_index(args)
-      table, options = args
-      unless options.is_a?(Hash)
-        options = {column: options}
-      end
-      options ||= {}
-
-      if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
-        throw :safe, safe_remove_index(table, options) if StrongMigrations.safe_by_default
-        raise_error :remove_index, command: command_str("remove_index", [table, options.merge(algorithm: :concurrently)])
       end
     end
 
@@ -152,24 +52,46 @@ Then add the NOT NULL constraint in separate migrations."
       end
     end
 
-    def check_change_column(args)
-      table, column, type, options = args
+    # unlike add_index, we don't make an exception here for new tables
+    #
+    # with add_index, it's fine to lock a new table even after inserting data
+    # since the table won't be in use by the application
+    #
+    # with add_foreign_key, this would cause issues since it locks the referenced table
+    #
+    # it's okay to allow if the table is empty, but not a fan of data-dependent checks,
+    # since the data in production could be different from development
+    #
+    # note: adding foreign_keys with create_table is fine
+    # since the table is always guaranteed to be empty
+    def check_add_foreign_key(args)
+      from_table, to_table, options = args
       options ||= {}
 
-      safe = false
-      existing_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
-      if existing_column
-        existing_type = existing_column.sql_type.sub(/\(\d+(,\d+)?\)/, "")
-        safe = adapter.change_type_safe?(table, column, type, options, existing_column, existing_type)
+      validate = options.fetch(:validate, true)
+      if postgresql? && validate
+        throw :safe, safe_add_foreign_key(from_table, to_table, options) if StrongMigrations.safe_by_default
+
+        raise_error :add_foreign_key,
+          add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options.merge(validate: false)]),
+          validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
+      end
+    end
+
+    def check_add_index(args)
+      table, columns, options = args
+      options ||= {}
+
+      if columns.is_a?(Array) && columns.size > 3 && !options[:unique]
+        raise_error :add_index_columns, header: "Best practice"
       end
 
-      # unsafe to set NOT NULL for safe types with Postgres
-      # TODO check if safe for MySQL and MariaDB
-      if safe && existing_column.null && options[:null] == false
-        raise_error :change_column_with_not_null
+      # safe to add non-concurrently to new tables (even after inserting data)
+      # since the table won't be in use by the application
+      if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
+        throw :safe, safe_add_index(table, columns, options) if StrongMigrations.safe_by_default
+        raise_error :add_index, command: command_str("add_index", [table, columns, options.merge(algorithm: :concurrently)])
       end
-
-      raise_error :change_column, rewrite_blocks: adapter.rewrite_blocks unless safe
     end
 
     def check_add_reference(method, args)
@@ -205,6 +127,26 @@ Then add the foreign key in separate migrations."
             append: append
         end
       end
+    end
+
+    def check_change_column(args)
+      table, column, type, options = args
+      options ||= {}
+
+      safe = false
+      existing_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
+      if existing_column
+        existing_type = existing_column.sql_type.sub(/\(\d+(,\d+)?\)/, "")
+        safe = adapter.change_type_safe?(table, column, type, options, existing_column, existing_type)
+      end
+
+      # unsafe to set NOT NULL for safe types with Postgres
+      # TODO check if safe for MySQL and MariaDB
+      if safe && existing_column.null && options[:null] == false
+        raise_error :change_column_with_not_null
+      end
+
+      raise_error :change_column, rewrite_blocks: adapter.rewrite_blocks unless safe
     end
 
     def check_change_column_null(args)
@@ -280,26 +222,85 @@ Then add the foreign key in separate migrations."
       end
     end
 
-    def check_add_check_constraint(args)
-      table, expression, options = args
+    def check_change_table
+      raise_error :change_table, header: "Possibly dangerous operation"
+    end
+
+    def check_create_table(args)
+      table, options = args
       options ||= {}
 
-      if !new_table?(table)
-        if postgresql? && options[:validate] != false
-          add_options = options.merge(validate: false)
-          name = options[:name] || @migration.check_constraint_options(table, expression, options)[:name]
-          validate_options = {name: name}
+      raise_error :create_table if options[:force]
 
-          throw :safe, safe_add_check_constraint(table, expression, add_options, validate_options) if StrongMigrations.safe_by_default
+      # keep track of new tables of add_index check
+      @new_tables << table.to_s
+    end
 
-          raise_error :add_check_constraint,
-            add_check_constraint_code: command_str("add_check_constraint", [table, expression, add_options]),
-            validate_check_constraint_code: command_str("validate_check_constraint", [table, validate_options])
-        elsif mysql? || mariadb?
-          raise_error :add_check_constraint_mysql
+    def check_execute
+      raise_error :execute, header: "Possibly dangerous operation"
+    end
+
+    def check_remove_column(method, args)
+      columns =
+        case method
+        when :remove_timestamps
+          ["created_at", "updated_at"]
+        when :remove_column
+          [args[1].to_s]
+        when :remove_columns
+          args[1..-1].map(&:to_s)
+        else
+          options = args[2] || {}
+          reference = args[1]
+          cols = []
+          cols << "#{reference}_type" if options[:polymorphic]
+          cols << "#{reference}_id"
+          cols
         end
+
+      code = "self.ignored_columns = #{columns.inspect}"
+
+      raise_error :remove_column,
+        model: args[0].to_s.classify,
+        code: code,
+        command: command_str(method, args),
+        column_suffix: columns.size > 1 ? "s" : ""
+    end
+
+    def check_remove_index(args)
+      table, options = args
+      unless options.is_a?(Hash)
+        options = {column: options}
+      end
+      options ||= {}
+
+      if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
+        throw :safe, safe_remove_index(table, options) if StrongMigrations.safe_by_default
+        raise_error :remove_index, command: command_str("remove_index", [table, options.merge(algorithm: :concurrently)])
       end
     end
+
+    def check_rename_column
+      raise_error :rename_column
+    end
+
+    def check_rename_table
+      raise_error :rename_table
+    end
+
+    def check_validate_check_constraint
+      if postgresql? && adapter.writes_blocked?
+        raise_error :validate_check_constraint
+      end
+    end
+
+    def check_validate_foreign_key
+      if postgresql? && adapter.writes_blocked?
+        raise_error :validate_foreign_key
+      end
+    end
+
+    # helpers
 
     def postgresql?
       adapter.instance_of?(Adapters::PostgreSQLAdapter)
