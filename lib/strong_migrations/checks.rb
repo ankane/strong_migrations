@@ -86,7 +86,7 @@ Then add the NOT NULL constraint in separate migrations."
 
         raise_error :add_foreign_key,
           add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options.merge(validate: false)]),
-          validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
+          validate_foreign_key_code: "def change\n    #{command_str("validate_foreign_key", [from_table, to_table])}\n  end"
       end
     end
 
