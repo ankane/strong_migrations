@@ -1,6 +1,10 @@
 require_relative "test_helper"
 
 class TimeoutsTest < Minitest::Test
+  def teardown
+    reset_timeouts
+  end
+
   def test_timeouts
     skip unless postgresql? || mysql? || mariadb?
 
@@ -16,8 +20,6 @@ class TimeoutsTest < Minitest::Test
       assert_equal 3600, $statement_timeout
       assert_equal 10, $lock_timeout
     end
-  ensure
-    reset_timeouts
   end
 
   def test_statement_timeout_float
@@ -32,8 +34,6 @@ class TimeoutsTest < Minitest::Test
     else
       assert_equal 0.5, $statement_timeout
     end
-  ensure
-    reset_timeouts
   end
 
   # designed for 0 case to prevent no timeout
@@ -50,8 +50,6 @@ class TimeoutsTest < Minitest::Test
     else
       assert_equal 1.001, $statement_timeout
     end
-  ensure
-    reset_timeouts
   end
 
   def test_lock_timeout_float
@@ -62,8 +60,6 @@ class TimeoutsTest < Minitest::Test
     migrate CheckTimeouts
 
     assert_equal "500ms", $lock_timeout
-  ensure
-    reset_timeouts
   end
 
   def test_timeouts_string
@@ -76,8 +72,6 @@ class TimeoutsTest < Minitest::Test
 
     assert_equal "1h", $statement_timeout
     assert_equal "1d", $lock_timeout
-  ensure
-    reset_timeouts
   end
 
   def test_lock_timeout_limit
@@ -89,7 +83,6 @@ class TimeoutsTest < Minitest::Test
     end
   ensure
     StrongMigrations.lock_timeout_limit = nil
-    reset_timeouts
   end
 
   def test_lock_timeout_limit_postgresql
