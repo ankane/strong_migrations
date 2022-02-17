@@ -67,6 +67,9 @@ module StrongMigrations
           if columns.is_a?(Array) && columns.size > 3 && !options[:unique]
             raise_error :add_index_columns, header: "Best practice"
           end
+
+          # safe to add non-concurrently to new tables (even after inserting data)
+          # since the table won't be in use by the application
           if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
             return safe_add_index(table, columns, options) if StrongMigrations.safe_by_default
             raise_error :add_index, command: command_str("add_index", [table, columns, options.merge(algorithm: :concurrently)])
@@ -337,6 +340,18 @@ Then add the foreign key in separate migrations."
 
           validate = options.fetch(:validate, true)
 
+          # unlike add_index, we don't make an exception here for new tables
+          #
+          # with add_index, it's fine to lock a new table even after inserting data
+          # since the table won't be in use by the application
+          #
+          # with add_foreign_key, this would cause issues since it locks the referenced table
+          #
+          # it's okay to allow if table is empty, but not a fan of data-dependent checks,
+          # since the data in production could be different from development
+          #
+          # note: adding foreign_keys with create_table is fine
+          # since the table is always guaranteed to be empty
           if postgresql? && validate
             return safe_add_foreign_key(from_table, to_table, options) if StrongMigrations.safe_by_default
 
