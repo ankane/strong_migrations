@@ -204,7 +204,7 @@ class ChangeSomeColumnType < ActiveRecord::Migration[7.0]
 end
 ```
 
-A few changes don’t require a table rewrite and are safe in Postgres:
+Some changes don’t require a table rewrite and are safe in Postgres:
 
 Type | Safe Changes
 --- | ---
@@ -219,7 +219,7 @@ Type | Safe Changes
 `time` | Increasing or removing `:precision`
 `timestamptz` | Increasing or removing `:limit`, changing to `datetime` when session time zone is UTC in Postgres 12+
 
-And a few in MySQL and MariaDB:
+And some in MySQL and MariaDB:
 
 Type | Safe Changes
 --- | ---
