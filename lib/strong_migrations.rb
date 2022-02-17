@@ -8,6 +8,7 @@ require "strong_migrations/adapters/mariadb_adapter"
 require "strong_migrations/adapters/postgresql_adapter"
 
 # modules
+require "strong_migrations/checks"
 require "strong_migrations/safe_methods"
 require "strong_migrations/checker"
 require "strong_migrations/database_tasks"

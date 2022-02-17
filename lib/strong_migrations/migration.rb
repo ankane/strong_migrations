@@ -12,8 +12,10 @@ module StrongMigrations
       # Active Record 7.0.2+ versioned schema
       return super if defined?(ActiveRecord::Schema::Definition) && is_a?(ActiveRecord::Schema::Definition)
 
-      strong_migrations_checker.perform(method, *args) do
-        super
+      catch(:safe) do
+        strong_migrations_checker.perform(method, *args) do
+          super
+        end
       end
     end
     ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
