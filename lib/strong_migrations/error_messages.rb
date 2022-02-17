@@ -187,7 +187,9 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end
 
 class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
-  %{validate_foreign_key_code}
+  def change
+    %{validate_foreign_key_code}
+  end
 end",
 
     validate_foreign_key:
