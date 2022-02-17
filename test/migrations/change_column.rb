@@ -117,6 +117,18 @@ class ChangeColumnTextToCitextIndexed < TestMigration
   end
 end
 
+class ChangeColumnTextToCitextIndexedExpression < TestMigration
+  def up
+    safety_assured { add_index :users, "lower(description)" }
+    change_column :users, :description, :citext
+  end
+
+  def down
+    change_column :users, :description, :text
+    remove_index :users, :description
+  end
+end
+
 class ChangeColumnCitextToText < TestMigration
   def up
     change_column :users, :code, :text

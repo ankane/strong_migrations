@@ -56,9 +56,14 @@ class ChangeColumnTest < Minitest::Test
     assert_safe ChangeColumnTextToCitext
   end
 
-  def test_text_to_citext_index
+  def test_text_to_citext_indexed
     skip unless postgresql?
     assert_unsafe ChangeColumnTextToCitextIndexed
+  end
+
+  def test_text_to_citext_indexed_expression
+    skip unless postgresql?
+    assert_unsafe ChangeColumnTextToCitextIndexedExpression
   end
 
   def test_citext_to_text

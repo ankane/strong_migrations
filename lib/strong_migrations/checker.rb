@@ -689,7 +689,9 @@ Then add the foreign key in separate migrations."
       sql_modes.include?("STRICT_ALL_TABLES") || sql_modes.include?("STRICT_TRANS_TABLES")
     end
 
-    # TODO test expression indexes
+    # columns is array for column index and string for expression index
+    # the current approach can yield false positives for expression indexes
+    # but prefer to keep it simple for now
     def indexed?(table, column)
       connection.indexes(table).any? { |i| i.columns.include?(column.to_s) }
     end
