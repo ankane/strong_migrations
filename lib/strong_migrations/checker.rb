@@ -160,11 +160,21 @@ Then add the NOT NULL constraint in separate migrations."
                 precision = (type.to_s == "datetime" ? options[:precision] : options[:limit]) || 6
                 existing_precision = existing_column.limit || existing_column.precision || 6
 
-                # TODO only check Postgres version and timezone if changing type
-                safe = ["timestamp without time zone", "timestamp with time zone"].include?(existing_type) &&
-                  precision >= existing_precision &&
-                  postgresql_version >= Gem::Version.new("12") &&
-                  postgresql_time_zone == "UTC"
+                type_map = {
+                  "timestamp" => "timestamp without time zone",
+                  "timestamptz" => "timestamp with time zone"
+                }
+                maybe_safe = type_map.values.include?(existing_type) && precision >= existing_precision
+
+                if maybe_safe
+                  check_type = type.to_s
+                  if check_type == "datetime"
+                    # TODO resolve
+                    check_type = "timestamp"
+                  end
+
+                  safe = type_map[check_type] == existing_type || (postgresql_version >= Gem::Version.new("12") && postgresql_time_zone == "UTC")
+                end
               when "time"
                 precision = options[:precision] || options[:limit] || 6
                 existing_precision = existing_column.precision || existing_column.limit || 6

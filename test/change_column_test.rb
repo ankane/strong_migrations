@@ -142,6 +142,13 @@ class ChangeColumnTest < Minitest::Test
     assert_safe ChangeColumnDatetimeIncreasePrecision
   end
 
+  def test_datetime_increase_precision_before_12
+    skip unless postgresql?
+    with_target_version(11) do
+      assert_safe ChangeColumnDatetimeIncreasePrecision
+    end
+  end
+
   def test_datetime_decrease_precision
     skip unless postgresql?
     assert_unsafe ChangeColumnDatetimeDecreasePrecision
@@ -152,6 +159,13 @@ class ChangeColumnTest < Minitest::Test
     assert_safe ChangeColumnTimestampIncreaseLimit
   end
 
+  def test_timestamp_increase_limit_before_12
+    skip unless postgresql?
+    with_target_version(11) do
+      assert_safe ChangeColumnTimestampIncreaseLimit
+    end
+  end
+
   def test_timestamp_decrease_limit
     skip unless postgresql?
     assert_unsafe ChangeColumnTimestampDecreaseLimit
@@ -160,6 +174,13 @@ class ChangeColumnTest < Minitest::Test
   def test_timestamptz_increase_limit
     skip unless postgresql?
     assert_safe ChangeColumnTimestamptzIncreaseLimit
+  end
+
+  def test_timestamptz_increase_limit_before_12
+    skip unless postgresql?
+    with_target_version(11) do
+      assert_safe ChangeColumnTimestamptzIncreaseLimit
+    end
   end
 
   def test_timestamptz_decrease_limit
