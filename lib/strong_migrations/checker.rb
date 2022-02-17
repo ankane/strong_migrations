@@ -560,6 +560,10 @@ Then add the foreign key in separate migrations."
       end
     end
 
+    def postgresql_time_zone
+      connection.select_all("SHOW timezone").first["TimeZone"]
+    end
+
     def analyze_table(table)
       if postgresql?
         connection.execute "ANALYZE #{connection.quote_table_name(table.to_s)}"
@@ -666,10 +670,6 @@ Then add the foreign key in separate migrations."
       else
         false
       end
-    end
-
-    def postgresql_time_zone
-      connection.select_all("SHOW timezone").first["TimeZone"]
     end
 
     # do not memoize
