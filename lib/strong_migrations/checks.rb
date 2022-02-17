@@ -13,7 +13,10 @@ module StrongMigrations
           name = options[:name] || @migration.check_constraint_options(table, expression, options)[:name]
           validate_options = {name: name}
 
-          throw :safe, safe_add_check_constraint(table, expression, add_options, validate_options) if StrongMigrations.safe_by_default
+          if StrongMigrations.safe_by_default
+            safe_add_check_constraint(table, expression, add_options, validate_options)
+            throw :safe
+          end
 
           raise_error :add_check_constraint,
             add_check_constraint_code: command_str("add_check_constraint", [table, expression, add_options]),
@@ -70,7 +73,10 @@ Then add the NOT NULL constraint in separate migrations."
 
       validate = options.fetch(:validate, true)
       if postgresql? && validate
-        throw :safe, safe_add_foreign_key(from_table, to_table, options) if StrongMigrations.safe_by_default
+        if StrongMigrations.safe_by_default
+          safe_add_foreign_key(from_table, to_table, options)
+          throw :safe
+        end
 
         raise_error :add_foreign_key,
           add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options.merge(validate: false)]),
@@ -89,7 +95,11 @@ Then add the NOT NULL constraint in separate migrations."
       # safe to add non-concurrently to new tables (even after inserting data)
       # since the table won't be in use by the application
       if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
-        throw :safe, safe_add_index(table, columns, options) if StrongMigrations.safe_by_default
+        if StrongMigrations.safe_by_default
+          safe_add_index(table, columns, options)
+          throw :safe
+        end
+
         raise_error :add_index, command: command_str("add_index", [table, columns, options.merge(algorithm: :concurrently)])
       end
     end
@@ -110,7 +120,10 @@ Then add the NOT NULL constraint in separate migrations."
             options = options.merge(index: {algorithm: :concurrently})
           end
 
-          throw :safe, safe_add_reference(table, reference, options) if StrongMigrations.safe_by_default
+          if StrongMigrations.safe_by_default
+            safe_add_reference(table, reference, options)
+            throw :safe
+          end
 
           if options.delete(:foreign_key)
             headline = "Adding a foreign key blocks writes on both tables."
@@ -188,7 +201,10 @@ Then add the foreign key in separate migrations."
               end
             end
 
-            throw :safe, safe_change_column_null(add_code, validate_code, change_args, remove_code, default) if StrongMigrations.safe_by_default
+            if StrongMigrations.safe_by_default
+              safe_change_column_null(add_code, validate_code, change_args, remove_code, default)
+              throw :safe
+            end
 
             add_constraint_code =
               if constraint_methods
@@ -275,7 +291,11 @@ Then add the foreign key in separate migrations."
       options ||= {}
 
       if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
-        throw :safe, safe_remove_index(table, options) if StrongMigrations.safe_by_default
+        if StrongMigrations.safe_by_default
+          safe_remove_index(table, options)
+          throw :safe
+        end
+
         raise_error :remove_index, command: command_str("remove_index", [table, options.merge(algorithm: :concurrently)])
       end
     end
