@@ -120,93 +120,9 @@ Then add the NOT NULL constraint in separate migrations."
           if existing_column
             existing_type = existing_column.sql_type.sub(/\(\d+(,\d+)?\)/, "")
             if postgresql?
-              case type.to_s
-              when "string"
-                # safe to increase limit or remove it
-                # not safe to decrease limit or add a limit
-                case existing_type
-                when "character varying"
-                  safe = !options[:limit] || (existing_column.limit && options[:limit] >= existing_column.limit)
-                when "text"
-                  safe = !options[:limit]
-                when "citext"
-                  safe = !options[:limit] && !indexed?(table, column)
-                end
-              when "text"
-                # safe to change varchar to text (and text to text)
-                safe =
-                  ["character varying", "text"].include?(existing_type) ||
-                  (existing_type == "citext" && !indexed?(table, column))
-              when "citext"
-                safe = ["character varying", "text"].include?(existing_type) && !indexed?(table, column)
-              when "varbit"
-                # increasing length limit or removing the limit is safe
-                # but there doesn't seem to be a way to set/modify it
-                # https://wiki.postgresql.org/wiki/What%27s_new_in_PostgreSQL_9.2#Reduce_ALTER_TABLE_rewrites
-              when "numeric", "decimal"
-                # numeric and decimal are equivalent and can be used interchangably
-                safe = ["numeric", "decimal"].include?(existing_type) &&
-                  (
-                    (
-                      # unconstrained
-                      !options[:precision] && !options[:scale]
-                    ) || (
-                      # increased precision, same scale
-                      options[:precision] && existing_column.precision &&
-                      options[:precision] >= existing_column.precision &&
-                      options[:scale] == existing_column.scale
-                    )
-                  )
-              when "datetime", "timestamp", "timestamptz"
-                # precision for datetime
-                # limit for timestamp, timestamptz
-                precision = (type.to_s == "datetime" ? options[:precision] : options[:limit]) || 6
-                existing_precision = existing_column.limit || existing_column.precision || 6
-
-                type_map = {
-                  "timestamp" => "timestamp without time zone",
-                  "timestamptz" => "timestamp with time zone"
-                }
-                maybe_safe = type_map.values.include?(existing_type) && precision >= existing_precision
-
-                if maybe_safe
-                  new_type = type.to_s == "datetime" ? datetime_type : type.to_s
-
-                  # resolve with fallback
-                  new_type = type_map[new_type] || new_type
-
-                  safe = new_type == existing_type || (postgresql_version >= Gem::Version.new("12") && postgresql_time_zone == "UTC")
-                end
-              when "time"
-                precision = options[:precision] || options[:limit] || 6
-                existing_precision = existing_column.precision || existing_column.limit || 6
-
-                safe = existing_type == "time without time zone" && precision >= existing_precision
-              when "timetz"
-                # increasing precision is safe
-                # but there doesn't seem to be a way to set/modify it
-              when "interval"
-                # https://wiki.postgresql.org/wiki/What%27s_new_in_PostgreSQL_9.2#Reduce_ALTER_TABLE_rewrites
-                # Active Record uses precision before limit
-                precision = options[:precision] || options[:limit] || 6
-                existing_precision = existing_column.precision || existing_column.limit || 6
-
-                safe = existing_type == "interval" && precision >= existing_precision
-              when "inet"
-                safe = existing_type == "cidr"
-              end
+              safe = postgresql_change_type_safe?(table, column, type, options, existing_column, existing_type)
             elsif mysql? || mariadb?
-              case type.to_s
-              when "string"
-                # https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html
-                # https://mariadb.com/kb/en/innodb-online-ddl-operations-with-the-instant-alter-algorithm/#changing-the-data-type-of-a-column
-                # increased limit, but doesn't change number of length bytes
-                # 1-255 = 1 byte, 256-65532 = 2 bytes, 65533+ = too big for varchar
-                limit = options[:limit] || 255
-                safe = ["varchar"].include?(existing_type) &&
-                  limit >= existing_column.limit &&
-                  (limit <= 255 || existing_column.limit > 255)
-              end
+              safe = mysql_change_type_safe?(table, column, type, options, existing_column, existing_type)
             end
           end
 
@@ -732,6 +648,106 @@ Then add the foreign key in separate migrations."
 
       # could be timestamp, timestamp without time zone, timestamp with time zone, etc
       connection.class.const_get(:NATIVE_DATABASE_TYPES).fetch(key).fetch(:name)
+    end
+
+    def postgresql_change_type_safe?(table, column, type, options, existing_column, existing_type)
+      safe = false
+
+      case type.to_s
+      when "string"
+        # safe to increase limit or remove it
+        # not safe to decrease limit or add a limit
+        case existing_type
+        when "character varying"
+          safe = !options[:limit] || (existing_column.limit && options[:limit] >= existing_column.limit)
+        when "text"
+          safe = !options[:limit]
+        when "citext"
+          safe = !options[:limit] && !indexed?(table, column)
+        end
+      when "text"
+        # safe to change varchar to text (and text to text)
+        safe =
+          ["character varying", "text"].include?(existing_type) ||
+          (existing_type == "citext" && !indexed?(table, column))
+      when "citext"
+        safe = ["character varying", "text"].include?(existing_type) && !indexed?(table, column)
+      when "varbit"
+        # increasing length limit or removing the limit is safe
+        # but there doesn't seem to be a way to set/modify it
+        # https://wiki.postgresql.org/wiki/What%27s_new_in_PostgreSQL_9.2#Reduce_ALTER_TABLE_rewrites
+      when "numeric", "decimal"
+        # numeric and decimal are equivalent and can be used interchangably
+        safe = ["numeric", "decimal"].include?(existing_type) &&
+          (
+            (
+              # unconstrained
+              !options[:precision] && !options[:scale]
+            ) || (
+              # increased precision, same scale
+              options[:precision] && existing_column.precision &&
+              options[:precision] >= existing_column.precision &&
+              options[:scale] == existing_column.scale
+            )
+          )
+      when "datetime", "timestamp", "timestamptz"
+        # precision for datetime
+        # limit for timestamp, timestamptz
+        precision = (type.to_s == "datetime" ? options[:precision] : options[:limit]) || 6
+        existing_precision = existing_column.limit || existing_column.precision || 6
+
+        type_map = {
+          "timestamp" => "timestamp without time zone",
+          "timestamptz" => "timestamp with time zone"
+        }
+        maybe_safe = type_map.values.include?(existing_type) && precision >= existing_precision
+
+        if maybe_safe
+          new_type = type.to_s == "datetime" ? datetime_type : type.to_s
+
+          # resolve with fallback
+          new_type = type_map[new_type] || new_type
+
+          safe = new_type == existing_type || (postgresql_version >= Gem::Version.new("12") && postgresql_time_zone == "UTC")
+        end
+      when "time"
+        precision = options[:precision] || options[:limit] || 6
+        existing_precision = existing_column.precision || existing_column.limit || 6
+
+        safe = existing_type == "time without time zone" && precision >= existing_precision
+      when "timetz"
+        # increasing precision is safe
+        # but there doesn't seem to be a way to set/modify it
+      when "interval"
+        # https://wiki.postgresql.org/wiki/What%27s_new_in_PostgreSQL_9.2#Reduce_ALTER_TABLE_rewrites
+        # Active Record uses precision before limit
+        precision = options[:precision] || options[:limit] || 6
+        existing_precision = existing_column.precision || existing_column.limit || 6
+
+        safe = existing_type == "interval" && precision >= existing_precision
+      when "inet"
+        safe = existing_type == "cidr"
+      end
+
+      safe
+    end
+
+    def mysql_change_type_safe?(table, column, type, options, existing_column, existing_type)
+      safe = false
+
+      case type.to_s
+      when "string"
+        # https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html
+        # https://mariadb.com/kb/en/innodb-online-ddl-operations-with-the-instant-alter-algorithm/#changing-the-data-type-of-a-column
+        # increased limit, but doesn't change number of length bytes
+        # 1-255 = 1 byte, 256-65532 = 2 bytes, 65533+ = too big for varchar
+        limit = options[:limit] || 255
+        safe = ["varchar"].include?(existing_type) &&
+          limit >= existing_column.limit &&
+          (limit <= 255 || existing_column.limit > 255)
+      end
+
+      safe
     end
   end
 end
