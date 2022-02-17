@@ -53,6 +53,9 @@ ActiveRecord::Schema.define do
   end
 end
 
+class User < ActiveRecord::Base
+end
+
 module Helpers
   def postgresql?
     $adapter == "postgresql"

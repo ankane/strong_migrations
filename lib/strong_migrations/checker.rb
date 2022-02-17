@@ -285,7 +285,7 @@ Then add the foreign key in separate migrations."
                   end
                 end
 
-                return safe_change_column_null(add_code, validate_code, change_args, remove_code) if StrongMigrations.safe_by_default
+                return safe_change_column_null(add_code, validate_code, change_args, remove_code, default) if StrongMigrations.safe_by_default
 
                 add_constraint_code =
                   if constraint_methods

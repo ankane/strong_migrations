@@ -3,6 +3,7 @@
 - Setting `NOT NULL` on an existing column is safe in MySQL 5.6+ and MariaDB 10.0+ with strict mode enabled
 - Added `target_sql_mode` option
 - Added warning for unsupported database versions
+- Added warning for `change_column_null` with default value with `safe_by_default` option
 - Changing between `text` and `citext` is safe in Postgres when not indexed
 - Changing a `varchar` column to a `citext` column is safe in Postgres when not indexed
 - Changing a `citext` column to a `varchar` column with no length limit is safe in Postgres when not indexed
