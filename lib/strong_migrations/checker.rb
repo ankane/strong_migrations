@@ -28,6 +28,7 @@ module StrongMigrations
 
       if !safe? || safe_by_default_method?(method)
         # TODO better pattern
+        # see checks.rb for methods
         case method
         when :remove_column, :remove_columns, :remove_timestamps, :remove_reference, :remove_belongs_to
           check_remove_column(method, args)
