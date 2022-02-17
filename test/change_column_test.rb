@@ -56,9 +56,19 @@ class ChangeColumnTest < Minitest::Test
     assert_safe ChangeColumnTextToCitext
   end
 
+  def test_text_to_citext_index
+    skip unless postgresql?
+    assert_unsafe ChangeColumnTextToCitextIndexed
+  end
+
   def test_citext_to_text
     skip unless postgresql?
     assert_safe ChangeColumnCitextToText
+  end
+
+  def test_citext_to_text_indexed
+    skip unless postgresql?
+    assert_unsafe ChangeColumnCitextToTextIndexed
   end
 
   def test_citext_to_varchar_limit
@@ -69,6 +79,11 @@ class ChangeColumnTest < Minitest::Test
   def test_citext_to_varchar_no_limit
     skip unless postgresql?
     assert_safe ChangeColumnCitextToVarcharNoLimit
+  end
+
+  def test_citext_to_varchar_no_limit_indexed
+    skip unless postgresql?
+    assert_unsafe ChangeColumnCitextToVarcharNoLimitIndexed
   end
 
   def test_decimal_decrease_precision

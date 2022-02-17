@@ -105,6 +105,18 @@ class ChangeColumnTextToCitext < TestMigration
   end
 end
 
+class ChangeColumnTextToCitextIndexed < TestMigration
+  def up
+    safety_assured { add_index :users, :description }
+    change_column :users, :description, :citext
+  end
+
+  def down
+    change_column :users, :description, :text
+    remove_index :users, :description
+  end
+end
+
 class ChangeColumnCitextToText < TestMigration
   def up
     change_column :users, :code, :text
@@ -112,6 +124,18 @@ class ChangeColumnCitextToText < TestMigration
 
   def down
     change_column :users, :code, :citext
+  end
+end
+
+class ChangeColumnCitextToTextIndexed < TestMigration
+  def up
+    safety_assured { add_index :users, :code }
+    change_column :users, :code, :text
+  end
+
+  def down
+    change_column :users, :code, :citext
+    remove_index :users, :code
   end
 end
 
@@ -132,6 +156,18 @@ class ChangeColumnCitextToVarcharNoLimit < TestMigration
 
   def down
     change_column :users, :code, :citext
+  end
+end
+
+class ChangeColumnCitextToVarcharNoLimitIndexed < TestMigration
+  def up
+    safety_assured { add_index :users, :code }
+    change_column :users, :code, :string
+  end
+
+  def down
+    change_column :users, :code, :citext
+    remove_index :users, :code
   end
 end
 
