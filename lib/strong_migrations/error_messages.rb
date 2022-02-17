@@ -25,6 +25,11 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
+    add_column_default_callable:
+"Strong Migrations does not support inspecting callable default values.
+Please make really sure you're not calling a VOLATILE function,
+then wrap it in a safety_assured { ... } block.",
+
     add_column_json:
 "There's no equality operator for the json column type, which can cause errors for
 existing SELECT DISTINCT queries in your application. Use jsonb instead.

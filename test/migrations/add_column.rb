@@ -17,6 +17,12 @@ class AddColumnDefaultSafe < TestMigration
   end
 end
 
+class AddColumnDefaultCallable < TestMigration
+  def change
+    add_column :users, :nice, :datetime, default: -> { "clock_timestamp()" }
+  end
+end
+
 class AddColumnJson < TestMigration
   def change
     add_column :users, :properties, :json

@@ -14,6 +14,7 @@ New safe operations with Postgres
 
 New unsafe operations with Postgres
 
+- Adding a column with a callable default value
 - Decreasing `:precision` of a `datetime` column
 - Decreasing `:limit` of a `timestamptz` column
 - Passing a default value to `change_column_null`
