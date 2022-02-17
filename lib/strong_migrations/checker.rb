@@ -347,7 +347,7 @@ Then add the foreign key in separate migrations."
           #
           # with add_foreign_key, this would cause issues since it locks the referenced table
           #
-          # it's okay to allow if table is empty, but not a fan of data-dependent checks,
+          # it's okay to allow if the table is empty, but not a fan of data-dependent checks,
           # since the data in production could be different from development
           #
           # note: adding foreign_keys with create_table is fine
