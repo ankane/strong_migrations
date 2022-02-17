@@ -90,7 +90,7 @@ module StrongMigrations
           options ||= {}
           default = options[:default]
 
-          if !default.nil? && !add_column_default_safe?
+          if !default.nil? && !adapter.add_column_default_safe?
             if options[:null] == false
               options = options.except(:null)
               append = "
@@ -104,7 +104,7 @@ Then add the NOT NULL constraint in separate migrations."
               remove_command: command_str("remove_column", [table, column]),
               code: backfill_code(table, column, default),
               append: append,
-              rewrite_blocks: rewrite_blocks
+              rewrite_blocks: adapter.rewrite_blocks
           end
 
           if type.to_s == "json" && postgresql?
@@ -119,19 +119,16 @@ Then add the NOT NULL constraint in separate migrations."
           existing_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
           if existing_column
             existing_type = existing_column.sql_type.sub(/\(\d+(,\d+)?\)/, "")
-            if postgresql?
-              safe = postgresql_change_type_safe?(table, column, type, options, existing_column, existing_type)
-            elsif mysql? || mariadb?
-              safe = mysql_change_type_safe?(table, column, type, options, existing_column, existing_type)
-            end
+            safe = adapter.change_type_safe?(table, column, type, options, existing_column, existing_type)
           end
 
-          # unsafe to set NOT NULL for safe types
+          # unsafe to set NOT NULL for safe types with Postgres
+          # TODO check if safe for MySQL and MariaDB
           if safe && existing_column.null && options[:null] == false
             raise_error :change_column_with_not_null
           end
 
-          raise_error :change_column, rewrite_blocks: rewrite_blocks unless safe
+          raise_error :change_column, rewrite_blocks: adapter.rewrite_blocks unless safe
         when :create_table
           table, options = args
           options ||= {}
@@ -180,8 +177,9 @@ Then add the foreign key in separate migrations."
           if !null
             if postgresql?
               safe = false
-              if postgresql_version >= Gem::Version.new("12")
-                safe = constraints(table).any? { |c| c["def"] == "CHECK ((#{column} IS NOT NULL))" || c["def"] == "CHECK ((#{connection.quote_column_name(column)} IS NOT NULL))" }
+              safe_with_check_constraint = adapter.server_version >= Gem::Version.new("12")
+              if safe_with_check_constraint
+                safe = adapter.constraints(table).any? { |c| c["def"] == "CHECK ((#{column} IS NOT NULL))" || c["def"] == "CHECK ((#{connection.quote_column_name(column)} IS NOT NULL))" }
               end
 
               unless safe
@@ -201,7 +199,7 @@ Then add the foreign key in separate migrations."
                     String.new(safety_assured_str(validate_code))
                   end
 
-                if postgresql_version >= Gem::Version.new("12")
+                if safe_with_check_constraint
                   change_args = [table, column, null]
 
                   validate_constraint_code << "\n    #{command_str(:change_column_null, change_args)}"
@@ -231,16 +229,11 @@ Then add the foreign key in separate migrations."
             elsif mysql? || mariadb?
               # does not support online DDL
               # TODO remove in 0.9.0
-              if mysql? && mysql_version < Gem::Version.new("5.6")
+              unless adapter.online_ddl_supported?
                 raise_error :change_column_null_mysql_too_old
               end
 
-              # TODO remove in 0.9.0
-              if mariadb? && mariadb_version < Gem::Version.new("10.0")
-                raise_error :change_column_null_mysql_too_old
-              end
-
-              unless strict_mode?
+              unless adapter.strict_mode?
                 raise_error :change_column_null_mysql
               end
             end
@@ -276,7 +269,7 @@ Then add the foreign key in separate migrations."
               validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
           end
         when :validate_foreign_key
-          if postgresql? && writes_blocked?
+          if postgresql? && adapter.writes_blocked?
             raise_error :validate_foreign_key
           end
         when :add_check_constraint
@@ -299,7 +292,7 @@ Then add the foreign key in separate migrations."
             end
           end
         when :validate_check_constraint
-          if postgresql? && writes_blocked?
+          if postgresql? && adapter.writes_blocked?
             raise_error :validate_check_constraint
           end
         end
@@ -313,7 +306,7 @@ Then add the foreign key in separate migrations."
 
       # outdated statistics + a new index can hurt performance of existing queries
       if StrongMigrations.auto_analyze && direction == :up && method == :add_index
-        analyze_table(args[0])
+        adapter.analyze_table(args[0])
       end
 
       result
@@ -324,34 +317,11 @@ Then add the foreign key in separate migrations."
     def set_timeouts
       if !@timeouts_set
         if StrongMigrations.statement_timeout
-          statement =
-            if postgresql?
-              "SET statement_timeout TO #{connection.quote(postgresql_timeout(StrongMigrations.statement_timeout))}"
-            elsif mysql?
-              # use ceil to prevent no timeout for values under 1 ms
-              "SET max_execution_time = #{connection.quote((StrongMigrations.statement_timeout.to_f * 1000).ceil)}"
-            elsif mariadb?
-              "SET max_statement_time = #{connection.quote(StrongMigrations.statement_timeout)}"
-            else
-              raise StrongMigrations::Error, "Statement timeout not supported for this database"
-            end
-
-          connection.select_all(statement)
+          adapter.set_statement_timeout(StrongMigrations.statement_timeout)
         end
-
         if StrongMigrations.lock_timeout
-          statement =
-            if postgresql?
-              "SET lock_timeout TO #{connection.quote(postgresql_timeout(StrongMigrations.lock_timeout))}"
-            elsif mysql? || mariadb?
-              "SET lock_wait_timeout = #{connection.quote(StrongMigrations.lock_timeout)}"
-            else
-              raise StrongMigrations::Error, "Lock timeout not supported for this database"
-            end
-
-          connection.select_all(statement)
+          adapter.set_lock_timeout(StrongMigrations.lock_timeout)
         end
-
         @timeouts_set = true
       end
     end
@@ -372,52 +342,36 @@ Then add the foreign key in separate migrations."
       version && version <= StrongMigrations.start_after
     end
 
-    def postgresql?
-      connection.adapter_name =~ /postg/i # PostgreSQL, PostGIS
+    def adapter
+      @adapter ||= begin
+        cls =
+          case connection.adapter_name
+          when /postg/i # PostgreSQL, PostGIS
+            Adapters::PostgreSQLAdapter
+          when /mysql/i
+            if connection.try(:mariadb?)
+              Adapters::MariaDBAdapter
+            else
+              Adapters::MySQLAdapter
+            end
+          else
+            Adapters::AbstractAdapter
+          end
+
+        cls.new(self)
+      end
     end
 
-    def postgresql_version
-      @postgresql_version ||= begin
-        target_version(StrongMigrations.target_postgresql_version) do
-          # only works with major versions
-          connection.select_all("SHOW server_version_num").first["server_version_num"].to_i / 10000
-        end
-      end
+    def postgresql?
+      adapter.instance_of?(Adapters::PostgreSQLAdapter)
     end
 
     def mysql?
-      connection.adapter_name =~ /mysql/i && !connection.try(:mariadb?)
-    end
-
-    def mysql_version
-      @mysql_version ||= begin
-        target_version(StrongMigrations.target_mysql_version) do
-          connection.select_all("SELECT VERSION()").first["VERSION()"].split("-").first
-        end
-      end
+      adapter.instance_of?(Adapters::MySQLAdapter)
     end
 
     def mariadb?
-      connection.adapter_name =~ /mysql/i && connection.try(:mariadb?)
-    end
-
-    def mariadb_version
-      @mariadb_version ||= begin
-        target_version(StrongMigrations.target_mariadb_version) do
-          connection.select_all("SELECT VERSION()").first["VERSION()"].split("-").first
-        end
-      end
-    end
-
-    def target_version(target_version)
-      target_version ||= StrongMigrations.target_version
-      version =
-        if target_version && StrongMigrations.developer_env?
-          target_version.to_s
-        else
-          yield
-        end
-      Gem::Version.new(version)
+      adapter.instance_of?(Adapters::MariaDBAdapter)
     end
 
     def ar_version
@@ -428,21 +382,7 @@ Then add the foreign key in separate migrations."
       limit = StrongMigrations.lock_timeout_limit
 
       if limit && !@lock_timeout_checked
-        if postgresql?
-          lock_timeout = connection.select_all("SHOW lock_timeout").first["lock_timeout"]
-          lock_timeout_sec = timeout_to_sec(lock_timeout)
-          if lock_timeout_sec == 0
-            warn "[strong_migrations] DANGER: No lock timeout set"
-          elsif lock_timeout_sec > limit
-            warn "[strong_migrations] DANGER: Lock timeout is longer than #{limit} seconds: #{lock_timeout}"
-          end
-        elsif mysql? || mariadb?
-          lock_timeout = connection.select_all("SHOW VARIABLES LIKE 'lock_wait_timeout'").first["Value"]
-          # lock timeout is an integer
-          if lock_timeout.to_i > limit
-            warn "[strong_migrations] DANGER: Lock timeout is longer than #{limit} seconds: #{lock_timeout}"
-          end
-        end
+        adapter.check_lock_timeout(limit)
         @lock_timeout_checked = true
       end
     end
@@ -451,81 +391,15 @@ Then add the foreign key in separate migrations."
     def check_version_supported
       return if defined?(@version_checked)
 
-      if postgresql?
-        # postgresql_version only returns major versions for simplicity
-        # once min version hits 10 in 0.9.0, this will be more useful
-        check_version("PostgreSQL", postgresql_version, "9")
-      elsif mysql?
-        check_version("MySQL", mysql_version, "5.7")
-      elsif mariadb?
-        check_version("MariaDB", mariadb_version, "10.1")
+      min_version = adapter.min_version
+      if min_version
+        version = adapter.server_version
+        if version < Gem::Version.new(min_version)
+          warn "[strong_migrations] #{adapter.name} version (#{version}) not supported in this version of Strong Migrations (#{StrongMigrations::VERSION})"
+        end
       end
 
       @version_checked = true
-    end
-
-    def check_version(database, version, min_version)
-      if version < Gem::Version.new(min_version)
-        warn "[strong_migrations] #{database} version (#{version}) not supported in this version of Strong Migrations (#{StrongMigrations::VERSION})"
-      end
-    end
-
-    # units: https://www.postgresql.org/docs/current/config-setting.html
-    def timeout_to_sec(timeout)
-      units = {
-        "us" => 0.001,
-        "ms" => 1,
-        "s" => 1000,
-        "min" => 1000 * 60,
-        "h" => 1000 * 60 * 60,
-        "d" => 1000 * 60 * 60 * 24
-      }
-      timeout_ms = timeout.to_i
-      units.each do |k, v|
-        if timeout.end_with?(k)
-          timeout_ms *= v
-          break
-        end
-      end
-      timeout_ms / 1000.0
-    end
-
-    def postgresql_timeout(timeout)
-      if timeout.is_a?(String)
-        timeout
-      else
-        # use ceil to prevent no timeout for values under 1 ms
-        (timeout.to_f * 1000).ceil
-      end
-    end
-
-    # do not memoize
-    # want latest value
-    def postgresql_time_zone
-      connection.select_all("SHOW timezone").first["TimeZone"]
-    end
-
-    def analyze_table(table)
-      if postgresql?
-        connection.execute "ANALYZE #{connection.quote_table_name(table.to_s)}"
-      elsif mariadb? || mysql?
-        connection.execute "ANALYZE TABLE #{connection.quote_table_name(table.to_s)}"
-      end
-    end
-
-    def constraints(table_name)
-      query = <<~SQL
-        SELECT
-          conname AS name,
-          pg_get_constraintdef(oid) AS def
-        FROM
-          pg_constraint
-        WHERE
-          contype = 'c' AND
-          convalidated AND
-          conrelid = #{connection.quote(connection.quote_table_name(table_name))}::regclass
-      SQL
-      connection.select_all(query.squish).to_a
     end
 
     def raise_error(message_key, header: nil, append: nil, **vars)
@@ -575,23 +449,6 @@ Then add the foreign key in separate migrations."
       "#{command} #{str_args.join(", ")}"
     end
 
-    def writes_blocked?
-      query = <<~SQL
-        SELECT
-          relation::regclass::text
-        FROM
-          pg_locks
-        WHERE
-          mode IN ('ShareRowExclusiveLock', 'AccessExclusiveLock') AND
-          pid = pg_backend_pid()
-      SQL
-      connection.select_all(query.squish).any?
-    end
-
-    def rewrite_blocks
-      mysql? || mariadb? ? "writes" : "reads and writes"
-    end
-
     def backfill_code(table, column, default)
       model = table.to_s.classify
       "#{model}.unscoped.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
@@ -599,155 +456,6 @@ Then add the foreign key in separate migrations."
 
     def new_table?(table)
       @new_tables.include?(table.to_s)
-    end
-
-    def add_column_default_safe?
-      if postgresql?
-        postgresql_version >= Gem::Version.new("11")
-      elsif mysql?
-        mysql_version >= Gem::Version.new("8.0.12")
-      elsif mariadb?
-        mariadb_version >= Gem::Version.new("10.3.2")
-      else
-        false
-      end
-    end
-
-    # do not memoize
-    # want latest value
-    def sql_modes
-      if StrongMigrations.target_sql_mode && StrongMigrations.developer_env?
-        StrongMigrations.target_sql_mode.split(",")
-      else
-        connection.select_all("SELECT @@SESSION.sql_mode").first["@@SESSION.sql_mode"].split(",")
-      end
-    end
-
-    def strict_mode?
-      sql_modes = sql_modes()
-      sql_modes.include?("STRICT_ALL_TABLES") || sql_modes.include?("STRICT_TRANS_TABLES")
-    end
-
-    # columns is array for column index and string for expression index
-    # the current approach can yield false positives for expression indexes
-    # but prefer to keep it simple for now
-    def indexed?(table, column)
-      connection.indexes(table).any? { |i| i.columns.include?(column.to_s) }
-    end
-
-    def datetime_type
-      key =
-        if ActiveRecord::VERSION::MAJOR >= 7
-          # https://github.com/rails/rails/pull/41084
-          # no need to support custom datetime_types
-          connection.class.datetime_type
-        else
-          # https://github.com/rails/rails/issues/21126#issuecomment-327895275
-          :datetime
-        end
-
-      # could be timestamp, timestamp without time zone, timestamp with time zone, etc
-      connection.class.const_get(:NATIVE_DATABASE_TYPES).fetch(key).fetch(:name)
-    end
-
-    def postgresql_change_type_safe?(table, column, type, options, existing_column, existing_type)
-      safe = false
-
-      case type.to_s
-      when "string"
-        # safe to increase limit or remove it
-        # not safe to decrease limit or add a limit
-        case existing_type
-        when "character varying"
-          safe = !options[:limit] || (existing_column.limit && options[:limit] >= existing_column.limit)
-        when "text"
-          safe = !options[:limit]
-        when "citext"
-          safe = !options[:limit] && !indexed?(table, column)
-        end
-      when "text"
-        # safe to change varchar to text (and text to text)
-        safe =
-          ["character varying", "text"].include?(existing_type) ||
-          (existing_type == "citext" && !indexed?(table, column))
-      when "citext"
-        safe = ["character varying", "text"].include?(existing_type) && !indexed?(table, column)
-      when "varbit"
-        # increasing length limit or removing the limit is safe
-        # but there doesn't seem to be a way to set/modify it
-        # https://wiki.postgresql.org/wiki/What%27s_new_in_PostgreSQL_9.2#Reduce_ALTER_TABLE_rewrites
-      when "numeric", "decimal"
-        # numeric and decimal are equivalent and can be used interchangably
-        safe = ["numeric", "decimal"].include?(existing_type) &&
-          (
-            (
-              # unconstrained
-              !options[:precision] && !options[:scale]
-            ) || (
-              # increased precision, same scale
-              options[:precision] && existing_column.precision &&
-              options[:precision] >= existing_column.precision &&
-              options[:scale] == existing_column.scale
-            )
-          )
-      when "datetime", "timestamp", "timestamptz"
-        # precision for datetime
-        # limit for timestamp, timestamptz
-        precision = (type.to_s == "datetime" ? options[:precision] : options[:limit]) || 6
-        existing_precision = existing_column.limit || existing_column.precision || 6
-
-        type_map = {
-          "timestamp" => "timestamp without time zone",
-          "timestamptz" => "timestamp with time zone"
-        }
-        maybe_safe = type_map.values.include?(existing_type) && precision >= existing_precision
-
-        if maybe_safe
-          new_type = type.to_s == "datetime" ? datetime_type : type.to_s
-
-          # resolve with fallback
-          new_type = type_map[new_type] || new_type
-
-          safe = new_type == existing_type || (postgresql_version >= Gem::Version.new("12") && postgresql_time_zone == "UTC")
-        end
-      when "time"
-        precision = options[:precision] || options[:limit] || 6
-        existing_precision = existing_column.precision || existing_column.limit || 6
-
-        safe = existing_type == "time without time zone" && precision >= existing_precision
-      when "timetz"
-        # increasing precision is safe
-        # but there doesn't seem to be a way to set/modify it
-      when "interval"
-        # https://wiki.postgresql.org/wiki/What%27s_new_in_PostgreSQL_9.2#Reduce_ALTER_TABLE_rewrites
-        # Active Record uses precision before limit
-        precision = options[:precision] || options[:limit] || 6
-        existing_precision = existing_column.precision || existing_column.limit || 6
-
-        safe = existing_type == "interval" && precision >= existing_precision
-      when "inet"
-        safe = existing_type == "cidr"
-      end
-
-      safe
-    end
-
-    def mysql_change_type_safe?(table, column, type, options, existing_column, existing_type)
-      safe = false
-
-      case type.to_s
-      when "string"
-        # https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html
-        # https://mariadb.com/kb/en/innodb-online-ddl-operations-with-the-instant-alter-algorithm/#changing-the-data-type-of-a-column
-        # increased limit, but doesn't change number of length bytes
-        # 1-255 = 1 byte, 256-65532 = 2 bytes, 65533+ = too big for varchar
-        limit = options[:limit] || 255
-        safe = ["varchar"].include?(existing_type) &&
-          limit >= existing_column.limit &&
-          (limit <= 255 || existing_column.limit > 255)
-      end
-
-      safe
     end
   end
 end

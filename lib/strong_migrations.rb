@@ -1,6 +1,12 @@
 # dependencies
 require "active_support"
 
+# adapters
+require "strong_migrations/adapters/abstract_adapter"
+require "strong_migrations/adapters/mysql_adapter"
+require "strong_migrations/adapters/mariadb_adapter"
+require "strong_migrations/adapters/postgresql_adapter"
+
 # modules
 require "strong_migrations/safe_methods"
 require "strong_migrations/checker"
