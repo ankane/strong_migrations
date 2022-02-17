@@ -39,6 +39,14 @@ class ChangeColumnNullTest < Minitest::Test
     end
   end
 
+  def test_constraint_default
+    skip unless postgresql?
+
+    with_target_version(12) do
+      assert_unsafe ChangeColumnNullConstraintDefault
+    end
+  end
+
   def test_constraint_before_12
     skip unless postgresql?
 

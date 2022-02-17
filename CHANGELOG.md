@@ -9,6 +9,7 @@
 - Changing a `cidr` column to an `inet` column is safe in Postgres
 - Increasing the precision of an `interval` or `time` column is safe in Postgres
 - Decreasing the precision of a `timestamp` or `timestamptz` column is not safe in Postgres
+- Passing a default value to `change_column_null` is not safe in Postgres
 
 ## 0.8.0 (2022-02-09)
 

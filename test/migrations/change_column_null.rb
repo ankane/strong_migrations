@@ -48,6 +48,21 @@ class ChangeColumnNullConstraintUnvalidated < TestMigration
   end
 end
 
+class ChangeColumnNullConstraintDefault < TestMigration
+  def up
+    safety_assured do
+      execute 'ALTER TABLE "users" ADD CONSTRAINT "test" CHECK ("name" IS NOT NULL) NOT VALID'
+      execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "test"'
+    end
+    change_column_null :users, :name, false, "Andy"
+  end
+
+  def down
+    execute 'ALTER TABLE "users" DROP CONSTRAINT "test"'
+    change_column_null :users, :name, true
+  end
+end
+
 class ChangeColumnNullDefault < TestMigration
   def change
     change_column_null :users, :name, false, "Andy"

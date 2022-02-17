@@ -317,8 +317,7 @@ Then add the foreign key in separate migrations."
               end
             end
 
-            # TODO confirm safety in Postgres
-            if !postgresql? && !default.nil?
+            if !default.nil?
               raise_error :change_column_null,
                 code: backfill_code(table, column, default)
             end
