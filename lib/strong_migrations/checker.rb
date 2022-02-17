@@ -167,13 +167,23 @@ Then add the NOT NULL constraint in separate migrations."
                 maybe_safe = type_map.values.include?(existing_type) && precision >= existing_precision
 
                 if maybe_safe
-                  check_type = type.to_s
-                  if check_type == "datetime"
-                    # TODO resolve
-                    check_type = "timestamp"
-                  end
+                  new_type = type.to_s
+                  if new_type == "datetime"
+                    datetime_type =
+                      if ActiveRecord::VERSION::MAJOR >= 7
+                        # https://github.com/rails/rails/pull/41084
+                        # no need to support custom datetime_types
+                        connection.class.datetime_type
+                      else
+                        :datetime
+                      end
 
-                  safe = type_map[check_type] == existing_type || (postgresql_version >= Gem::Version.new("12") && postgresql_time_zone == "UTC")
+                    # could be timestamp, timestamp with time zone, etc
+                    new_type = connection.class.const_get(:NATIVE_DATABASE_TYPES).fetch(datetime_type).fetch(:name)
+                  end
+                  new_type = type_map[new_type] || new_type
+
+                  safe = new_type == existing_type || (postgresql_version >= Gem::Version.new("12") && postgresql_time_zone == "UTC")
                 end
               when "time"
                 precision = options[:precision] || options[:limit] || 6
