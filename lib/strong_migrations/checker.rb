@@ -167,21 +167,9 @@ Then add the NOT NULL constraint in separate migrations."
                 maybe_safe = type_map.values.include?(existing_type) && precision >= existing_precision
 
                 if maybe_safe
-                  new_type = type.to_s
-                  if new_type == "datetime"
-                    datetime_type =
-                      if ActiveRecord::VERSION::MAJOR >= 7
-                        # https://github.com/rails/rails/pull/41084
-                        # no need to support custom datetime_types
-                        connection.class.datetime_type
-                      else
-                        # https://github.com/rails/rails/issues/21126#issuecomment-327895275
-                        :datetime
-                      end
+                  new_type = type.to_s == "datetime" ? datetime_type : type.to_s
 
-                    # could be timestamp, timestamp with time zone, etc
-                    new_type = connection.class.const_get(:NATIVE_DATABASE_TYPES).fetch(datetime_type).fetch(:name)
-                  end
+                  # resolve with fallback
                   new_type = type_map[new_type] || new_type
 
                   safe = new_type == existing_type || (postgresql_version >= Gem::Version.new("12") && postgresql_time_zone == "UTC")
@@ -714,6 +702,21 @@ Then add the foreign key in separate migrations."
     # but prefer to keep it simple for now
     def indexed?(table, column)
       connection.indexes(table).any? { |i| i.columns.include?(column.to_s) }
+    end
+
+    def datetime_type
+      key =
+        if ActiveRecord::VERSION::MAJOR >= 7
+          # https://github.com/rails/rails/pull/41084
+          # no need to support custom datetime_types
+          connection.class.datetime_type
+        else
+          # https://github.com/rails/rails/issues/21126#issuecomment-327895275
+          :datetime
+        end
+
+      # could be timestamp, timestamp without time zone, timestamp with time zone, etc
+      connection.class.const_get(:NATIVE_DATABASE_TYPES).fetch(key).fetch(:name)
     end
   end
 end
