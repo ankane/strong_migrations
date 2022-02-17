@@ -72,9 +72,8 @@ module StrongMigrations
     def safe_change_column_null(add_code, validate_code, change_args, remove_code, default)
       @migration.reversible do |dir|
         dir.up do
-          # TODO raise error if not supported in 0.9.0
           unless default.nil?
-            warn "[strong_migrations] default value not supported yet"
+            raise Error, "default value not supported yet with safe_by_default"
           end
 
           @migration.safety_assured do

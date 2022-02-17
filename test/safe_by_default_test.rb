@@ -63,12 +63,12 @@ class SafeByDefaultTest < Minitest::Test
 
     # TODO add
     # User.create!
-    _, stderr = capture_io do
+    error = assert_raises(StrongMigrations::Error) do
       with_target_version(12) do
         assert_safe ChangeColumnNullDefault
       end
     end
-    assert_match "[strong_migrations] default value not supported yet", stderr
+    assert_match "default value not supported yet with safe_by_default", error.message
   ensure
     User.delete_all
   end
