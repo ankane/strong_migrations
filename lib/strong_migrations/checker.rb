@@ -175,6 +175,7 @@ Then add the NOT NULL constraint in separate migrations."
                         # no need to support custom datetime_types
                         connection.class.datetime_type
                       else
+                        # https://github.com/rails/rails/issues/21126#issuecomment-327895275
                         :datetime
                       end
 
