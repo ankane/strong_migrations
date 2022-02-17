@@ -668,17 +668,18 @@ Then add the foreign key in separate migrations."
       end
     end
 
+    # do not memoize
+    # want latest value for each operation that needs it
     def sql_modes
-      @sql_modes ||= begin
-        if StrongMigrations.target_sql_mode && StrongMigrations.developer_env?
-          StrongMigrations.target_sql_mode.split(",")
-        else
-          connection.select_all("SELECT @@SESSION.sql_mode").first["@@SESSION.sql_mode"].split(",")
-        end
+      if StrongMigrations.target_sql_mode && StrongMigrations.developer_env?
+        StrongMigrations.target_sql_mode.split(",")
+      else
+        connection.select_all("SELECT @@SESSION.sql_mode").first["@@SESSION.sql_mode"].split(",")
       end
     end
 
     def strict_mode?
+      sql_modes = sql_modes()
       sql_modes.include?("STRICT_ALL_TABLES") || sql_modes.include?("STRICT_TRANS_TABLES")
     end
 
