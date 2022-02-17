@@ -4,7 +4,7 @@ Catch unsafe migrations in development
 
 &nbsp;&nbsp;✓&nbsp;&nbsp;Detects potentially dangerous operations<br />&nbsp;&nbsp;✓&nbsp;&nbsp;Prevents them from running by default<br />&nbsp;&nbsp;✓&nbsp;&nbsp;Provides instructions on safer ways to do what you want
 
-Supports for PostgreSQL, MySQL, and MariaDB
+Supports PostgreSQL, MySQL, and MariaDB
 
 :tangerine: Battle-tested at [Instacart](https://www.instacart.com/opensource)
 
