@@ -21,9 +21,9 @@ New unsafe operations with Postgres
 
 Other
 
-- Dropped support for Postgres < 10, MySQL < 5.7, and MariaDB < 10.2
-- Added error for `change_column_null` with default value with `safe_by_default` option
 - Added `target_sql_mode` option
+- Added error for `change_column_null` with default value with `safe_by_default` option
+- Dropped support for Postgres < 10, MySQL < 5.7, and MariaDB < 10.2
 
 ## 0.8.0 (2022-02-09)
 
