@@ -560,6 +560,8 @@ Then add the foreign key in separate migrations."
       end
     end
 
+    # do not memoize
+    # want latest value
     def postgresql_time_zone
       connection.select_all("SHOW timezone").first["TimeZone"]
     end
@@ -673,7 +675,7 @@ Then add the foreign key in separate migrations."
     end
 
     # do not memoize
-    # want latest value for each operation that needs it
+    # want latest value
     def sql_modes
       if StrongMigrations.target_sql_mode && StrongMigrations.developer_env?
         StrongMigrations.target_sql_mode.split(",")
