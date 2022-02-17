@@ -1,6 +1,8 @@
 # TODO better pattern
 module StrongMigrations
   module Checks
+    private
+
     def check_change_table
       raise_error :change_table, header: "Possibly dangerous operation"
     end
@@ -297,6 +299,78 @@ Then add the foreign key in separate migrations."
           raise_error :add_check_constraint_mysql
         end
       end
+    end
+
+    def postgresql?
+      adapter.instance_of?(Adapters::PostgreSQLAdapter)
+    end
+
+    def mysql?
+      adapter.instance_of?(Adapters::MySQLAdapter)
+    end
+
+    def mariadb?
+      adapter.instance_of?(Adapters::MariaDBAdapter)
+    end
+
+    def ar_version
+      ActiveRecord::VERSION::STRING.to_f
+    end
+
+    def raise_error(message_key, header: nil, append: nil, **vars)
+      return unless StrongMigrations.check_enabled?(message_key, version: version)
+
+      message = StrongMigrations.error_messages[message_key] || "Missing message"
+      message = message + append if append
+
+      vars[:migration_name] = @migration.class.name
+      vars[:migration_suffix] = "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]"
+      vars[:base_model] = "ApplicationRecord"
+
+      # escape % not followed by {
+      message = message.gsub(/%(?!{)/, "%%") % vars if message.include?("%")
+      @migration.stop!(message, header: header || "Dangerous operation detected")
+    end
+
+    def constraint_str(statement, identifiers)
+      # not all identifiers are tables, but this method of quoting should be fine
+      statement % identifiers.map { |v| connection.quote_table_name(v) }
+    end
+
+    def safety_assured_str(code)
+      "safety_assured do\n      execute '#{code}' \n    end"
+    end
+
+    def command_str(command, args)
+      str_args = args[0..-2].map { |a| a.inspect }
+
+      # prettier last arg
+      last_arg = args[-1]
+      if last_arg.is_a?(Hash)
+        if last_arg.any?
+          str_args << last_arg.map do |k, v|
+            if v.is_a?(Hash)
+              # pretty index: {algorithm: :concurrently}
+              "#{k}: {#{v.map { |k2, v2| "#{k2}: #{v2.inspect}" }.join(", ")}}"
+            else
+              "#{k}: #{v.inspect}"
+            end
+          end.join(", ")
+        end
+      else
+        str_args << last_arg.inspect
+      end
+
+      "#{command} #{str_args.join(", ")}"
+    end
+
+    def backfill_code(table, column, default)
+      model = table.to_s.classify
+      "#{model}.unscoped.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
+    end
+
+    def new_table?(table)
+      @new_tables.include?(table.to_s)
     end
   end
 end
