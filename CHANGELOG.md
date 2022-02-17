@@ -4,14 +4,15 @@ New safe operations
 
 - Setting `NOT NULL` on an existing column is safe in MySQL 5.6+ and MariaDB 10.0+ with strict mode enabled
 - Changing between `text` and `citext` is safe in Postgres when not indexed
-- Changing a `varchar` column to a `citext` column is safe in Postgres when not indexed
-- Changing a `citext` column to a `varchar` column with no length limit is safe in Postgres when not indexed
+- Changing a `string` column to a `citext` column is safe in Postgres when not indexed
+- Changing a `citext` column to a `string` column with no `:limit` is safe in Postgres when not indexed
 - Changing a `cidr` column to an `inet` column is safe in Postgres
-- Increasing the precision of an `interval` or `time` column is safe in Postgres
+- Increasing `:precision` of an `interval` or `time` column is safe in Postgres
 
 New unsafe operations
 
-- Decreasing the precision of a `timestamp` or `timestamptz` column is not safe in Postgres
+- Decreasing `:precision` of a `datetime` column is not safe in Postgres
+- Decreasing `:limit` of a `timestamptz` column is not safe in Postgres
 - Passing a default value to `change_column_null` is not safe in Postgres
 
 Other
