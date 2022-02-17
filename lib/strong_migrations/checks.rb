@@ -47,10 +47,11 @@ Then add the NOT NULL constraint in separate migrations."
           code: backfill_code(table, column, default),
           append: append,
           rewrite_blocks: adapter.rewrite_blocks
-      elsif default.respond_to?(:call) && postgresql?
+      elsif default.is_a?(Proc) && postgresql?
         # adding a column with a VOLATILE default is not safe
         # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
         # functions like random() and clock_timestamp() are VOLATILE
+        # check for Proc to match Active Record
         raise_error :add_column_default_callable
       end
 
