@@ -1,9 +1,3 @@
-class AddColumnJson < TestMigration
-  def change
-    add_column :users, :properties, :json
-  end
-end
-
 class ExecuteArbitrarySQL < TestMigration
   def change
     execute 'SELECT CURRENT_TIMESTAMP'

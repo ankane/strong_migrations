@@ -16,3 +16,9 @@ class AddColumnDefaultSafe < TestMigration
     change_column_default :users, :nice, from: true, to: false
   end
 end
+
+class AddColumnJson < TestMigration
+  def change
+    add_column :users, :properties, :json
+  end
+end

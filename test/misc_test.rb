@@ -1,11 +1,6 @@
 require_relative "test_helper"
 
 class MiscTest < Minitest::Test
-  def test_add_column_json
-    skip unless postgresql?
-    assert_unsafe AddColumnJson
-  end
-
   def test_execute_arbitrary_sql
     assert_unsafe ExecuteArbitrarySQL
   end
