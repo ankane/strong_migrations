@@ -167,9 +167,7 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end
 
 class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
-  def change
-    %{validate_constraint_code}
-  end
+  %{validate_constraint_code}
 end",
 
     change_column_null_mysql:

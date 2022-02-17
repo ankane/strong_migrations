@@ -223,7 +223,7 @@ Then add the foreign key in separate migrations."
 
             raise_error :change_column_null_postgresql,
               add_constraint_code: add_constraint_code,
-              validate_constraint_code: validate_constraint_code
+              validate_constraint_code: "def change\n    #{validate_constraint_code}\n  end"
           end
         elsif mysql? || mariadb?
           unless adapter.strict_mode?
