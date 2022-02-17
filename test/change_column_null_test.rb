@@ -4,22 +4,8 @@ class ChangeColumnNullTest < Minitest::Test
   def test_basic
     if postgresql?
       assert_unsafe ChangeColumnNull
-    elsif mysql?
-      with_target_version("5.6.0") do
-        assert_safe ChangeColumnNull
-      end
-    elsif mariadb?
-      with_target_version("10.0.0") do
-        assert_safe ChangeColumnNull
-      end
-    end
-  end
-
-  def test_old_mysql
-    skip unless mysql? || mariadb?
-
-    with_target_version("5.5.0") do
-      assert_unsafe ChangeColumnNull
+    else
+      assert_safe ChangeColumnNull
     end
   end
 
@@ -56,17 +42,7 @@ class ChangeColumnNullTest < Minitest::Test
   end
 
   def test_default
-    if postgresql?
-      assert_unsafe ChangeColumnNullDefault
-    elsif mysql?
-      with_target_version("5.6.0") do
-        assert_unsafe ChangeColumnNullDefault
-      end
-    elsif mariadb?
-      with_target_version("10.0.0") do
-        assert_unsafe ChangeColumnNullDefault
-      end
-    end
+    assert_unsafe ChangeColumnNullDefault
   end
 
   def test_constraint_methods
@@ -89,9 +65,7 @@ class ChangeColumnNullTest < Minitest::Test
     skip unless mysql? || mariadb?
 
     without_strict_mode do
-      with_target_version(mysql? ? "5.6.0" : "10.0.0") do
-        assert_unsafe ChangeColumnNull
-      end
+      assert_unsafe ChangeColumnNull
     end
   end
 

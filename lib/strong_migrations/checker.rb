@@ -82,7 +82,6 @@ module StrongMigrations
 
     private
 
-    # TODO raise error in 0.9.0
     def check_version_supported
       return if defined?(@version_checked)
 
@@ -90,7 +89,7 @@ module StrongMigrations
       if min_version
         version = adapter.server_version
         if version < Gem::Version.new(min_version)
-          warn "[strong_migrations] #{adapter.name} version (#{version}) not supported in this version of Strong Migrations (#{StrongMigrations::VERSION})"
+          raise UnsupportedVersion, "#{adapter.name} version (#{version}) not supported in this version of Strong Migrations (#{StrongMigrations::VERSION})"
         end
       end
 

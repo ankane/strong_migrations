@@ -172,9 +172,6 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
-    change_column_null_mysql_too_old:
-"Setting NOT NULL on an existing column is not safe with this version of your database engine.",
-
     change_column_null_mysql:
 "Setting NOT NULL on an existing column is not safe without strict mode enabled.",
 

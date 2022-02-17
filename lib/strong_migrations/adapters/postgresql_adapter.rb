@@ -5,17 +5,21 @@ module StrongMigrations
         "PostgreSQL"
       end
 
-      # server_version only returns major versions for simplicity
-      # once min version hits 10 in 0.9.0, this will be more useful
       def min_version
-        "9"
+        "10"
       end
 
       def server_version
         @version ||= begin
           target_version(StrongMigrations.target_postgresql_version) do
-            # only works with major versions
-            select_all("SHOW server_version_num").first["server_version_num"].to_i / 10000
+            version = select_all("SHOW server_version_num").first["server_version_num"].to_i
+            if version >= 100000
+              # major version for 10+
+              "#{version / 10000}"
+            else
+              # major and minor version for < 10
+              "#{version / 10000}.#{(version % 10000) / 100}"
+            end
           end
         end
       end

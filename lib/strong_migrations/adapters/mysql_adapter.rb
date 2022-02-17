@@ -40,10 +40,6 @@ module StrongMigrations
         connection.execute "ANALYZE TABLE #{connection.quote_table_name(table.to_s)}"
       end
 
-      def online_ddl_supported?
-        server_version >= Gem::Version.new("5.6")
-      end
-
       def add_column_default_safe?
         server_version >= Gem::Version.new("8.0.12")
       end

@@ -21,6 +21,7 @@ require "strong_migrations/railtie" if defined?(Rails)
 module StrongMigrations
   class Error < StandardError; end
   class UnsafeMigration < Error; end
+  class UnsupportedVersion < Error; end
 
   class << self
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,

@@ -2,7 +2,7 @@
 
 New safe operations with MySQL and MariaDB
 
-- Setting `NOT NULL` on an existing column with strict mode enabled in MySQL 5.6+ and MariaDB 10.0+
+- Setting `NOT NULL` on an existing column with strict mode enabled
 
 New safe operations with Postgres
 
@@ -21,7 +21,7 @@ New unsafe operations with Postgres
 
 Other
 
-- Added warning for unsupported database versions
+- Dropped support for Postgres < 10, MySQL < 5.7, and MariaDB < 10.2
 - Added warning for `change_column_null` with default value with `safe_by_default` option
 - Added `target_sql_mode` option
 

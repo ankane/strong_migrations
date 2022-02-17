@@ -226,12 +226,6 @@ Then add the foreign key in separate migrations."
               validate_constraint_code: validate_constraint_code
           end
         elsif mysql? || mariadb?
-          # does not support online DDL
-          # TODO remove in 0.9.0
-          unless adapter.online_ddl_supported?
-            raise_error :change_column_null_mysql_too_old
-          end
-
           unless adapter.strict_mode?
             raise_error :change_column_null_mysql
           end
