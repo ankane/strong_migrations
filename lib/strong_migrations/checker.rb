@@ -164,7 +164,7 @@ Then add the NOT NULL constraint in separate migrations."
                 safe = ["timestamp without time zone", "timestamp with time zone"].include?(existing_type) &&
                   precision >= existing_precision &&
                   postgresql_version >= Gem::Version.new("12") &&
-                  connection.select_all("SHOW timezone").first["TimeZone"] == "UTC"
+                  postgresql_time_zone == "UTC"
               when "time"
                 precision = options[:precision] || options[:limit] || 6
                 existing_precision = existing_column.precision || existing_column.limit || 6
@@ -666,6 +666,10 @@ Then add the foreign key in separate migrations."
       else
         false
       end
+    end
+
+    def postgresql_time_zone
+      connection.select_all("SHOW timezone").first["TimeZone"]
     end
 
     # do not memoize
