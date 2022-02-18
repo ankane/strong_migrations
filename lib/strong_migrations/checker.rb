@@ -81,7 +81,7 @@ module StrongMigrations
 
       result =
         if StrongMigrations.lock_timeout_retries > 0 && !in_transaction?
-          # TODO figure how to handle methods that generate multiple statements
+          # TODO figure out how to handle methods that generate multiple statements
           # like add_reference(table, ref, index: {algorithm: :concurrently})
           # lock timeout after first statement will cause retry to fail
           with_lock_timeout_retries { yield }
