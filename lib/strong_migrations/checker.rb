@@ -80,7 +80,7 @@ module StrongMigrations
       end
 
       result =
-        if StrongMigrations.lock_timeout_retries > 0 && !in_transaction? && (StrongMigrations.lock_timeout_retry_transactions || method != :transaction)
+        if retry_lock_timeouts?(method)
           # TODO figure out how to handle methods that generate multiple statements
           # like add_reference(table, ref, index: {algorithm: :concurrently})
           # lock timeout after first statement will cause retry to fail
@@ -186,6 +186,14 @@ module StrongMigrations
 
     def connection
       @migration.connection
+    end
+
+    def retry_lock_timeouts?(method)
+      (
+        StrongMigrations.lock_timeout_retries > 0 &&
+        !in_transaction? &&
+        (StrongMigrations.lock_timeout_retry_transactions || method != :transaction)
+      )
     end
   end
 end
