@@ -30,6 +30,27 @@ module StrongMigrations
       raise StrongMigrations::UnsafeMigration, "\n=== #{header} #strong_migrations ===\n\n#{message}\n"
     end
 
+    def connection
+      conn = super
+      if StrongMigrations.lock_timeout_retries > 0
+        if !conn.instance_variable_defined?(:@strong_migrations_checker)
+          original = conn.method(:execute)
+          conn.define_singleton_method(:execute) do |*args|
+            if open_transactions == 0
+              instance_variable_get(:@strong_migrations_checker).with_lock_timeout_retries do
+                original.call(*args)
+              end
+            else
+              original.call(*args)
+            end
+          end
+        end
+        # update checker
+        conn.instance_variable_set(:@strong_migrations_checker, strong_migrations_checker)
+      end
+      conn
+    end
+
     private
 
     def strong_migrations_checker
