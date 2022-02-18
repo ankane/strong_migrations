@@ -130,6 +130,8 @@ class TimeoutsTest < Minitest::Test
   end
 
   def test_lock_timeout_retries_transaction_ddl_transaction
+    skip "Requires DDL transaction" unless postgresql?
+
     with_lock_timeout_retries do
       assert_raises(ActiveRecord::LockWaitTimeout) do
         migrate CheckLockTimeoutRetriesTransactionDdlTransaction
