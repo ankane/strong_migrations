@@ -78,8 +78,8 @@ class Minitest::Test
   def migrate(migration, direction: :up)
     ActiveRecord::SchemaMigration.delete_all
     migration = migration.new
+    migration.version ||= 123
     if direction == :down
-      migration.version ||= 1
       ActiveRecord::SchemaMigration.create!(version: migration.version)
     end
     args = ActiveRecord::VERSION::MAJOR >= 6 ? [ActiveRecord::SchemaMigration] : []
