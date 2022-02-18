@@ -1,7 +1,7 @@
 module StrongMigrations
   module Migrator
     def ddl_transaction(migration, *args)
-      if use_transaction?(migration) && StrongMigrations.lock_timeout_retries > 0 && StrongMigrations.lock_timeout_retry_transactions
+      if use_transaction?(migration) && StrongMigrations.lock_timeout_retries > 0
         # handle MigrationProxy class
         migration = migration.send(:migration) if migration.respond_to?(:migration, true)
 

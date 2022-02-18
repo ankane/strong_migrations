@@ -157,24 +157,6 @@ class TimeoutsTest < Minitest::Test
     assert_equal 1, $migrate_attempts
   end
 
-  def test_lock_timeout_retry_transactions_false
-    refute_retries CheckLockTimeoutRetriesTransaction, transactions: false
-
-    # does not retry
-    assert_equal 1, $migrate_attempts
-    assert_equal 1, $transaction_attempts
-  end
-
-  def test_lock_timeout_retry_transactions_false_transaction_ddl_transaction
-    skip "Requires DDL transaction" unless postgresql?
-
-    refute_retries CheckLockTimeoutRetriesTransactionDdlTransaction, transactions: false
-
-    # does not retry
-    assert_equal 1, $migrate_attempts
-    assert_equal 1, $transaction_attempts
-  end
-
   def reset_timeouts
     StrongMigrations.lock_timeout = nil
     StrongMigrations.statement_timeout = nil
@@ -190,11 +172,10 @@ class TimeoutsTest < Minitest::Test
     end
   end
 
-  def with_lock_timeout_retries(lock: true, transactions: true)
+  def with_lock_timeout_retries(lock: true)
     StrongMigrations.lock_timeout = postgresql? ? 0.1 : 1
     StrongMigrations.lock_timeout_retries = 1
     StrongMigrations.lock_timeout_retry_delay = 0
-    StrongMigrations.lock_timeout_retry_transactions = transactions
     $migrate_attempts = 0
     $transaction_attempts = 0
 
@@ -219,7 +200,6 @@ class TimeoutsTest < Minitest::Test
   ensure
     StrongMigrations.lock_timeout_retries = 0
     StrongMigrations.lock_timeout_retry_delay = 5
-    StrongMigrations.lock_timeout_retry_transactions = true
     ActiveRecord::Base.connection_pool.checkin(connection) if connection
   end
 

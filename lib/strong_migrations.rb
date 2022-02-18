@@ -28,15 +28,13 @@ module StrongMigrations
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
       :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
       :enabled_checks, :lock_timeout, :statement_timeout, :check_down, :target_version,
-      :safe_by_default, :target_sql_mode, :lock_timeout_retries, :lock_timeout_retry_delay,
-      :lock_timeout_retry_transactions
+      :safe_by_default, :target_sql_mode, :lock_timeout_retries, :lock_timeout_retry_delay
     attr_writer :lock_timeout_limit
   end
   self.auto_analyze = false
   self.start_after = 0
   self.lock_timeout_retries = 0
   self.lock_timeout_retry_delay = 5 # seconds
-  self.lock_timeout_retry_transactions = true
   self.checks = []
   self.safe_by_default = false
   self.check_down = false

@@ -740,12 +740,6 @@ Set the delay between retries with:
 StrongMigrations.lock_timeout_retry_delay = 5.seconds
 ```
 
-Disable retries for the DDL transaction with:
-
-```ruby
-StrongMigrations.lock_timeout_retry_transactions = false
-```
-
 ## App Timeouts
 
 We recommend adding timeouts to `config/database.yml` to prevent connections from hanging and individual queries from taking up too many resources in controllers, jobs, the Rails console, and other places.
