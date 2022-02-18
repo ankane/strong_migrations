@@ -727,7 +727,7 @@ There’s the option to automatically retry statements when the lock timeout is 
 
 - If a lock timeout happens outside a transaction, the statement is retried.
 - If it happens inside a transaction, the entire transaction is retried (only applies to transactions started with `transaction` in the migration, not `Model.transaction` or `begin_db_transaction`). This includes all code inside the `transaction` block.
-- If it happens inside the DDL transaction (only applicable to Postgres), the entire migration is retried. For migrations that should not be retried, use `disable_ddl_transaction!`.
+- If it happens inside the DDL transaction (only applicable to Postgres), the entire migration is retried.
 
 Add to `config/initializers/strong_migrations.rb`:
 
