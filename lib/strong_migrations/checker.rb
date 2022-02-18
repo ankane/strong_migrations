@@ -84,7 +84,7 @@ module StrongMigrations
           # TODO figure out how to handle methods that generate multiple statements
           # like add_reference(table, ref, index: {algorithm: :concurrently})
           # lock timeout after first statement will cause retry to fail
-          with_lock_timeout_retries { yield }
+          retry_lock_timeouts { yield }
         else
           yield
         end
@@ -97,7 +97,7 @@ module StrongMigrations
       result
     end
 
-    def with_lock_timeout_retries(check_committed: false)
+    def retry_lock_timeouts(check_committed: false)
       retries = 0
       begin
         yield
