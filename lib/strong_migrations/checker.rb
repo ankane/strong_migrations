@@ -66,11 +66,9 @@ module StrongMigrations
           check_validate_foreign_key
         when :commit_db_transaction
           # if committed, likely no longer in DDL transaction
+          # and no longer eligible to be retried at migration level
           # okay to have false positives
           @committed = true
-        when :transaction
-          # no need to do anything special
-          # already wrapped for retries by default
         end
 
         # custom checks
