@@ -108,6 +108,58 @@ class TimeoutsTest < Minitest::Test
     StrongMigrations.lock_timeout_limit = nil
   end
 
+  def test_lock_timeout_retries
+    with_lock_timeout_retries do
+      assert_raises(ActiveRecord::LockWaitTimeout) do
+        migrate CheckLockTimeoutRetries
+      end
+      # MySQL and MariaDB do not support DDL transactions
+      assert_equal (postgresql? ? 2 : 1), $migrate_attempts
+    end
+  end
+
+  def test_lock_timeout_retries_transaction
+    with_lock_timeout_retries do
+      assert_raises(ActiveRecord::LockWaitTimeout) do
+        migrate CheckLockTimeoutRetriesTransaction
+      end
+      # retries just transaction block
+      assert_equal 1, $migrate_attempts
+      assert_equal 2, $transaction_attempts
+    end
+  end
+
+  def test_lock_timeout_retries_transaction_ddl_transaction
+    with_lock_timeout_retries do
+      assert_raises(ActiveRecord::LockWaitTimeout) do
+        migrate CheckLockTimeoutRetriesTransactionDdlTransaction
+      end
+      # retries entire migration, not transaction block alone
+      assert_equal 2, $migrate_attempts
+      assert_equal 2, $transaction_attempts
+    end
+  end
+
+  def test_lock_timeout_retries_no_ddl_transaction
+    with_lock_timeout_retries do
+      assert_raises(ActiveRecord::LockWaitTimeout) do
+        migrate CheckLockTimeoutRetriesNoDdlTransaction
+      end
+      # retries only single statement, not migration
+      assert_equal 1, $migrate_attempts
+    end
+  end
+
+  def test_lock_timeout_retries_commit_db_transaction
+    with_lock_timeout_retries do
+      assert_raises(ActiveRecord::LockWaitTimeout) do
+        migrate CheckLockTimeoutRetriesCommitDbTransaction
+      end
+      # does not retry since outside DDL transaction
+      assert_equal 1, $migrate_attempts
+    end
+  end
+
   def reset_timeouts
     StrongMigrations.lock_timeout = nil
     StrongMigrations.statement_timeout = nil
@@ -121,5 +173,32 @@ class TimeoutsTest < Minitest::Test
       ActiveRecord::Base.connection.execute("SET max_statement_time = DEFAULT")
       ActiveRecord::Base.connection.execute("SET lock_wait_timeout = DEFAULT")
     end
+  end
+
+  def with_lock_timeout_retries
+    StrongMigrations.lock_timeout = postgresql? ? 0.1 : 1
+    StrongMigrations.lock_timeout_retries = 1
+    StrongMigrations.lock_timeout_retry_delay = 0
+    $migrate_attempts = 0
+    $transaction_attempts = 0
+
+    connection = ActiveRecord::Base.connection_pool.checkout
+    if postgresql?
+      connection.transaction do
+        connection.execute("LOCK TABLE users IN ACCESS EXCLUSIVE MODE")
+        yield
+      end
+    else
+      begin
+        connection.execute("LOCK TABLE users WRITE")
+        yield
+      ensure
+        connection.execute("UNLOCK TABLES")
+      end
+    end
+  ensure
+    StrongMigrations.lock_timeout_retries = 0
+    StrongMigrations.lock_timeout_retry_delay = 5
+    ActiveRecord::Base.connection_pool.checkin(connection) if connection
   end
 end

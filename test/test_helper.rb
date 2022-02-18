@@ -27,6 +27,8 @@ end
 TestMigration = ActiveRecord::Migration[migration_version]
 TestSchema = ActiveRecord::Schema
 
+ActiveRecord::SchemaMigration.create_table
+
 ActiveRecord::Schema.define do
   enable_extension "citext" if $adapter == "postgresql"
 
@@ -74,15 +76,18 @@ class Minitest::Test
   include Helpers
 
   def migrate(migration, direction: :up)
-    if !migration.disable_ddl_transaction
-      ActiveRecord::Base.transaction do
-        migration.migrate(direction)
-      end
-    else
-      migration.migrate(direction)
+    ActiveRecord::SchemaMigration.delete_all
+    migration = migration.new
+    if direction == :down
+      migration.version ||= 1
+      ActiveRecord::SchemaMigration.create!(version: migration.version)
     end
-    puts "\n\n" if ENV["VERBOSE"]
+    args = ActiveRecord::VERSION::MAJOR >= 6 ? [ActiveRecord::SchemaMigration] : []
+    ActiveRecord::Migrator.new(direction, [migration], *args).migrate
     true
+  rescue => e
+    raise e.cause if e.cause
+    raise e
   end
 
   def assert_unsafe(migration, message = nil, **options)

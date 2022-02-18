@@ -3,12 +3,14 @@ module StrongMigrations
     include Checks
     include SafeMethods
 
-    attr_accessor :direction, :transaction_disabled
+    attr_accessor :direction, :transaction_disabled, :timeouts_set
 
     def initialize(migration)
       @migration = migration
       @new_tables = []
       @safe = false
+      @timeouts_set = false
+      @committed = false
     end
 
     def safety_assured
@@ -62,6 +64,13 @@ module StrongMigrations
           check_validate_check_constraint
         when :validate_foreign_key
           check_validate_foreign_key
+        when :commit_db_transaction
+          # if committed, likely no longer in DDL transaction
+          # okay to have false positives
+          @committed = true
+        when :transaction
+          # no need to do anything special
+          # already wrapped for retries by default
         end
 
         # custom checks
@@ -70,7 +79,12 @@ module StrongMigrations
         end
       end
 
-      result = yield
+      result =
+        if StrongMigrations.lock_timeout_retries > 0 && !in_transaction?
+          with_lock_timeout_retries { yield }
+        else
+          yield
+        end
 
       # outdated statistics + a new index can hurt performance of existing queries
       if StrongMigrations.auto_analyze && direction == :up && method == :add_index
@@ -78,6 +92,22 @@ module StrongMigrations
       end
 
       result
+    end
+
+    def with_lock_timeout_retries(check_committed: false)
+      retries = 0
+      begin
+        yield
+      rescue ActiveRecord::LockWaitTimeout => e
+        if retries < StrongMigrations.lock_timeout_retries && !(check_committed && @committed)
+          retries += 1
+          delay = StrongMigrations.lock_timeout_retry_delay
+          @migration.say("Lock timeout. Retrying in #{delay} seconds...")
+          sleep(delay)
+          retry
+        end
+        raise e
+      end
     end
 
     private
@@ -97,7 +127,7 @@ module StrongMigrations
     end
 
     def set_timeouts
-      return if defined?(@timeouts_set)
+      return if @timeouts_set
 
       if StrongMigrations.statement_timeout
         adapter.set_statement_timeout(StrongMigrations.statement_timeout)

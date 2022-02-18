@@ -27,3 +27,55 @@ class CheckLockTimeout < TestMigration
     safety_assured { execute "SELECT 1" }
   end
 end
+
+class CheckLockTimeoutRetries < TestMigration
+  def change
+    $migrate_attempts += 1
+    safety_assured { execute "SELECT COUNT(*) FROM users" }
+  end
+end
+
+class CheckLockTimeoutRetriesTransaction < TestMigration
+  disable_ddl_transaction!
+
+  def change
+    $migrate_attempts += 1
+
+    transaction do
+      $transaction_attempts += 1
+      safety_assured { execute "SELECT COUNT(*) FROM users" }
+    end
+  end
+end
+
+class CheckLockTimeoutRetriesTransactionDdlTransaction < TestMigration
+  def change
+    $migrate_attempts += 1
+
+    transaction do
+      $transaction_attempts += 1
+      safety_assured { execute "SELECT COUNT(*) FROM users" }
+    end
+  end
+end
+
+class CheckLockTimeoutRetriesNoDdlTransaction < TestMigration
+  disable_ddl_transaction!
+
+  def change
+    $migrate_attempts += 1
+    safety_assured { execute "SELECT COUNT(*) FROM users" }
+  end
+end
+
+class CheckLockTimeoutRetriesCommitDbTransaction < TestMigration
+  def change
+    $migrate_attempts += 1
+    commit_db_transaction
+
+    # no longer in DDL transaction
+
+    begin_db_transaction
+    safety_assured { execute "SELECT COUNT(*) FROM users" }
+  end
+end

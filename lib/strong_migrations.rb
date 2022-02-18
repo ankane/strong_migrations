@@ -13,6 +13,7 @@ require "strong_migrations/safe_methods"
 require "strong_migrations/checker"
 require "strong_migrations/database_tasks"
 require "strong_migrations/migration"
+require "strong_migrations/migrator"
 require "strong_migrations/version"
 
 # integrations
@@ -27,11 +28,13 @@ module StrongMigrations
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
       :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
       :enabled_checks, :lock_timeout, :statement_timeout, :check_down, :target_version,
-      :safe_by_default, :target_sql_mode
+      :safe_by_default, :target_sql_mode, :lock_timeout_retries, :lock_timeout_retry_delay
     attr_writer :lock_timeout_limit
   end
   self.auto_analyze = false
   self.start_after = 0
+  self.lock_timeout_retries = 0
+  self.lock_timeout_retry_delay = 5 # seconds
   self.checks = []
   self.safe_by_default = false
   self.check_down = false
@@ -75,6 +78,7 @@ require "strong_migrations/error_messages"
 
 ActiveSupport.on_load(:active_record) do
   ActiveRecord::Migration.prepend(StrongMigrations::Migration)
+  ActiveRecord::Migrator.prepend(StrongMigrations::Migrator)
 
   if defined?(ActiveRecord::Tasks::DatabaseTasks)
     ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)
