@@ -34,7 +34,7 @@ module StrongMigrations
   self.auto_analyze = false
   self.start_after = 0
   self.lock_timeout_retries = 0
-  self.lock_timeout_retry_delay = 5 # seconds
+  self.lock_timeout_retry_delay = 10 # seconds
   self.checks = []
   self.safe_by_default = false
   self.check_down = false

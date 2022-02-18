@@ -737,7 +737,7 @@ StrongMigrations.lock_timeout_retries = 3
 Set the delay between retries with:
 
 ```ruby
-StrongMigrations.lock_timeout_retry_delay = 5.seconds
+StrongMigrations.lock_timeout_retry_delay = 10.seconds
 ```
 
 ## App Timeouts
