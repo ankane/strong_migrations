@@ -148,14 +148,14 @@ class TimeoutsTest < Minitest::Test
   end
 
   def test_lock_timeout_retries_commit_db_transaction
-    assert_retries CheckLockTimeoutRetriesCommitDbTransaction, retries: 0
+    refute_retries CheckLockTimeoutRetriesCommitDbTransaction
 
     # does not retry since outside DDL transaction
     assert_equal 1, $migrate_attempts
   end
 
   def test_lock_timeout_retry_transactions_false
-    assert_retries CheckLockTimeoutRetriesTransaction, retries: 0, transactions: false
+    refute_retries CheckLockTimeoutRetriesTransaction, transactions: false
 
     # does not retry
     assert_equal 1, $migrate_attempts
@@ -165,7 +165,7 @@ class TimeoutsTest < Minitest::Test
   def test_lock_timeout_retry_transactions_false_transaction_ddl_transaction
     skip "Requires DDL transaction" unless postgresql?
 
-    assert_retries CheckLockTimeoutRetriesTransactionDdlTransaction, retries: 0, transactions: false
+    refute_retries CheckLockTimeoutRetriesTransactionDdlTransaction, transactions: false
 
     # does not retry
     assert_equal 1, $migrate_attempts
@@ -235,5 +235,9 @@ class TimeoutsTest < Minitest::Test
       end
     end
     assert_equal retries, retry_count
+  end
+
+  def refute_retries(migration, **options)
+    assert_retries(migration, retries: 0, **options)
   end
 end
