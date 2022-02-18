@@ -34,16 +34,17 @@ module StrongMigrations
       conn = super
       if StrongMigrations.lock_timeout_retries > 0
         if !conn.instance_variable_defined?(:@strong_migrations_checker)
-          original = conn.method(:execute)
-          conn.define_singleton_method(:execute) do |*args|
-            if open_transactions == 0
+          m = Module.new
+          m.class_eval do
+            def execute(*)
+              return super if open_transactions > 0
+
               instance_variable_get(:@strong_migrations_checker).with_lock_timeout_retries do
-                original.call(*args)
+                super
               end
-            else
-              original.call(*args)
             end
           end
+          conn.singleton_class.prepend(m)
         end
         # update checker
         conn.instance_variable_set(:@strong_migrations_checker, strong_migrations_checker)
