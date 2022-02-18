@@ -741,6 +741,12 @@ Here’s how it works:
 - If it happens inside a transaction, the entire transaction is retried (only applies to transactions started with `transaction` in the migration, not `Model.transaction` or `begin_db_transaction`). This includes all code inside the `transaction` block.
 - If it happens inside the DDL transaction (only applicable to Postgres), the entire migration is retried. For migrations that should not be retried, use `disable_ddl_transaction!`.
 
+Disable retries for transactions (including the DDL transaction) for all migrations with:
+
+```ruby
+StrongMigrations.lock_timeout_retry_transactions = false
+```
+
 ## App Timeouts
 
 We recommend adding timeouts to `config/database.yml` to prevent connections from hanging and individual queries from taking up too many resources in controllers, jobs, the Rails console, and other places.
