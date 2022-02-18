@@ -124,11 +124,11 @@ class TimeoutsTest < Minitest::Test
   end
 
   def test_lock_timeout_retries_transaction
-    assert_retries CheckLockTimeoutRetriesTransaction
+    refute_retries CheckLockTimeoutRetriesTransaction
 
-    # retries just transaction block
+    # does not retry
     assert_equal 1, $migrate_attempts
-    assert_equal 2, $transaction_attempts
+    assert_equal 1, $transaction_attempts
   end
 
   def test_lock_timeout_retries_transaction_ddl_transaction

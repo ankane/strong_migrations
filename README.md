@@ -726,7 +726,6 @@ Note: If you use PgBouncer in transaction mode, you must set timeouts on the dat
 There’s the option to automatically retry statements when the lock timeout is reached. Here’s how it works:
 
 - If a lock timeout happens outside a transaction, the statement is retried.
-- If it happens inside a transaction, the entire transaction is retried (only applies to transactions started with `transaction` in the migration, not `Model.transaction` or `begin_db_transaction`). This includes all code inside the `transaction` block.
 - If it happens inside the DDL transaction (only applicable to Postgres), the entire migration is retried.
 
 Add to `config/initializers/strong_migrations.rb`:
@@ -741,7 +740,7 @@ Set the delay between retries with:
 StrongMigrations.lock_timeout_retry_delay = 5.seconds
 ```
 
-Disable retries for transactions (including the DDL transaction) with:
+Disable retries for the DDL transaction with:
 
 ```ruby
 StrongMigrations.lock_timeout_retry_transactions = false

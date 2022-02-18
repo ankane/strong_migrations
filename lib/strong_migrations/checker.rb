@@ -192,7 +192,7 @@ module StrongMigrations
       (
         StrongMigrations.lock_timeout_retries > 0 &&
         !in_transaction? &&
-        (StrongMigrations.lock_timeout_retry_transactions || method != :transaction)
+        method != :transaction
       )
     end
   end
