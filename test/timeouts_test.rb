@@ -149,6 +149,8 @@ class TimeoutsTest < Minitest::Test
   end
 
   def test_lock_timeout_retries_commit_db_transaction
+    skip "Requires DDL transaction" unless postgresql?
+
     refute_retries CheckLockTimeoutRetriesCommitDbTransaction
 
     # does not retry since outside DDL transaction
