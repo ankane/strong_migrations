@@ -123,71 +123,53 @@ class TimeoutsTest < Minitest::Test
   end
 
   def test_lock_timeout_retries_transaction
-    with_lock_timeout_retries do
-      assert_raises(ActiveRecord::LockWaitTimeout) do
-        migrate CheckLockTimeoutRetriesTransaction
-      end
-      # retries just transaction block
-      assert_equal 1, $migrate_attempts
-      assert_equal 2, $transaction_attempts
-    end
+    assert_retries CheckLockTimeoutRetriesTransaction
+
+    # retries just transaction block
+    assert_equal 1, $migrate_attempts
+    assert_equal 2, $transaction_attempts
   end
 
   def test_lock_timeout_retries_transaction_ddl_transaction
     skip "Requires DDL transaction" unless postgresql?
 
-    with_lock_timeout_retries do
-      assert_raises(ActiveRecord::LockWaitTimeout) do
-        migrate CheckLockTimeoutRetriesTransactionDdlTransaction
-      end
-      # retries entire migration, not transaction block alone
-      assert_equal 2, $migrate_attempts
-      assert_equal 2, $transaction_attempts
-    end
+    assert_retries CheckLockTimeoutRetriesTransactionDdlTransaction
+
+    # retries entire migration, not transaction block alone
+    assert_equal 2, $migrate_attempts
+    assert_equal 2, $transaction_attempts
   end
 
   def test_lock_timeout_retries_no_ddl_transaction
-    with_lock_timeout_retries do
-      assert_raises(ActiveRecord::LockWaitTimeout) do
-        migrate CheckLockTimeoutRetriesNoDdlTransaction
-      end
-      # retries only single statement, not migration
-      assert_equal 1, $migrate_attempts
-    end
+    assert_retries CheckLockTimeoutRetriesNoDdlTransaction
+
+    # retries only single statement, not migration
+    assert_equal 1, $migrate_attempts
   end
 
   def test_lock_timeout_retries_commit_db_transaction
-    with_lock_timeout_retries do
-      assert_raises(ActiveRecord::LockWaitTimeout) do
-        migrate CheckLockTimeoutRetriesCommitDbTransaction
-      end
-      # does not retry since outside DDL transaction
-      assert_equal 1, $migrate_attempts
-    end
+    assert_retries CheckLockTimeoutRetriesCommitDbTransaction, retries: 0
+
+    # does not retry since outside DDL transaction
+    assert_equal 1, $migrate_attempts
   end
 
   def test_lock_timeout_retry_transactions_false
-    with_lock_timeout_retries(transactions: false) do
-      assert_raises(ActiveRecord::LockWaitTimeout) do
-        migrate CheckLockTimeoutRetriesTransaction
-      end
-      # does not retry
-      assert_equal 1, $migrate_attempts
-      assert_equal 1, $transaction_attempts
-    end
+    assert_retries CheckLockTimeoutRetriesTransaction, retries: 0, transactions: false
+
+    # does not retry
+    assert_equal 1, $migrate_attempts
+    assert_equal 1, $transaction_attempts
   end
 
   def test_lock_timeout_retry_transactions_false_transaction_ddl_transaction
     skip "Requires DDL transaction" unless postgresql?
 
-    with_lock_timeout_retries(transactions: false) do
-      assert_raises(ActiveRecord::LockWaitTimeout) do
-        migrate CheckLockTimeoutRetriesTransactionDdlTransaction
-      end
-      # does not retry
-      assert_equal 1, $migrate_attempts
-      assert_equal 1, $transaction_attempts
-    end
+    assert_retries CheckLockTimeoutRetriesTransactionDdlTransaction, retries: 0, transactions: false
+
+    # does not retry
+    assert_equal 1, $migrate_attempts
+    assert_equal 1, $transaction_attempts
   end
 
   def reset_timeouts
@@ -238,20 +220,20 @@ class TimeoutsTest < Minitest::Test
     ActiveRecord::Base.connection_pool.checkin(connection) if connection
   end
 
-  def assert_retries(migration)
-    retries = 0
-    count = lambda do |message|
-      retries += 1 if message.include?("Lock timeout")
+  def assert_retries(migration, retries: 1, **options)
+    retry_count = 0
+    count = proc do |message, *|
+      retry_count += 1 if message.include?("Lock timeout")
     end
 
     assert_raises(ActiveRecord::LockWaitTimeout) do
-      with_lock_timeout_retries do
+      with_lock_timeout_retries(**options) do
         migration = migration.new
         migration.stub(:say, count) do
           migrate migration
         end
       end
     end
-    assert_equal 1, retries
+    assert_equal retries, retry_count
   end
 end
