@@ -36,7 +36,7 @@ module StrongMigrations
         if !conn.instance_variable_defined?(:@strong_migrations_checker)
           m = Module.new
           m.class_eval do
-            def execute(*)
+            def execute(*, **)
               return super if open_transactions > 0
 
               instance_variable_get(:@strong_migrations_checker).with_lock_timeout_retries do
