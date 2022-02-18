@@ -117,8 +117,9 @@ class TimeoutsTest < Minitest::Test
 
   def test_lock_timeout_retries_no_retries
     with_lock_timeout_retries(lock: false) do
-      migrate CheckLockTimeoutRetries
-      assert_equal 1, $migrate_attempts
+      assert_safe CheckLockTimeoutRetries
+      # up and down
+      assert_equal 2, $migrate_attempts
     end
   end
 

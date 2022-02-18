@@ -31,7 +31,7 @@ end
 class CheckLockTimeoutRetries < TestMigration
   def change
     $migrate_attempts += 1
-    safety_assured { execute "SELECT COUNT(*) FROM users" }
+    add_column :users, :nice, :boolean
   end
 end
 
@@ -43,7 +43,7 @@ class CheckLockTimeoutRetriesTransaction < TestMigration
 
     transaction do
       $transaction_attempts += 1
-      safety_assured { execute "SELECT COUNT(*) FROM users" }
+      add_column :users, :nice, :boolean
     end
   end
 end
@@ -54,7 +54,7 @@ class CheckLockTimeoutRetriesTransactionDdlTransaction < TestMigration
 
     transaction do
       $transaction_attempts += 1
-      safety_assured { execute "SELECT COUNT(*) FROM users" }
+      add_column :users, :nice, :boolean
     end
   end
 end
@@ -64,7 +64,7 @@ class CheckLockTimeoutRetriesNoDdlTransaction < TestMigration
 
   def change
     $migrate_attempts += 1
-    safety_assured { execute "SELECT COUNT(*) FROM users" }
+    add_column :users, :nice, :boolean
   end
 end
 
@@ -76,6 +76,6 @@ class CheckLockTimeoutRetriesCommitDbTransaction < TestMigration
     # no longer in DDL transaction
 
     begin_db_transaction
-    safety_assured { execute "SELECT COUNT(*) FROM users" }
+    add_column :users, :nice, :boolean
   end
 end
