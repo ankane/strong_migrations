@@ -77,7 +77,7 @@ class Minitest::Test
 
   def migrate(migration, direction: :up)
     ActiveRecord::SchemaMigration.delete_all
-    migration = migration.new
+    migration = migration.new unless migration.is_a?(TestMigration)
     migration.version ||= 123
     if direction == :down
       ActiveRecord::SchemaMigration.create!(version: migration.version)
