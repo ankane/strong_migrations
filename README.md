@@ -723,7 +723,9 @@ Note: If you use PgBouncer in transaction mode, you must set timeouts on the dat
 
 ## Lock Timeout Retries [experimental, unreleased]
 
-Automatically retry statements when the lock timeout is reached. Add to `config/initializers/strong_migrations.rb`:
+Automatically retry statements when the lock timeout is reached.
+
+Add to `config/initializers/strong_migrations.rb`:
 
 ```ruby
 StrongMigrations.lock_timeout_retries = 3
