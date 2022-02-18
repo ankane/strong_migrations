@@ -64,7 +64,7 @@ class CheckLockTimeoutRetriesNoDdlTransaction < TestMigration
 
   def change
     $migrate_attempts += 1
-    add_column :users, :nice, :boolean
+    add_index :users, :name, algorithm: :concurrently
   end
 end
 
