@@ -1,4 +1,4 @@
-## 0.9.0 (unreleased)
+## 1.0.0 (2022-03-21)
 
 New safe operations with MySQL and MariaDB
 

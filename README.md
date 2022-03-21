@@ -721,7 +721,7 @@ ALTER ROLE myuser SET statement_timeout = '1h';
 
 Note: If you use PgBouncer in transaction mode, you must set timeouts on the database user.
 
-## Lock Timeout Retries [experimental, unreleased]
+## Lock Timeout Retries [experimental]
 
 There’s the option to automatically retry statements when the lock timeout is reached. Here’s how it works:
 
