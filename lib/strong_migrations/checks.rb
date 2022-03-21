@@ -264,7 +264,12 @@ Then add the foreign key in separate migrations."
         when :remove_column
           [args[1].to_s]
         when :remove_columns
-          args[1..-1].map(&:to_s)
+          # Active Record 6.1+ supports options
+          if args.last.is_a?(Hash)
+            args[1..-2].map(&:to_s)
+          else
+            args[1..-1].map(&:to_s)
+          end
         else
           options = args[2] || {}
           reference = args[1]

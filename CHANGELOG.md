@@ -24,6 +24,7 @@ Other
 - Added experimental support for lock timeout retries
 - Added `target_sql_mode` option
 - Added error for `change_column_null` with default value with `safe_by_default` option
+- Fixed instructions for `remove_columns` with options
 - Dropped support for Postgres < 10, MySQL < 5.7, and MariaDB < 10.2
 
 ## 0.8.0 (2022-02-09)

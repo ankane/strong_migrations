@@ -9,6 +9,10 @@ class RemoveColumnTest < Minitest::Test
     assert_unsafe RemoveColumns
   end
 
+  def test_remove_columns_type
+    assert_unsafe RemoveColumnsType, 'self.ignored_columns = ["name", "other"]'
+  end
+
   def test_remove_timestamps
     assert_unsafe RemoveTimestamps
   end

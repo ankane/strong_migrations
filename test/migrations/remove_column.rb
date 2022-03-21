@@ -10,6 +10,12 @@ class RemoveColumns < TestMigration
   end
 end
 
+class RemoveColumnsType < TestMigration
+  def change
+    remove_columns :users, :name, :other, type: :text
+  end
+end
+
 class RemoveTimestamps < TestMigration
   def change
     remove_timestamps :users
