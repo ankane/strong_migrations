@@ -562,12 +562,17 @@ For Rails 6.1, use:
 
 ```ruby
 class ValidateSomeColumnNotNull < ActiveRecord::Migration[7.0]
-  def change
+  def up
     validate_check_constraint :users, name: "users_some_column_null"
 
     # in Postgres 12+, you can then safely set NOT NULL on the column
     change_column_null :users, :some_column, false
     remove_check_constraint :users, name: "users_some_column_null"
+  end
+
+  def down
+    change_column_null :users, :some_column, true
+    add_check_constraint :users, "some_column IS NOT NULL", name: "users_some_column_null", validate: false
   end
 end
 ```
@@ -576,7 +581,7 @@ For Rails < 6.1, use:
 
 ```ruby
 class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
-  def change
+  def up
     safety_assured do
       execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "users_some_column_null"'
     end
@@ -585,6 +590,14 @@ class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
     change_column_null :users, :some_column, false
     safety_assured do
       execute 'ALTER TABLE "users" DROP CONSTRAINT "users_some_column_null"'
+    end
+  end
+
+  def down
+    change_column_null :users, :some_column, true
+
+    safety_assured do
+      execute 'ALTER TABLE "users" ADD CONSTRAINT "users_some_column_null" CHECK ("some_column" IS NOT NULL) NOT VALID'
     end
   end
 end
