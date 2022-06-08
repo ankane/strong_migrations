@@ -70,3 +70,9 @@ class AddIndexExtraArguments < TestMigration
     add_index :users, :name, :extra
   end
 end
+
+class AddIndexConcurrentlyExtraArguments < TestMigration
+  def change
+    add_index :users, :name, :extra, algorithm: :concurrently
+  end
+end

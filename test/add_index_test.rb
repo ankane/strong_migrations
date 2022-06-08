@@ -77,4 +77,8 @@ class AddIndexTest < Minitest::Test
       assert_argument_error AddIndexExtraArguments
     end
   end
+
+  def test_concurrently_extra_arguments
+    assert_argument_error AddIndexConcurrentlyExtraArguments
+  end
 end
