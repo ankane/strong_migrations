@@ -35,4 +35,12 @@ class AddReferenceTest < Minitest::Test
     skip unless postgresql?
     assert_unsafe AddBelongsTo
   end
+
+  def test_extra_arguments
+    if postgresql?
+      assert_unsafe AddReferenceExtraArguments
+    else
+      assert_argument_error AddReferenceExtraArguments
+    end
+  end
 end

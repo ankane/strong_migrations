@@ -41,3 +41,9 @@ class AddCheckConstraintName < TestMigration
     add_check_constraint :users, "credit_score > 0", name: "credit_check"
   end
 end
+
+class AddCheckConstraintExtraArguments < TestMigration
+  def change
+    add_check_constraint :users, "credit_score > 0", :extra
+  end
+end

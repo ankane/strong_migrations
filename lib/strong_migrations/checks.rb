@@ -3,9 +3,9 @@ module StrongMigrations
   module Checks
     private
 
-    def check_add_check_constraint(args)
-      table, expression, options = args
-      options ||= {}
+    def check_add_check_constraint(*args)
+      options = args.extract_options!
+      table, expression = args
 
       if !new_table?(table)
         if postgresql? && options[:validate] != false
@@ -14,7 +14,7 @@ module StrongMigrations
           validate_options = {name: name}
 
           if StrongMigrations.safe_by_default
-            safe_add_check_constraint(table, expression, add_options, validate_options)
+            safe_add_check_constraint(*args, add_options, validate_options)
             throw :safe
           end
 
@@ -27,9 +27,9 @@ module StrongMigrations
       end
     end
 
-    def check_add_column(args)
-      table, column, type, options = args
-      options ||= {}
+    def check_add_column(*args)
+      options = args.extract_options!
+      table, column, type = args
       default = options[:default]
 
       if !default.nil? && !adapter.add_column_default_safe?
@@ -73,14 +73,14 @@ Then add the NOT NULL constraint in separate migrations."
     #
     # note: adding foreign_keys with create_table is fine
     # since the table is always guaranteed to be empty
-    def check_add_foreign_key(args)
-      from_table, to_table, options = args
-      options ||= {}
+    def check_add_foreign_key(*args)
+      options = args.extract_options!
+      from_table, to_table = args
 
       validate = options.fetch(:validate, true)
       if postgresql? && validate
         if StrongMigrations.safe_by_default
-          safe_add_foreign_key(from_table, to_table, options)
+          safe_add_foreign_key(*args, **options)
           throw :safe
         end
 
@@ -90,9 +90,9 @@ Then add the NOT NULL constraint in separate migrations."
       end
     end
 
-    def check_add_index(args)
-      table, columns, options = args
-      options ||= {}
+    def check_add_index(*args)
+      options = args.extract_options!
+      table, columns = args
 
       if columns.is_a?(Array) && columns.size > 3 && !options[:unique]
         raise_error :add_index_columns, header: "Best practice"
@@ -102,7 +102,7 @@ Then add the NOT NULL constraint in separate migrations."
       # since the table won't be in use by the application
       if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
         if StrongMigrations.safe_by_default
-          safe_add_index(table, columns, options)
+          safe_add_index(*args, **options)
           throw :safe
         end
 
@@ -110,9 +110,9 @@ Then add the NOT NULL constraint in separate migrations."
       end
     end
 
-    def check_add_reference(method, args)
-      table, reference, options = args
-      options ||= {}
+    def check_add_reference(method, *args)
+      options = args.extract_options!
+      table, reference = args
 
       if postgresql?
         index_value = options.fetch(:index, true)
@@ -127,7 +127,7 @@ Then add the NOT NULL constraint in separate migrations."
           end
 
           if StrongMigrations.safe_by_default
-            safe_add_reference(table, reference, options)
+            safe_add_reference(*args, **options)
             throw :safe
           end
 
@@ -148,9 +148,9 @@ Then add the foreign key in separate migrations."
       end
     end
 
-    def check_change_column(args)
-      table, column, type, options = args
-      options ||= {}
+    def check_change_column(*args)
+      options = args.extract_options!
+      table, column, type = args
 
       safe = false
       existing_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
@@ -168,7 +168,7 @@ Then add the foreign key in separate migrations."
       raise_error :change_column, rewrite_blocks: adapter.rewrite_blocks unless safe
     end
 
-    def check_change_column_null(args)
+    def check_change_column_null(*args)
       table, column, null, default = args
       if !null
         if postgresql?
@@ -242,18 +242,17 @@ Then add the foreign key in separate migrations."
       raise_error :change_table, header: "Possibly dangerous operation"
     end
 
-    def check_create_join_table(args)
-      _table_1, _table_2, options = args
-      options ||= {}
+    def check_create_join_table(*args)
+      options = args.extract_options!
 
       raise_error :create_table if options[:force]
 
       # TODO keep track of new table of add_index check
     end
 
-    def check_create_table(args)
-      table, options = args
-      options ||= {}
+    def check_create_table(*args)
+      options = args.extract_options!
+      table, _ = args
 
       raise_error :create_table if options[:force]
 
@@ -265,7 +264,7 @@ Then add the foreign key in separate migrations."
       raise_error :execute, header: "Possibly dangerous operation"
     end
 
-    def check_remove_column(method, args)
+    def check_remove_column(method, *args)
       columns =
         case method
         when :remove_timestamps
@@ -297,27 +296,26 @@ Then add the foreign key in separate migrations."
         column_suffix: columns.size > 1 ? "s" : ""
     end
 
-    def check_remove_index(args)
-      if args.size == 3 && ActiveRecord::VERSION::STRING.to_f >= 6.1
-        table, column, options = args
-        # arg takes precedence over option
-        options = options.merge(column: column)
-      else
-        table, options = args
-        unless options.is_a?(Hash)
-          options = {column: options}
-        end
-        options ||= {}
-      end
+    def check_remove_index(*args)
+      options = args.extract_options!
+      table, _ = args
 
       if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
+        # avoid suggesting extra (invalid) args
+        args = args[0..1] unless StrongMigrations.safe_by_default
+
+        # Active Record < 6.1 only supports two arguments (including options)
+        if args.size == 2 && ar_version < 6.1
+          # arg takes precedence over option
+          options[:column] = args.pop
+        end
+
         if StrongMigrations.safe_by_default
-          # TODO pass extra arguments to raise error
-          safe_remove_index(table, options)
+          safe_remove_index(*args, **options)
           throw :safe
         end
 
-        raise_error :remove_index, command: command_str("remove_index", [table, options.merge(algorithm: :concurrently)])
+        raise_error :remove_index, command: command_str("remove_index", args + [options.merge(algorithm: :concurrently)])
       end
     end
 

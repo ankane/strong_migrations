@@ -37,4 +37,8 @@ class AddCheckConstraintTest < Minitest::Test
   def test_name
     assert_unsafe AddCheckConstraintName
   end
+
+  def test_extra_arguments
+    assert_unsafe AddCheckConstraintExtraArguments
+  end
 end

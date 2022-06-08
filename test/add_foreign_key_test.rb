@@ -31,6 +31,14 @@ class AddForeignKeyTest < Minitest::Test
     assert_safe AddForeignKeyValidateNoTransaction
   end
 
+  def test_extra_arguments
+    if postgresql?
+      assert_unsafe AddForeignKeyExtraArguments
+    else
+      assert_argument_error AddForeignKeyExtraArguments
+    end
+  end
+
   def ar_bug?
     ActiveRecord::VERSION::STRING.start_with?("6.0.3")
   end

@@ -107,6 +107,12 @@ class Minitest::Test
     end
   end
 
+  def assert_argument_error(migration)
+    assert_raises(ArgumentError) do
+      migrate(migration)
+    end
+  end
+
   def with_target_version(version)
     StrongMigrations.target_version = version
     yield

@@ -13,6 +13,10 @@ class SafeByDefaultTest < Minitest::Test
     assert_safe AddIndex
   end
 
+  def test_add_index_extra_arguments
+    assert_argument_error AddIndexExtraArguments
+  end
+
   def test_remove_index
     migrate AddIndex
     assert_safe RemoveIndex
@@ -32,6 +36,10 @@ class SafeByDefaultTest < Minitest::Test
     migrate RemoveIndexOptions
   end
 
+  def test_remove_index_extra_arguments
+    assert_argument_error RemoveIndexExtraArguments
+  end
+
   def test_add_reference
     assert_safe AddReference
   end
@@ -44,14 +52,28 @@ class SafeByDefaultTest < Minitest::Test
     assert_safe AddReferenceForeignKeyToTable
   end
 
+  def test_add_reference_extra_arguments
+    assert_argument_error AddReferenceExtraArguments
+  end
+
   def test_add_foreign_key
     assert_safe AddForeignKey
+  end
+
+  def test_add_foreign_key_extra_arguments
+    assert_argument_error AddForeignKeyExtraArguments
   end
 
   def test_add_check_constraint
     skip unless check_constraints? && postgresql?
 
     assert_safe AddCheckConstraint
+  end
+
+  def test_add_check_constraint_extra_arguments
+    skip unless check_constraints? && postgresql?
+
+    assert_argument_error AddCheckConstraintExtraArguments
   end
 
   def test_change_column_null

@@ -29,3 +29,9 @@ class RemoveIndexConcurrently < TestMigration
     remove_index :users, column: :name, algorithm: :concurrently
   end
 end
+
+class RemoveIndexExtraArguments < TestMigration
+  def change
+    remove_index :users, :name, :extra
+  end
+end

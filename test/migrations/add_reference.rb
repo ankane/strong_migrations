@@ -47,3 +47,9 @@ class AddBelongsTo < TestMigration
     add_belongs_to :users, :device, index: true
   end
 end
+
+class AddReferenceExtraArguments < TestMigration
+  def change
+    add_reference :users, :device, :extra, index: true
+  end
+end

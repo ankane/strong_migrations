@@ -64,3 +64,9 @@ class AddIndexName < TestMigration
     add_index :users, :name, name: "my_index"
   end
 end
+
+class AddIndexExtraArguments < TestMigration
+  def change
+    add_index :users, :name, :extra
+  end
+end

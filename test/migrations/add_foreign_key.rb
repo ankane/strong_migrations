@@ -25,3 +25,9 @@ class AddForeignKeyValidateNoTransaction < TestMigration
     validate_foreign_key :users, :orders
   end
 end
+
+class AddForeignKeyExtraArguments < TestMigration
+  def change
+    add_foreign_key :users, :orders, :extra
+  end
+end

@@ -69,4 +69,12 @@ class AddIndexTest < Minitest::Test
   ensure
     StrongMigrations.auto_analyze = false
   end
+
+  def test_extra_arguments
+    if postgresql?
+      assert_unsafe AddIndexExtraArguments
+    else
+      assert_argument_error AddIndexExtraArguments
+    end
+  end
 end

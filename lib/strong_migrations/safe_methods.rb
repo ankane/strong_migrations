@@ -5,22 +5,22 @@ module StrongMigrations
     end
 
     # TODO check if invalid index with expected name exists and remove if needed
-    def safe_add_index(table, columns, options)
+    def safe_add_index(*args, **options)
       disable_transaction
-      @migration.add_index(table, columns, **options.merge(algorithm: :concurrently))
+      @migration.add_index(*args, **options.merge(algorithm: :concurrently))
     end
 
-    def safe_remove_index(table, options)
+    def safe_remove_index(*args, **options)
       disable_transaction
-      @migration.remove_index(table, **options.merge(algorithm: :concurrently))
+      @migration.remove_index(*args, **options.merge(algorithm: :concurrently))
     end
 
-    def safe_add_reference(table, reference, options)
+    def safe_add_reference(table, reference, *args, **options)
       @migration.reversible do |dir|
         dir.up do
           disable_transaction
           foreign_key = options.delete(:foreign_key)
-          @migration.add_reference(table, reference, **options)
+          @migration.add_reference(table, reference, *args, **options)
           if foreign_key
             # same as Active Record
             name =
@@ -43,10 +43,10 @@ module StrongMigrations
       end
     end
 
-    def safe_add_foreign_key(from_table, to_table, options)
+    def safe_add_foreign_key(from_table, to_table, *args, **options)
       @migration.reversible do |dir|
         dir.up do
-          @migration.add_foreign_key(from_table, to_table, **options.merge(validate: false))
+          @migration.add_foreign_key(from_table, to_table, *args, **options.merge(validate: false))
           disable_transaction
           @migration.validate_foreign_key(from_table, to_table)
         end
@@ -56,10 +56,10 @@ module StrongMigrations
       end
     end
 
-    def safe_add_check_constraint(table, expression, add_options, validate_options)
+    def safe_add_check_constraint(table, expression, *args, add_options, validate_options)
       @migration.reversible do |dir|
         dir.up do
-          @migration.add_check_constraint(table, expression, **add_options)
+          @migration.add_check_constraint(table, expression, *args, **add_options)
           disable_transaction
           @migration.validate_check_constraint(table, **validate_options)
         end
