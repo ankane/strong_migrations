@@ -22,7 +22,7 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_remove_index_name
-    migrate AddIndexUp
+    migrate AddIndexName
     migrate RemoveIndexName
   end
 

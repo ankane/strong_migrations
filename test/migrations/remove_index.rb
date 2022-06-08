@@ -12,7 +12,7 @@ end
 
 class RemoveIndexName < TestMigration
   def change
-    remove_index :users, name: "index_users_on_name"
+    remove_index :users, name: "my_index"
   end
 end
 

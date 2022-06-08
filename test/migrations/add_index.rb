@@ -58,3 +58,9 @@ class AddIndexColumnsUnique < TestMigration
     add_index :users, :name, unique: true, algorithm: :concurrently
   end
 end
+
+class AddIndexName < TestMigration
+  def change
+    add_index :users, :name, name: "my_index"
+  end
+end
