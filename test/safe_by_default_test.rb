@@ -16,6 +16,8 @@ class SafeByDefaultTest < Minitest::Test
   def test_remove_index
     migrate AddIndex
     assert_safe RemoveIndex
+    assert_safe RemoveIndexColumn
+    # TODO separate test for RemoveIndexName since not reversible
   ensure
     migrate AddIndex, direction: :down
   end

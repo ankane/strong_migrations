@@ -8,6 +8,8 @@ class RemoveIndexTest < Minitest::Test
     begin
       StrongMigrations.enable_check(:remove_index)
       assert_unsafe RemoveIndex
+      assert_unsafe RemoveIndexColumn
+      assert_unsafe RemoveIndexName
       migrate RemoveIndexConcurrently
     ensure
       StrongMigrations.disable_check(:remove_index)
