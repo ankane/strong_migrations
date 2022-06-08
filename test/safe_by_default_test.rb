@@ -26,6 +26,12 @@ class SafeByDefaultTest < Minitest::Test
     migrate RemoveIndexName
   end
 
+  def test_remove_index_options
+    skip if ActiveRecord::VERSION::STRING.to_f < 6.1
+
+    migrate RemoveIndexOptions
+  end
+
   def test_add_reference
     assert_safe AddReference
   end

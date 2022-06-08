@@ -16,6 +16,12 @@ class RemoveIndexName < TestMigration
   end
 end
 
+class RemoveIndexOptions < TestMigration
+  def change
+    remove_index :users, :name, name: "my_index", if_exists: true
+  end
+end
+
 class RemoveIndexConcurrently < TestMigration
   disable_ddl_transaction!
 

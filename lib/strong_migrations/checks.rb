@@ -289,14 +289,21 @@ Then add the foreign key in separate migrations."
     end
 
     def check_remove_index(args)
-      table, options = args
-      unless options.is_a?(Hash)
-        options = {column: options}
+      if args.size == 3 && ActiveRecord::VERSION::STRING.to_f >= 6.1
+        table, column, options = args
+        # arg takes precedence over option
+        options = options.merge(column: column)
+      else
+        table, options = args
+        unless options.is_a?(Hash)
+          options = {column: options}
+        end
+        options ||= {}
       end
-      options ||= {}
 
       if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
         if StrongMigrations.safe_by_default
+          # TODO pass extra arguments to raise error
           safe_remove_index(table, options)
           throw :safe
         end

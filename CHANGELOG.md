@@ -1,3 +1,7 @@
+## 1.0.1 (unreleased)
+
+- Fixed missing options with `remove_index` and `safe_by_default`
+
 ## 1.0.0 (2022-03-21)
 
 New safe operations with MySQL and MariaDB
