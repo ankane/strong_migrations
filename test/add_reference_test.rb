@@ -2,23 +2,31 @@ require_relative "test_helper"
 
 class AddReferenceTest < Minitest::Test
   def test_basic
-    skip unless postgresql?
-    assert_unsafe AddReference
+    if postgresql?
+      assert_unsafe AddReference
+    else
+      assert_safe AddReference
+    end
   end
 
   def test_polymorphic
-    skip unless postgresql?
-    assert_unsafe AddReferencePolymorphic
+    if postgresql?
+      assert_unsafe AddReferencePolymorphic
+    else
+      assert_safe AddReferencePolymorphic
+    end
   end
 
   def test_no_index
-    skip unless postgresql?
     assert_safe AddReferenceNoIndex
   end
 
   def test_default
-    skip unless postgresql?
-    assert_unsafe AddReferenceDefault
+    if postgresql?
+      assert_unsafe AddReferenceDefault
+    else
+      assert_safe AddReferenceDefault
+    end
   end
 
   def test_concurrently
@@ -27,13 +35,19 @@ class AddReferenceTest < Minitest::Test
   end
 
   def test_foreign_key
-    skip unless postgresql?
-    assert_unsafe AddReferenceForeignKey, /Then add the foreign key/
+    if postgresql?
+      assert_unsafe AddReferenceForeignKey, "Then add the foreign key"
+    else
+      assert_safe AddReferenceForeignKey
+    end
   end
 
   def test_add_belongs_to
-    skip unless postgresql?
-    assert_unsafe AddBelongsTo
+    if postgresql?
+      assert_unsafe AddBelongsTo
+    else
+      assert_safe AddBelongsTo
+    end
   end
 
   def test_extra_arguments
