@@ -7,7 +7,8 @@ class RemoveIndexTest < Minitest::Test
 
     begin
       StrongMigrations.enable_check(:remove_index)
-      assert_unsafe RemoveIndex
+      # cannot pass column argument and options together in Active Record < 6.1
+      assert_unsafe RemoveIndex, "remove_index :users, column: :name, algorithm: :concurrently"
       assert_unsafe RemoveIndexColumn
       assert_unsafe RemoveIndexName
       migrate RemoveIndexConcurrently
