@@ -18,9 +18,21 @@ end
 
 class CreateTableForce < TestMigration
   def change
-    create_table "users", force: :cascade do |t|
+    create_table :users, force: :cascade do |t|
       t.string :name
     end
+  end
+end
+
+class CreateJoinTable < TestMigration
+  def change
+    create_join_table :users, :cities
+  end
+end
+
+class CreateJoinTableForce < TestMigration
+  def change
+    create_join_table :users, :cities, force: :cascade
   end
 end
 

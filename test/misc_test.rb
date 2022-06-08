@@ -17,6 +17,14 @@ class MiscTest < Minitest::Test
     assert_unsafe CreateTableForce
   end
 
+  def test_create_join_table
+    assert_safe CreateJoinTable
+  end
+
+  def test_create_join_table_force
+    assert_unsafe CreateJoinTableForce
+  end
+
   def test_custom
     assert_unsafe Custom, "Cannot add forbidden column"
   end

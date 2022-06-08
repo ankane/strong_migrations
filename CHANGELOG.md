@@ -1,5 +1,6 @@
-## 1.0.1 (unreleased)
+## 1.1.0 (unreleased)
 
+- Added check for `force` option with `create_join_table`
 - Fixed missing options with `remove_index` and `safe_by_default`
 
 ## 1.0.0 (2022-03-21)

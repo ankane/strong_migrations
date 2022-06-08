@@ -32,7 +32,7 @@ ActiveRecord::SchemaMigration.create_table
 ActiveRecord::Schema.define do
   enable_extension "citext" if $adapter == "postgresql"
 
-  [:users, :new_users, :orders, :devices].each do |table|
+  [:users, :new_users, :orders, :devices, :cities_users].each do |table|
     drop_table(table) if table_exists?(table)
   end
 

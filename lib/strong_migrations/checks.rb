@@ -242,13 +242,22 @@ Then add the foreign key in separate migrations."
       raise_error :change_table, header: "Possibly dangerous operation"
     end
 
+    def check_create_join_table(args)
+      _table_1, _table_2, options = args
+      options ||= {}
+
+      raise_error :create_table if options[:force]
+
+      # TODO keep track of new table of add_index check
+    end
+
     def check_create_table(args)
       table, options = args
       options ||= {}
 
       raise_error :create_table if options[:force]
 
-      # keep track of new tables of add_index check
+      # keep track of new table of add_index check
       @new_tables << table.to_s
     end
 
