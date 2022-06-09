@@ -1,4 +1,4 @@
-## 1.1.0 (unreleased)
+## 1.1.0 (2022-06-08)
 
 - Added check for `force` option with `create_join_table`
 - Improved errors for extra arguments
