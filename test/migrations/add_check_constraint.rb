@@ -28,7 +28,7 @@ end
 
 class AddCheckConstraintNewTable < TestMigration
   def change
-    create_table "new_users" do |t|
+    create_table :new_users do |t|
       t.string :name
     end
 
