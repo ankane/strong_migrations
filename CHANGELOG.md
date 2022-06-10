@@ -1,4 +1,4 @@
-## 1.2.0 (unreleased)
+## 1.2.0 (2022-06-10)
 
 - Added check for index corruption with Postgres 14.0 to 14.3
 
