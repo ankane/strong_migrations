@@ -14,11 +14,7 @@ module StrongMigrations
           target_version(StrongMigrations.target_postgresql_version) do
             version = select_all("SHOW server_version_num").first["server_version_num"].to_i
             # major and minor version
-            if version >= 100000
-              "#{version / 10000}.#{(version % 10000)}"
-            else
-              "#{version / 10000}.#{(version % 10000) / 100}"
-            end
+            "#{version / 10000}.#{(version % 10000)}"
           end
         end
       end
