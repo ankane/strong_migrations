@@ -37,4 +37,14 @@ class MiscTest < Minitest::Test
     end
     assert_match "version (1) not supported", error.message
   end
+
+  def test_target_version_outside_developer_env
+    outside_developer_env do
+      with_target_version(1) do
+        # ignores target version
+        # (does not throw UnsupportedVersion error)
+        assert_unsafe ExecuteArbitrarySQL
+      end
+    end
+  end
 end
