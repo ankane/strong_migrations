@@ -120,6 +120,12 @@ class Minitest::Test
     StrongMigrations.target_version = nil
   end
 
+  def outside_developer_env
+    StrongMigrations.stub(:developer_env?, false) do
+      yield
+    end
+  end
+
   def check_constraints?
     ActiveRecord::VERSION::STRING.to_f >= 6.1
   end
