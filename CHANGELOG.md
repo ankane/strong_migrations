@@ -1,3 +1,7 @@
+## 1.2.0 (unreleased)
+
+- Added check for index corruption with Postgres 14.0 to 14.3
+
 ## 1.1.0 (2022-06-08)
 
 - Added check for `force` option with `create_join_table`

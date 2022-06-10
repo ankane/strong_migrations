@@ -81,4 +81,13 @@ class AddIndexTest < Minitest::Test
   def test_concurrently_extra_arguments
     assert_argument_error AddIndexConcurrentlyExtraArguments
   end
+
+  def test_corruption
+    skip unless postgresql?
+    StrongMigrations.stub(:developer_env?, false) do
+      with_target_version(14.3) do
+        assert_unsafe AddIndexConcurrently, "can cause silent data corruption in Postgres 14.0 to 14.3"
+      end
+    end
+  end
 end

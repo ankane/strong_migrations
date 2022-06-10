@@ -98,6 +98,11 @@ Then add the NOT NULL constraint in separate migrations."
         raise_error :add_index_columns, header: "Best practice"
       end
 
+      # safe_by_default goes through this path as well
+      if postgresql? && options[:algorithm] == :concurrently && adapter.index_corruption?
+        raise_error :add_index_corruption
+      end
+
       # safe to add non-concurrently to new tables (even after inserting data)
       # since the table won't be in use by the application
       if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)

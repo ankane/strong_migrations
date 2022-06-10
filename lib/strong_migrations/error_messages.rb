@@ -128,6 +128,11 @@ end",
 "Adding a non-unique index with more than three columns rarely improves performance.
 Instead, start an index with columns that narrow down the results the most.",
 
+    add_index_corruption:
+"Adding an index concurrently can cause silent data corruption in Postgres 14.0 to 14.3.
+Upgrade Postgres before adding new indexes, or wrap this step in a safety_assured { ... } block
+to accept the risk.",
+
     change_table:
 "Strong Migrations does not support inspecting what happens inside a
 change_table block, so cannot help you here. Please make really sure that what

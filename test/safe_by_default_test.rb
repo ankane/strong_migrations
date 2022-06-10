@@ -17,6 +17,15 @@ class SafeByDefaultTest < Minitest::Test
     assert_argument_error AddIndexExtraArguments
   end
 
+  def test_add_index_corruption
+    skip unless postgresql?
+    StrongMigrations.stub(:developer_env?, false) do
+      with_target_version(14.3) do
+        assert_unsafe AddIndex, "can cause silent data corruption in Postgres 14.0 to 14.3"
+      end
+    end
+  end
+
   def test_remove_index
     migrate AddIndex
     assert_safe RemoveIndex
