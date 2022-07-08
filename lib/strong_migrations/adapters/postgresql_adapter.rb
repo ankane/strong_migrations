@@ -72,7 +72,7 @@ module StrongMigrations
           # but there doesn't seem to be a way to set/modify it
           # https://wiki.postgresql.org/wiki/What%27s_new_in_PostgreSQL_9.2#Reduce_ALTER_TABLE_rewrites
         when "numeric", "decimal"
-          # numeric and decimal are equivalent and can be used interchangably
+          # numeric and decimal are equivalent and can be used interchangeably
           safe = ["numeric", "decimal"].include?(existing_type) &&
             (
               (
