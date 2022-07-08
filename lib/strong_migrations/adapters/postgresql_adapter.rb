@@ -155,11 +155,9 @@ module StrongMigrations
         select_all(query.squish).any?
       end
 
-      # only check in non-developer environments (where actual server version is used)
       def index_corruption?
         server_version >= Gem::Version.new("14.0") &&
-          server_version < Gem::Version.new("14.4") &&
-          !StrongMigrations.developer_env?
+          server_version < Gem::Version.new("14.4")
       end
 
       private
