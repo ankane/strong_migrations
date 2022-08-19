@@ -23,6 +23,12 @@ class AddColumnDefaultCallable < TestMigration
   end
 end
 
+class AddColumnDefaultFunction < TestMigration
+  def change
+    add_column :users, :new_uuid, :uuid, default: "gen_random_uuid()"
+  end
+end
+
 class AddColumnJson < TestMigration
   def change
     add_column :users, :properties, :json

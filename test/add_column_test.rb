@@ -40,6 +40,7 @@ class AddColumnTest < Minitest::Test
     # TODO check MySQL and MariaDB
     skip unless postgresql?
     assert_unsafe AddColumnDefaultCallable
+    assert_unsafe AddColumnDefaultFunction
   end
 
   def test_json

@@ -47,7 +47,7 @@ Then add the NOT NULL constraint in separate migrations."
           code: backfill_code(table, column, default),
           append: append,
           rewrite_blocks: adapter.rewrite_blocks
-      elsif default.is_a?(Proc) && postgresql?
+      elsif postgresql? && (default.is_a?(Proc) || /\(.*\)/ =~ default.to_s)
         # adding a column with a VOLATILE default is not safe
         # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
         # functions like random() and clock_timestamp() are VOLATILE
@@ -342,6 +342,15 @@ Then add the foreign key in separate migrations."
       if postgresql? && adapter.writes_blocked?
         raise_error :validate_foreign_key
       end
+    end
+
+    def check_change_column_default(*args)
+      options = args.extract_options!
+      to = options[:to] || args.last
+
+      return unless postgresql? && (to.is_a?(Proc) || /\(.*\)/ =~ to.to_s)
+
+      raise_error :add_column_default_callable
     end
 
     # helpers

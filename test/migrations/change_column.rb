@@ -383,3 +383,65 @@ class ChangeColumnWithNotNull < TestMigration
     change_column :users, :country, :string, limit: 20
   end
 end
+
+class ChangeColumnWithFunctionDefault < TestMigration
+  def up
+    change_column :users, :uuid, :uuid, default: "gen_random_uuid()"
+  end
+
+  def down
+    change_column :users, :uuid, :uuid, default: nil
+  end
+end
+
+class ChangeColumnDefaultToFunctionFromTo < TestMigration
+  def change
+    change_column_default :users, :uuid, from: nil, to: "gen_random_uuid()"
+  end
+end
+
+class ChangeColumnDefaultToFunctionUpDown < TestMigration
+  def up
+    change_column_default :users, :uuid, "gen_random_uuid()"
+  end
+
+  def down
+    change_column_default :users, :uuid, nil
+  end
+end
+
+class ChangeColumnDefaultWithChangeTable < TestMigration
+  def up
+    change_table :users do |t|
+      t.column :uuid, :uuid, default: "gen_random_uuid()"
+    end
+  end
+
+  def down
+    change_table :users do |t|
+      t.column :uuid, :uuid, default: nil
+    end
+  end
+end
+
+class ChangeColumnDefaultWithChangeTableAndChangeDefault < TestMigration
+  def up
+    change_table :users do |t|
+      t.change_default :uuid, "gen_random_uuid()"
+    end
+  end
+
+  def down
+    change_table :users do |t|
+      t.change_default :uuid, nil
+    end
+  end
+end
+
+class ChangeColumnDefaultWithChangeTableAndChangeDefaultFromTo < TestMigration
+  def change
+    change_table :users do |t|
+      t.change_default :uuid, from: nil, to: "gen_random_uuid()"
+    end
+  end
+end

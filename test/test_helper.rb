@@ -31,6 +31,7 @@ ActiveRecord::SchemaMigration.create_table
 
 ActiveRecord::Schema.define do
   enable_extension "citext" if $adapter == "postgresql"
+  enable_extension "pgcrypto" if $adapter == "postgresql"
 
   [:users, :new_users, :orders, :devices, :cities_users].each do |table|
     drop_table(table) if table_exists?(table)
@@ -46,6 +47,7 @@ ActiveRecord::Schema.define do
     t.text :description
     t.citext :code if $adapter == "postgresql"
     t.references :order
+    t.uuid :uuid
   end
 
   create_table :orders do |t|

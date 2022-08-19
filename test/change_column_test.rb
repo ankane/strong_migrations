@@ -224,6 +224,16 @@ class ChangeColumnTest < Minitest::Test
     assert_unsafe ChangeColumnWithNotNull
   end
 
+  def test_change_default_to_function
+    skip unless postgresql?
+    assert_unsafe ChangeColumnWithFunctionDefault
+    assert_unsafe ChangeColumnDefaultToFunctionFromTo
+    assert_unsafe ChangeColumnDefaultToFunctionUpDown
+    assert_unsafe ChangeColumnDefaultWithChangeTable
+    assert_unsafe ChangeColumnDefaultWithChangeTableAndChangeDefault
+    assert_unsafe ChangeColumnDefaultWithChangeTableAndChangeDefaultFromTo
+  end
+
   def with_time_zone
     ActiveRecord::Base.connection.execute("SET timezone = 'America/Los_Angeles'")
     yield

@@ -71,6 +71,8 @@ module StrongMigrations
           # and no longer eligible to be retried at migration level
           # okay to have false positives
           @committed = true
+        when :change_column_default
+          check_change_column_default(*args)
         end
 
         # custom checks
