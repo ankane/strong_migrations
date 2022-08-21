@@ -681,7 +681,7 @@ Disable specific checks with:
 StrongMigrations.disable_check(:add_index)
 ```
 
-Check the [source code](https://github.com/ankane/strong_migrations/blob/master/lib/strong_migrations.rb) for the list of keys.
+Check the [source code](https://github.com/ankane/strong_migrations/blob/master/lib/strong_migrations/error_messages.rb) for the list of keys.
 
 ## Down Migrations / Rollbacks
 
