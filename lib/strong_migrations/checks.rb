@@ -34,8 +34,7 @@ module StrongMigrations
 
       # Active Record has special case for uuid columns that allows function default values
       # https://github.com/rails/rails/blob/v7.0.3.1/activerecord/lib/active_record/connection_adapters/postgresql/quoting.rb#L92-L93
-      # TODO mark safe if function is in pg_proc and non-volatile
-      if !default.nil? && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()"))))
+      if !default.nil? && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()") && adapter.default_volatile?(default))))
         if options[:null] == false
           options = options.except(:null)
           append = "

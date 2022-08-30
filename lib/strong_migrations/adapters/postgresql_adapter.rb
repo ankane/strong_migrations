@@ -162,6 +162,13 @@ module StrongMigrations
           !StrongMigrations.developer_env?
       end
 
+      # default to true if unsure
+      def default_volatile?(default)
+        name = default.to_s.delete_suffix("()")
+        rows = select_all("SELECT provolatile FROM pg_proc WHERE proname = #{connection.quote(name)}").to_a
+        rows.empty? || rows.any? { |r| r["provolatile"] == "v" }
+      end
+
       private
 
       def set_timeout(setting, timeout)
