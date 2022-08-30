@@ -424,7 +424,10 @@ Then add the foreign key in separate migrations."
       model = table.to_s.classify
       if function
         # update_all(column: Arel.sql(default)) also works in newer versions of Active Record
-        "#{model}.unscoped.in_batches do |relation| \n      relation.where(#{column}: nil).update_all(\"#{column} = #{default}\")\n      sleep(0.01)\n    end"
+        # only quote when needed
+        update_column = column.to_s =~ /\A[a-z0-9_]+\z/ ? column : connection.quote_column_name(column)
+        update_expr = "#{update_column} = #{default}"
+        "#{model}.unscoped.in_batches do |relation| \n      relation.where(#{column}: nil).update_all(#{update_expr.inspect})\n      sleep(0.01)\n    end"
       else
         "#{model}.unscoped.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
       end
