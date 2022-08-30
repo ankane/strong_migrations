@@ -1,3 +1,7 @@
+## 1.3.0 (unreleased)
+
+- Added check for `add_column` with `uuid` column and volatile default value
+
 ## 1.2.0 (2022-06-10)
 
 - Added check for index corruption with Postgres 14.0 to 14.3

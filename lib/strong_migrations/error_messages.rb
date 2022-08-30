@@ -1,7 +1,7 @@
 module StrongMigrations
   self.error_messages = {
     add_column_default:
-"Adding a column with a non-null default blocks %{rewrite_blocks} while the entire table is rewritten.
+"Adding a column with a %{default_type} default blocks %{rewrite_blocks} while the entire table is rewritten.
 Instead, add the column without a default value, then change the default.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}

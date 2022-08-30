@@ -42,6 +42,11 @@ class AddColumnTest < Minitest::Test
     assert_unsafe AddColumnDefaultCallable
   end
 
+  def test_default_uuid
+    skip unless postgresql?
+    assert_unsafe AddColumnDefaultUUID
+  end
+
   def test_json
     skip unless postgresql?
     assert_unsafe AddColumnJson

@@ -32,7 +32,10 @@ module StrongMigrations
       table, column, type = args
       default = options[:default]
 
-      if !default.nil? && !adapter.add_column_default_safe?
+      # Active Record has special case for uuid columns that allows function default values
+      # https://github.com/rails/rails/blob/v7.0.3.1/activerecord/lib/active_record/connection_adapters/postgresql/quoting.rb#L92-L93
+      # TODO mark safe if function is in pg_proc and non-volatile
+      if !default.nil? && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()"))))
         if options[:null] == false
           options = options.except(:null)
           append = "
@@ -44,9 +47,10 @@ Then add the NOT NULL constraint in separate migrations."
           add_command: command_str("add_column", [table, column, type, options.except(:default)]),
           change_command: command_str("change_column_default", [table, column, default]),
           remove_command: command_str("remove_column", [table, column]),
-          code: backfill_code(table, column, default),
+          code: backfill_code(table, column, default, volatile),
           append: append,
-          rewrite_blocks: adapter.rewrite_blocks
+          rewrite_blocks: adapter.rewrite_blocks,
+          default_type: (volatile ? "volatile" : "non-null")
       elsif default.is_a?(Proc) && postgresql?
         # adding a column with a VOLATILE default is not safe
         # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
@@ -409,9 +413,13 @@ Then add the foreign key in separate migrations."
       "#{command} #{str_args.join(", ")}"
     end
 
-    def backfill_code(table, column, default)
+    def backfill_code(table, column, default, function = false)
       model = table.to_s.classify
-      "#{model}.unscoped.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
+      if function
+        "#{model}.unscoped.in_batches do |relation| \n      relation.where(#{column}: nil).update_all(\"#{column} = #{default}\")\n      sleep(0.01)\n    end"
+      else
+        "#{model}.unscoped.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
+      end
     end
 
     def new_table?(table)
