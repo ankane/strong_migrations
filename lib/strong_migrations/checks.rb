@@ -222,9 +222,7 @@ Then add the foreign key in separate migrations."
 
             add_constraint_code =
               if constraint_methods
-                # only quote when needed
-                expr_column = column.to_s =~ /\A[a-z0-9_]+\z/ ? column : connection.quote_column_name(column)
-                command_str(:add_check_constraint, [table, "#{expr_column} IS NOT NULL", {name: constraint_name, validate: false}])
+                command_str(:add_check_constraint, [table, "#{quote_column_if_needed(column)} IS NOT NULL", {name: constraint_name, validate: false}])
               else
                 safety_assured_str(add_code)
               end
@@ -424,13 +422,16 @@ Then add the foreign key in separate migrations."
       model = table.to_s.classify
       if function
         # update_all(column: Arel.sql(default)) also works in newer versions of Active Record
-        # only quote when needed
-        update_column = column.to_s =~ /\A[a-z0-9_]+\z/ ? column : connection.quote_column_name(column)
-        update_expr = "#{update_column} = #{default}"
+        update_expr = "#{quote_column_if_needed(column)} = #{default}"
         "#{model}.unscoped.in_batches do |relation| \n      relation.where(#{column}: nil).update_all(#{update_expr.inspect})\n      sleep(0.01)\n    end"
       else
         "#{model}.unscoped.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
       end
+    end
+
+    # only quote when needed
+    def quote_column_if_needed(column)
+      column.to_s =~ /\A[a-z0-9_]+\z/ ? column : connection.quote_column_name(column)
     end
 
     def new_table?(table)
