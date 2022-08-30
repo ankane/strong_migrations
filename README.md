@@ -135,7 +135,7 @@ class AddSomeColumnToUsers < ActiveRecord::Migration[7.0]
 end
 ```
 
-In Postgres 11+, MySQL 8.0.12+, and MariaDB 10.3.2+, this no longer requires a table rewrite and is safe.
+In Postgres 11+, MySQL 8.0.12+, and MariaDB 10.3.2+, this no longer requires a table rewrite and is safe (except for volatile functions like `gen_random_uuid()`).
 
 #### Good
 

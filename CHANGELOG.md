@@ -1,4 +1,4 @@
-## 1.3.0 (unreleased)
+## 1.3.0 (2022-08-30)
 
 - Added check for `add_column` with `uuid` type and volatile default value
 
