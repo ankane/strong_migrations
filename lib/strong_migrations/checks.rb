@@ -415,6 +415,7 @@ Then add the foreign key in separate migrations."
     def backfill_code(table, column, default, function = false)
       model = table.to_s.classify
       if function
+        # update_all(column: Arel.sql(default)) also works in newer versions of Active Record
         "#{model}.unscoped.in_batches do |relation| \n      relation.where(#{column}: nil).update_all(\"#{column} = #{default}\")\n      sleep(0.01)\n    end"
       else
         "#{model}.unscoped.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
