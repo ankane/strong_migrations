@@ -229,9 +229,17 @@ Then add the foreign key in separate migrations."
                 safety_assured_str(add_code)
               end
 
+            validate_constraint_code =
+              if safe_with_check_constraint
+                down_code = "#{add_constraint_code}\n    #{command_str(:change_column_null, [table, column, true])}"
+                "def up\n    #{validate_constraint_code}\n  end\n\n  def down\n    #{down_code}\n  end"
+              else
+                "def change\n    #{validate_constraint_code}\n  end"
+              end
+
             raise_error :change_column_null_postgresql,
               add_constraint_code: add_constraint_code,
-              validate_constraint_code: "def change\n    #{validate_constraint_code}\n  end"
+              validate_constraint_code: validate_constraint_code
           end
         elsif mysql? || mariadb?
           unless adapter.strict_mode?
