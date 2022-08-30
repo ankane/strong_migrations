@@ -1,6 +1,6 @@
 ## 1.3.0 (unreleased)
 
-- Added check for `add_column` with `uuid` column and volatile default value
+- Added check for `add_column` with `uuid` type and volatile default value
 
 ## 1.2.0 (2022-06-10)
 
