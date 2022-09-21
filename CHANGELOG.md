@@ -1,4 +1,4 @@
-## 1.3.1 (unreleased)
+## 1.3.1 (2022-09-21)
 
 - Fixed check for `add_column` with `default: nil` with Postgres 10
 
