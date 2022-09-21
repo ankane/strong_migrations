@@ -1,3 +1,7 @@
+## 1.3.1 (unreleased)
+
+- Fixed check for `add_column` with `default: nil` with Postgres 10
+
 ## 1.3.0 (2022-08-30)
 
 - Added check for `add_column` with `uuid` type and volatile default value

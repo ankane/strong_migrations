@@ -18,6 +18,12 @@ class AddColumnTest < Minitest::Test
     StrongMigrations.target_mariadb_version = nil
   end
 
+  def test_default_null
+    with_target_version(postgresql? ? 10 : (mysql? ? "8.0.11" : "10.3.1")) do
+      assert_unsafe AddColumnDefaultNull
+    end
+  end
+
   def test_default_not_null
     with_target_version(postgresql? ? 10 : (mysql? ? "8.0.11" : "10.3.1")) do
       assert_unsafe AddColumnDefaultNotNull, /Then add the NOT NULL constraint/

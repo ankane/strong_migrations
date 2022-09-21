@@ -32,9 +32,11 @@ module StrongMigrations
       table, column, type = args
       default = options[:default]
 
-      # Active Record has special case for uuid columns that allows function default values
+      # Check key since DEFAULT NULL behaves differently from no default
+      #
+      # Also, Active Record has special case for uuid columns that allows function default values
       # https://github.com/rails/rails/blob/v7.0.3.1/activerecord/lib/active_record/connection_adapters/postgresql/quoting.rb#L92-L93
-      if !default.nil? && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()") && adapter.default_volatile?(default))))
+      if options.key?(:default) && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()") && adapter.default_volatile?(default))))
         if options[:null] == false
           options = options.except(:null)
           append = "

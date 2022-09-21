@@ -4,6 +4,12 @@ class AddColumnDefault < TestMigration
   end
 end
 
+class AddColumnDefaultNull < TestMigration
+  def change
+    add_column :users, :nice, :boolean, default: nil
+  end
+end
+
 class AddColumnDefaultNotNull < TestMigration
   def change
     add_column :users, :nice, :boolean, default: true, null: false
