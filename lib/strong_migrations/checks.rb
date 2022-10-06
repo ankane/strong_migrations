@@ -44,14 +44,21 @@ module StrongMigrations
 Then add the NOT NULL constraint in separate migrations."
         end
 
-        raise_error :add_column_default,
-          add_command: command_str("add_column", [table, column, type, options.except(:default)]),
-          change_command: command_str("change_column_default", [table, column, default]),
-          remove_command: command_str("remove_column", [table, column]),
-          code: backfill_code(table, column, default, volatile),
-          append: append,
-          rewrite_blocks: adapter.rewrite_blocks,
-          default_type: (volatile ? "volatile" : "non-null")
+        if default.nil?
+          raise_error :add_column_default_null,
+            command: command_str("add_column", [table, column, type, options.except(:default)]),
+            append: append,
+            rewrite_blocks: adapter.rewrite_blocks
+        else
+          raise_error :add_column_default,
+            add_command: command_str("add_column", [table, column, type, options.except(:default)]),
+            change_command: command_str("change_column_default", [table, column, default]),
+            remove_command: command_str("remove_column", [table, column]),
+            code: backfill_code(table, column, default, volatile),
+            append: append,
+            rewrite_blocks: adapter.rewrite_blocks,
+            default_type: (volatile ? "volatile" : "non-null")
+        end
       elsif default.is_a?(Proc) && postgresql?
         # adding a column with a VOLATILE default is not safe
         # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
