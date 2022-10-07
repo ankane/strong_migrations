@@ -20,13 +20,13 @@ class AddColumnTest < Minitest::Test
 
   def test_default_null
     with_target_version(postgresql? ? 10 : (mysql? ? "8.0.11" : "10.3.1")) do
-      assert_unsafe AddColumnDefaultNull, /Adding a column with a null default/
+      assert_unsafe AddColumnDefaultNull, "Adding a column with a null default"
     end
   end
 
   def test_default_not_null
     with_target_version(postgresql? ? 10 : (mysql? ? "8.0.11" : "10.3.1")) do
-      assert_unsafe AddColumnDefaultNotNull, /Then add the NOT NULL constraint/
+      assert_unsafe AddColumnDefaultNotNull, "Then add the NOT NULL constraint"
     end
   end
 

@@ -55,7 +55,7 @@ class AddIndexTest < Minitest::Test
   end
 
   def test_columns
-    assert_unsafe AddIndexColumns, /more than three columns/
+    assert_unsafe AddIndexColumns, "more than three columns"
   end
 
   def test_columns_unique
