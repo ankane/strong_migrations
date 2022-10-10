@@ -1,4 +1,4 @@
-## 1.3.2 (unreleased)
+## 1.3.2 (2022-10-09)
 
 - Improved error message for `add_column` with `default: nil` with Postgres 10
 
