@@ -41,7 +41,7 @@ module StrongMigrations
 
   # private
   def self.developer_env?
-    defined?(Rails) && (Rails.env.development? || Rails.env.test?)
+    defined?(Rails.env) && (Rails.env.development? || Rails.env.test?)
   end
 
   def self.lock_timeout_limit

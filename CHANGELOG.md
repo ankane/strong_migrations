@@ -1,3 +1,7 @@
+## 1.4.0 (unreleased)
+
+- Fixed error when `Rails` defined without `Rails.env`
+
 ## 1.3.2 (2022-10-09)
 
 - Improved error message for `add_column` with `default: nil` with Postgres 10
