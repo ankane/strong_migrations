@@ -1,5 +1,6 @@
 ## 1.4.0 (unreleased)
 
+- Added support for `RACK_ENV`
 - Fixed error when `Rails` defined without `Rails.env`
 
 ## 1.3.2 (2022-10-09)

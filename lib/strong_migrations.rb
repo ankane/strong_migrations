@@ -41,7 +41,17 @@ module StrongMigrations
 
   # private
   def self.developer_env?
-    defined?(Rails.env) && (Rails.env.development? || Rails.env.test?)
+    env == "development" || env == "test"
+  end
+
+  # private
+  def self.env
+    if defined?(Rails.env)
+      Rails.env
+    else
+      # default to production for safety
+      ENV["RACK_ENV"] || "production"
+    end
   end
 
   def self.lock_timeout_limit
