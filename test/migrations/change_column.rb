@@ -383,3 +383,9 @@ class ChangeColumnWithNotNull < TestMigration
     change_column :users, :country, :string, limit: 20
   end
 end
+
+class ChangeColumnMissingTable < TestMigration
+  def change
+    change_column :missing, :properties, :string
+  end
+end

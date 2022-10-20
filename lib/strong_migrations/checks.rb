@@ -170,7 +170,8 @@ Then add the foreign key in separate migrations."
       table, column, type = args
 
       safe = false
-      existing_column = connection.columns(table).find { |c| c.name.to_s == column.to_s }
+      table_columns = connection.columns(table) rescue []
+      existing_column = table_columns.find { |c| c.name.to_s == column.to_s }
       if existing_column
         existing_type = existing_column.sql_type.sub(/\(\d+(,\d+)?\)/, "")
         safe = adapter.change_type_safe?(table, column, type, options, existing_column, existing_type)

@@ -2,6 +2,7 @@
 
 - Added support for `RACK_ENV`
 - Fixed error when `Rails` defined without `Rails.env`
+- Fixed error with `change_column_null` when table does not exist
 
 ## 1.3.2 (2022-10-09)
 

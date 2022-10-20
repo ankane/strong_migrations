@@ -224,6 +224,10 @@ class ChangeColumnTest < Minitest::Test
     assert_unsafe ChangeColumnWithNotNull
   end
 
+  def test_missing_table
+    assert_unsafe ChangeColumnMissingTable
+  end
+
   def with_time_zone
     ActiveRecord::Base.connection.execute("SET timezone = 'America/Los_Angeles'")
     yield
