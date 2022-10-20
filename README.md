@@ -107,7 +107,7 @@ end
   end
   ```
 
-2. Deploy code
+2. Deploy the code
 3. Write a migration to remove the column (wrap in `safety_assured` block)
 
   ```ruby
@@ -118,7 +118,7 @@ end
   end
   ```
 
-4. Deploy and run migration
+4. Deploy and run the migration
 5. Remove the line added in step 1
 
 ### Adding a column with a default value
