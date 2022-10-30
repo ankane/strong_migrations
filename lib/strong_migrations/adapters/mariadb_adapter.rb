@@ -18,6 +18,9 @@ module StrongMigrations
       end
 
       def set_statement_timeout(timeout)
+        # fix deprecation warning with Active Record 7.1
+        timeout = timeout.value if timeout.is_a?(ActiveSupport::Duration)
+
         select_all("SET max_statement_time = #{connection.quote(timeout)}")
       end
 

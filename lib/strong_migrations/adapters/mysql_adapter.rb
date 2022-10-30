@@ -25,6 +25,9 @@ module StrongMigrations
       end
 
       def set_lock_timeout(timeout)
+        # fix deprecation warning with Active Record 7.1
+        timeout = timeout.value if timeout.is_a?(ActiveSupport::Duration)
+
         select_all("SET lock_wait_timeout = #{connection.quote(timeout)}")
       end
 
