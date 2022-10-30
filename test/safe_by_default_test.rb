@@ -14,7 +14,11 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_index_extra_arguments
-    assert_argument_error AddIndexExtraArguments
+    if postgresql? || ActiveRecord::VERSION::STRING.to_f >= 6.1
+      assert_argument_error AddIndexExtraArguments
+    else
+      assert_type_error AddIndexExtraArguments
+    end
   end
 
   def test_add_index_corruption
