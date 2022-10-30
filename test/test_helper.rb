@@ -27,7 +27,15 @@ end
 TestMigration = ActiveRecord::Migration[migration_version]
 TestSchema = ActiveRecord::Schema
 
-ActiveRecord::SchemaMigration.create_table
+def schema_migration
+  if ActiveRecord::VERSION::STRING.to_f >= 7.1
+    ActiveRecord::Base.connection.schema_migration
+  else
+    ActiveRecord::SchemaMigration
+  end
+end
+
+schema_migration.create_table
 
 ActiveRecord::Schema.define do
   enable_extension "citext" if $adapter == "postgresql"
@@ -79,13 +87,28 @@ class Minitest::Test
   include Helpers
 
   def migrate(migration, direction: :up)
-    ActiveRecord::SchemaMigration.delete_all
+    if ActiveRecord::VERSION::STRING.to_f >= 7.1
+      schema_migration.delete_all_versions
+    else
+      schema_migration.delete_all
+    end
     migration = migration.new unless migration.is_a?(TestMigration)
     migration.version ||= 123
     if direction == :down
-      ActiveRecord::SchemaMigration.create!(version: migration.version)
+      if ActiveRecord::VERSION::STRING.to_f >= 7.1
+        schema_migration.create_version(migration.version)
+      else
+        schema_migration.create!(version: migration.version)
+      end
     end
-    args = ActiveRecord::VERSION::MAJOR >= 6 ? [ActiveRecord::SchemaMigration] : []
+    args =
+      if ActiveRecord::VERSION::STRING.to_f >= 7.1
+        [schema_migration, ActiveRecord::Base.connection.internal_metadata]
+      elsif ActiveRecord::VERSION::MAJOR >= 6
+        [schema_migration]
+      else
+        []
+      end
     ActiveRecord::Migrator.new(direction, [migration], *args).migrate
     true
   rescue => e

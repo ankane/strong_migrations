@@ -64,7 +64,7 @@ module StrongMigrations
           @migration.validate_check_constraint(table, **validate_options)
         end
         dir.down do
-          @migration.remove_check_constraint(table, expression, **add_options)
+          @migration.remove_check_constraint(table, expression, **add_options.except(:validate))
         end
       end
     end
