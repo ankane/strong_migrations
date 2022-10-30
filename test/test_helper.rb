@@ -12,7 +12,14 @@ module Rails
 end
 
 $adapter = ENV["ADAPTER"] || "postgresql"
-ActiveRecord::Base.establish_connection(adapter: $adapter, database: "strong_migrations_test")
+connection_options = {
+  adapter: $adapter,
+  database: "strong_migrations_test"
+}
+if $adapter == "mysql2" && ActiveRecord::VERSION::STRING.to_f >= 7.1
+  connection_options[:prepared_statements] = true
+end
+ActiveRecord::Base.establish_connection(**connection_options)
 
 if ENV["VERBOSE"]
   ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout)
