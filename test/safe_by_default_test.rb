@@ -14,7 +14,7 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_index_extra_arguments
-    if postgresql? || ActiveRecord::VERSION::STRING.to_f >= 6.1
+    if postgresql? || ActiveRecord::VERSION::STRING.to_f != 6.0
       assert_argument_error AddIndexExtraArguments
     else
       assert_type_error AddIndexExtraArguments
@@ -75,7 +75,11 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_foreign_key_extra_arguments
-    assert_argument_error AddForeignKeyExtraArguments
+    if postgresql? || ActiveRecord::VERSION::MAJOR >= 6
+      assert_argument_error AddForeignKeyExtraArguments
+    else
+      assert_type_error AddForeignKeyExtraArguments
+    end
   end
 
   def test_add_check_constraint

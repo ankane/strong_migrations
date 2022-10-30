@@ -34,8 +34,10 @@ class AddForeignKeyTest < Minitest::Test
   def test_extra_arguments
     if postgresql?
       assert_unsafe AddForeignKeyExtraArguments
-    else
+    elsif ActiveRecord::VERSION::MAJOR >= 6
       assert_argument_error AddForeignKeyExtraArguments
+    else
+      assert_type_error AddForeignKeyExtraArguments
     end
   end
 
