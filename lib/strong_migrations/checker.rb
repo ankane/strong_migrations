@@ -36,6 +36,8 @@ module StrongMigrations
           check_add_check_constraint(*args)
         when :add_column
           check_add_column(*args)
+        when :add_exclusion_constraint
+          check_add_exclusion_constraint(*args)
         when :add_foreign_key
           check_add_foreign_key(*args)
         when :add_index

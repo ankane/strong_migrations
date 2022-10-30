@@ -231,7 +231,10 @@ end",
 
     validate_check_constraint:
 "Validating a check constraint while writes are blocked is dangerous.
-Use disable_ddl_transaction! or a separate migration."
+Use disable_ddl_transaction! or a separate migration.",
+
+    add_exclusion_constraint:
+"Adding an exclusion constraint blocks reads and writes while every row is checked."
   }
   self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h
 end

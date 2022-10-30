@@ -73,6 +73,14 @@ Then add the NOT NULL constraint in separate migrations."
       end
     end
 
+    def check_add_exclusion_constraint(*args)
+      table = args[0]
+
+      unless new_table?(table)
+        raise_error :add_exclusion_constraint
+      end
+    end
+
     # unlike add_index, we don't make an exception here for new tables
     #
     # with add_index, it's fine to lock a new table even after inserting data

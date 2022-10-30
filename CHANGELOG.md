@@ -1,5 +1,6 @@
 ## 1.4.0 (unreleased)
 
+- Added check for `add_exclusion_constraint`
 - Added support for `RACK_ENV`
 - Fixed error when `Rails` defined without `Rails.env`
 - Fixed error with `change_column_null` when table does not exist

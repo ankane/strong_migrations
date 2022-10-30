@@ -74,6 +74,7 @@ Postgres-specific checks:
 - [adding an index non-concurrently](#adding-an-index-non-concurrently)
 - [adding a reference](#adding-a-reference)
 - [adding a foreign key](#adding-a-foreign-key)
+- [adding an exclusion constraint](#adding-an-exclusion-constraint) [unreleased]
 - [adding a json column](#adding-a-json-column)
 - [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
 
@@ -487,6 +488,24 @@ class ValidateForeignKeyOnUsers < ActiveRecord::Migration[7.0]
   end
 end
 ```
+
+### Adding an exclusion constraint
+
+#### Bad
+
+In Postgres, adding an exclusion constraint blocks reads and writes while every row is checked.
+
+```ruby
+class AddExclusionContraint < ActiveRecord::Migration[7.1]
+  def change
+    add_exclusion_constraint :users, "number WITH =", using: :gist
+  end
+end
+```
+
+#### Good
+
+[Let us know](https://github.com/ankane/strong_migrations/issues/new) if you have a safe way to do this (exclusion constraints cannot be marked `NOT VALID`).
 
 ### Adding a json column
 
