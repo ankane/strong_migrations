@@ -1,4 +1,4 @@
-## 1.4.0 (unreleased)
+## 1.4.0 (2022-10-31)
 
 - Added check for `add_exclusion_constraint`
 - Added support for `RACK_ENV`
