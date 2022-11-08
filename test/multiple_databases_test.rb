@@ -48,21 +48,15 @@ class MultipleDatabasesTest < Minitest::Test
 
     multi_db_config = {
       "test" => {
-        "primary" => {
-          "adapter" => $adapter,
-          "database" => "strong_migrations_test"
-        },
-        "animals" => {
-          "adapter" => $adapter,
-          "database" => "animals_test"
-        }
+        "primary" => previous_db_config,
+        "animals" => previous_db_config
       }
     }
     ActiveRecord::Base.configurations = multi_db_config
     ActiveRecord::Base.connects_to(database: {writing: :primary})
     yield
   ensure
-    ActiveRecord::Base.establish_connection(previous_db_config)
+    ActiveRecord::Base.establish_connection(previous_db_config) if previous_db_config
   end
 
   def multiple_dbs?
