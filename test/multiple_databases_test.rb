@@ -46,13 +46,12 @@ class MultipleDatabasesTest < Minitest::Test
   def with_multiple_dbs(&block)
     previous_db_config = ActiveRecord::Base.connection_db_config.configuration_hash
 
-    multi_db_config = {
+    ActiveRecord::Base.configurations = {
       "test" => {
         "primary" => previous_db_config,
         "animals" => previous_db_config
       }
     }
-    ActiveRecord::Base.configurations = multi_db_config
     ActiveRecord::Base.connects_to(database: {writing: :primary})
     yield
   ensure
