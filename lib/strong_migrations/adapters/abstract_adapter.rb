@@ -58,9 +58,8 @@ module StrongMigrations
                 raise StrongMigrations::Error, "target_version does not support multiple databases for Active Record < 6.1"
               end
 
-              target_version = target_version.stringify_keys
               db_config_name = connection.pool.db_config.name
-              target_version.fetch(db_config_name) do
+              target_version.stringify_keys.fetch(db_config_name) do
                 raise StrongMigrations::Error, "target_version is not configured for :#{db_config_name} database"
               end.to_s
             else
