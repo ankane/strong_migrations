@@ -51,6 +51,9 @@ module StrongMigrations
         version =
           if target_version && StrongMigrations.developer_env?
             if target_version.is_a?(Hash)
+              # Active Record 6.0 supports multiple databases
+              # but connection.pool.spec.name always returns "primary"
+              # in migrations with rails db:migrate
               if ActiveRecord::VERSION::STRING.to_f < 6.1
                 raise StrongMigrations::Error, "target_version does not support multiple databases for Active Record < 6.1"
               end
