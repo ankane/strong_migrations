@@ -15,15 +15,14 @@ class MultipleDatabasesTest < Minitest::Test
   def test_target_version
     skip unless multiple_dbs?
 
-    with_multiple_dbs do
-      safe_version = postgresql? ? 11 : (mysql? ? "8.0.12" : "10.3.2")
-      with_target_version({primary: safe_version}) do
-        assert_safe AddColumnDefault
-      end
-
-      unsafe_version = postgresql? ? 10 : (mysql? ? "8.0.11" : "10.3.1")
-      with_target_version({primary: unsafe_version}) do
+    safe_version = postgresql? ? 11 : (mysql? ? "8.0.12" : "10.3.2")
+    unsafe_version = postgresql? ? 10 : (mysql? ? "8.0.11" : "10.3.1")
+    with_target_version({primary: unsafe_version, animals: safe_version}) do
+      with_database(:primary) do
         assert_unsafe AddColumnDefault
+      end
+      with_database(:animals) do
+        assert_safe AddColumnDefault
       end
     end
   end
@@ -31,20 +30,21 @@ class MultipleDatabasesTest < Minitest::Test
   def test_target_version_unconfigured
     skip unless multiple_dbs?
 
-    with_multiple_dbs do
-      error = assert_raises(StrongMigrations::Error) do
-        with_target_version({animals: 10}) do
+    error = assert_raises(StrongMigrations::Error) do
+      with_target_version({primary: 10}) do
+        with_database(:animals) do
           assert_safe AddColumnDefault
         end
       end
-      assert_equal "target_version is not configured for :primary database", error.message
     end
+    assert_equal "target_version is not configured for :animals database", error.message
   end
 
   private
 
-  def with_multiple_dbs(&block)
+  def with_database(database, &block)
     previous_db_config = ActiveRecord::Base.connection_db_config.configuration_hash
+    previous_configurations = ActiveRecord::Base.configurations
 
     ActiveRecord::Base.configurations = {
       "test" => {
@@ -52,10 +52,11 @@ class MultipleDatabasesTest < Minitest::Test
         "animals" => previous_db_config
       }
     }
-    ActiveRecord::Base.connects_to(database: {writing: :primary})
+    ActiveRecord::Base.establish_connection(database)
     yield
   ensure
     ActiveRecord::Base.establish_connection(previous_db_config) if previous_db_config
+    ActiveRecord::Base.configurations = previous_configurations if previous_configurations
   end
 
   def multiple_dbs?
