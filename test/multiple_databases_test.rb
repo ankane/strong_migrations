@@ -43,8 +43,8 @@ class MultipleDatabasesTest < Minitest::Test
   private
 
   def with_database(database, &block)
-    previous_db_config = ActiveRecord::Base.connection_db_config.configuration_hash
     previous_configurations = ActiveRecord::Base.configurations
+    previous_db_config = ActiveRecord::Base.connection_db_config.configuration_hash
 
     ActiveRecord::Base.configurations = {
       "test" => {
@@ -55,8 +55,8 @@ class MultipleDatabasesTest < Minitest::Test
     ActiveRecord::Base.establish_connection(database)
     yield
   ensure
-    ActiveRecord::Base.establish_connection(previous_db_config) if previous_db_config
     ActiveRecord::Base.configurations = previous_configurations if previous_configurations
+    ActiveRecord::Base.establish_connection(previous_db_config) if previous_db_config
   end
 
   def multiple_dbs?
