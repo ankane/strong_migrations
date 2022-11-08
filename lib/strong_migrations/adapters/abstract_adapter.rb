@@ -50,7 +50,19 @@ module StrongMigrations
         target_version ||= StrongMigrations.target_version
         version =
           if target_version && StrongMigrations.developer_env?
-            target_version.to_s
+            if target_version.is_a?(Hash)
+              if ActiveRecord::VERSION::STRING.to_f < 6.1
+                raise StrongMigrations::Error, "StrongMigrations.target_version does not support multiple databases for ActiveRecord < 6.1"
+              end
+
+              target_version = target_version.stringify_keys
+              db_config_name = connection.pool.db_config.name
+              target_version.fetch(db_config_name) do
+                raise StrongMigrations::Error, "StrongMigrations.target_version is not configured for :#{db_config_name}"
+              end
+            else
+              target_version.to_s
+            end
           else
             yield
           end

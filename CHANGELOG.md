@@ -1,3 +1,5 @@
+- Support multiple databases for `target_version`
+
 ## 1.4.0 (2022-10-31)
 
 - Added check for `add_exclusion_constraint`
