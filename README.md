@@ -818,14 +818,17 @@ If your development database version is different from production, you can speci
 
 ```ruby
 StrongMigrations.target_version = 10 # or "8.0.12", "10.3.2", etc
-
-# or if you use multiple databases (ActiveRecord 6.1+)
-StrongMigrations.target_version = { primary: 10, animals: 15.0 }
 ```
 
 The major version works well for Postgres, while the full version is recommended for MySQL and MariaDB.
 
 For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
+
+If your app has multiple databases with different versions, with Rails 6.1+, you can use: [unreleased]
+
+```ruby
+StrongMigrations.target_version = {primary: 13, catalog: 15}
+```
 
 ## Analyze Tables
 

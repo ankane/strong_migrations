@@ -1,4 +1,6 @@
-- Support multiple databases for `target_version`
+## 1.4.1 (unreleased)
+
+- Added support for multiple databases to `target_version`
 
 ## 1.4.0 (2022-10-31)
 
