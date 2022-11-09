@@ -8,7 +8,7 @@ class MultipleDatabasesTest < Minitest::Test
       error = assert_raises(StrongMigrations::Error) do
         assert_safe AddColumnDefault
       end
-      assert_equal "target_version does not support multiple databases for Active Record < 6.1", error.message
+      assert_equal "StrongMigrations.target_version does not support multiple databases for Active Record < 6.1", error.message
     end
   end
 
@@ -37,7 +37,7 @@ class MultipleDatabasesTest < Minitest::Test
         end
       end
     end
-    assert_equal "target_version is not configured for :animals database", error.message
+    assert_equal "StrongMigrations.target_version is not configured for :animals database", error.message
   end
 
   private
