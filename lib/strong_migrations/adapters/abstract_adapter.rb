@@ -55,13 +55,13 @@ module StrongMigrations
               # but connection.pool.spec.name always returns "primary"
               # in migrations with rails db:migrate
               if ActiveRecord::VERSION::STRING.to_f < 6.1
-                # error class is hidden in db:migrate output so ensure message is descriptive
+                # error class is not shown in db:migrate output so ensure message is descriptive
                 raise StrongMigrations::Error, "StrongMigrations.target_version does not support multiple databases for Active Record < 6.1"
               end
 
               db_config_name = connection.pool.db_config.name
               target_version.stringify_keys.fetch(db_config_name) do
-                # error class is hidden in db:migrate output so ensure message is descriptive
+                # error class is not shown in db:migrate output so ensure message is descriptive
                 raise StrongMigrations::Error, "StrongMigrations.target_version is not configured for :#{db_config_name} database"
               end.to_s
             else
