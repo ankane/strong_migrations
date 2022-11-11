@@ -12,7 +12,7 @@ Supports PostgreSQL, MySQL, and MariaDB
 
 ## Installation
 
-Add this line to your application’s Gemfile:
+Add this line to your application’s Gemfile, in the [default group](https://github.com/ankane/strong_migrations/pull/68#issuecomment-484326980).
 
 ```ruby
 gem "strong_migrations"
