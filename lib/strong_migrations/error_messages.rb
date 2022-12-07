@@ -57,9 +57,14 @@ while the entire table is rewritten. A safer approach is to:
 1. Create a new column
 2. Write to both columns
 3. Backfill data from the old column to the new column
-4. Move reads from the old column to the new column
-5. Stop writing to the old column
-6. Drop the old column",
+4. Deploy and run migrations
+5. In a single migration (DDL transaction):
+  * Drop old column
+  * Rename new column to the old column name
+  * Create one more column with a new name and the new type (in order for the app still be able to write to it)
+6. Deploy and run the migration
+7. Stop writing to a column with the new name
+8. Follow `removing a column` steps for the column with the new name",
 
     change_column_with_not_null:
 "Changing the type is safe, but setting NOT NULL is not.",
