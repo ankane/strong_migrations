@@ -7,36 +7,36 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - ruby: 3.2.0-preview2
-          gemfile: gemfiles/activerecord71.gemfile
-        - ruby: 3.1
-          gemfile: Gemfile
-        - ruby: "3.0"
-          gemfile: gemfiles/activerecord61.gemfile
-        - ruby: 2.7
-          gemfile: gemfiles/activerecord60.gemfile
-        - ruby: 2.6
-          gemfile: gemfiles/activerecord52.gemfile
+          - ruby: 3.2
+            gemfile: gemfiles/activerecord71.gemfile
+          - ruby: 3.1
+            gemfile: Gemfile
+          - ruby: "3.0"
+            gemfile: gemfiles/activerecord61.gemfile
+          - ruby: 2.7
+            gemfile: gemfiles/activerecord60.gemfile
+          - ruby: 2.6
+            gemfile: gemfiles/activerecord52.gemfile
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:
-    - uses: actions/checkout@v3
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
 
-    - uses: ankane/setup-postgres@v1
-      with:
-        database: strong_migrations_test
-    - run: bundle exec rake test
+      - uses: ankane/setup-postgres@v1
+        with:
+          database: strong_migrations_test
+      - run: bundle exec rake test
 
-    - uses: ankane/setup-mysql@v1
-      with:
-        database: strong_migrations_test
-    - run: ADAPTER=mysql2 bundle exec rake test
+      - uses: ankane/setup-mysql@v1
+        with:
+          database: strong_migrations_test
+      - run: ADAPTER=mysql2 bundle exec rake test
 
-    - uses: ankane/setup-mariadb@v1
-      with:
-        database: strong_migrations_test
-    - run: ADAPTER=mysql2 bundle exec rake test
+      - uses: ankane/setup-mariadb@v1
+        with:
+          database: strong_migrations_test
+      - run: ADAPTER=mysql2 bundle exec rake test
