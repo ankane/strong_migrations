@@ -824,7 +824,7 @@ The major version works well for Postgres, while the full version is recommended
 
 For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
 
-If your app has multiple databases with different versions, with Rails 6.1+, you can use: [unreleased]
+If your app has multiple databases with different versions, with Rails 6.1+, you can use:
 
 ```ruby
 StrongMigrations.target_version = {primary: 13, catalog: 15}
