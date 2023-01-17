@@ -848,7 +848,7 @@ config.active_record.dump_schema_after_migration = `git status db/migrate/ --por
 
 ## Schema Sanity
 
-Columns and extensions can flip order in `db/schema.rb` when you have multiple developers. One way to prevent this is to [alphabetize them](https://www.pgrs.net/2008/03/12/alphabetize-schema-rb-columns/). Add to the end of your `Rakefile`:
+Columns can flip order in `db/schema.rb` when you have multiple developers. One way to prevent this is to [alphabetize them](https://www.pgrs.net/2008/03/12/alphabetize-schema-rb-columns/). Add to the end of your `Rakefile`:
 
 ```ruby
 task "db:schema:dump": "strong_migrations:alphabetize_columns"

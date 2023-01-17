@@ -4,16 +4,6 @@ class AlphabetizeSchemaTest < Minitest::Test
   def test_default
     schema = dump_schema
 
-    if postgresql?
-      expected_extensions = <<-EOS
-  enable_extension "btree_gist"
-  enable_extension "citext"
-  enable_extension "pgcrypto"
-  enable_extension "plpgsql"
-      EOS
-      assert_match expected_extensions, schema
-    end
-
     expected_columns = <<-EOS
     t.string "name"
     t.string "city"
@@ -26,16 +16,6 @@ class AlphabetizeSchemaTest < Minitest::Test
       StrongMigrations.stub(:alphabetize_schema, true) do
         dump_schema
       end
-
-    if postgresql?
-      expected_extensions = <<-EOS
-  enable_extension "btree_gist"
-  enable_extension "citext"
-  enable_extension "pgcrypto"
-  enable_extension "plpgsql"
-      EOS
-      assert_match expected_extensions, schema
-    end
 
     expected_columns = <<-EOS
     t.text "description"

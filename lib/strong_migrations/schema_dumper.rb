@@ -17,9 +17,5 @@ module StrongMigrations
     def columns(*args, **options)
       @connection.columns(*args, **options).sort_by(&:name)
     end
-
-    def extensions(*args, **options)
-      @connection.extensions(*args, **options).sort
-    end
   end
 end
