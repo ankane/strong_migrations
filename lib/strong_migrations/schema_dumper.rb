@@ -1,9 +1,9 @@
 module StrongMigrations
   module SchemaDumper
-    def initialize(connection, *args)
+    def initialize(connection, *args, **options)
       return super unless StrongMigrations.alphabetize_schema
 
-      super(WrappedConnection.new(connection), *args)
+      super(WrappedConnection.new(connection), *args, **options)
     end
   end
 
