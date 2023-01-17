@@ -1,3 +1,7 @@
+## 1.4.2 (unreleased)
+
+- Added `alphabetize_schema` option
+
 ## 1.4.1 (2023-01-05)
 
 - Added support for multiple databases to `target_version`

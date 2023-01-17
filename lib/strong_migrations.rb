@@ -28,7 +28,8 @@ module StrongMigrations
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
       :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
       :enabled_checks, :lock_timeout, :statement_timeout, :check_down, :target_version,
-      :safe_by_default, :target_sql_mode, :lock_timeout_retries, :lock_timeout_retry_delay
+      :safe_by_default, :target_sql_mode, :lock_timeout_retries, :lock_timeout_retry_delay,
+      :alphabetize_schema
     attr_writer :lock_timeout_limit
   end
   self.auto_analyze = false
@@ -38,6 +39,7 @@ module StrongMigrations
   self.checks = []
   self.safe_by_default = false
   self.check_down = false
+  self.alphabetize_schema = false
 
   # private
   def self.developer_env?
@@ -93,4 +95,7 @@ ActiveSupport.on_load(:active_record) do
   if defined?(ActiveRecord::Tasks::DatabaseTasks)
     ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)
   end
+
+  require "strong_migrations/schema_dumper"
+  ActiveRecord::SchemaDumper.prepend(StrongMigrations::SchemaDumper)
 end
