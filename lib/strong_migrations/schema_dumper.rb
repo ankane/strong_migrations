@@ -15,11 +15,11 @@ module StrongMigrations
     end
 
     def columns(*args, **options)
-      @connection.columns(*args).sort_by(&:name)
+      @connection.columns(*args, **options).sort_by(&:name)
     end
 
     def extensions(*args, **options)
-      @connection.extensions(*args).sort
+      @connection.extensions(*args, **options).sort
     end
   end
 end
