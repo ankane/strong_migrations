@@ -5,8 +5,8 @@ class AlphabetizeSchemaTest < Minitest::Test
     schema = dump_schema
 
     expected_columns = <<-EOS
+  create_table "users", force: :cascade do |t|
     t.string "name"
-    t.string "city"
     EOS
     assert_match expected_columns, schema
   end
@@ -18,9 +18,8 @@ class AlphabetizeSchemaTest < Minitest::Test
       end
 
     expected_columns = <<-EOS
-    t.text "description"
-    t.string "interval"
-    t.string "name"
+  create_table "users", force: :cascade do |t|
+    t.string "city"
     EOS
     assert_match expected_columns, schema
   end
