@@ -1,4 +1,4 @@
-## 1.4.2 (unreleased)
+## 1.4.2 (2023-01-29)
 
 - Added `alphabetize_schema` option
 
