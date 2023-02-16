@@ -220,7 +220,7 @@ Type | Safe Changes
 `time` | Increasing or removing `:precision`
 `timestamptz` | Increasing or removing `:limit`, changing to `datetime` when session time zone is UTC in Postgres 12+
 
-And some in MySQL and MariaDB:
+And some in MySQL and MariaDB 10.5+:
 
 Type | Safe Changes
 --- | ---
