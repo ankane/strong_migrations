@@ -1,4 +1,4 @@
-## 1.4.3 (unreleased)
+## 1.4.3 (2023-02-19)
 
 - Fixed check for `change_column` to account for charset with MySQL and MariaDB
 
