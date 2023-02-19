@@ -60,8 +60,9 @@ module StrongMigrations
           # account for charset
           # https://dev.mysql.com/doc/refman/8.0/en/charset-mysql.html
           # https://mariadb.com/kb/en/supported-character-sets-and-collations/
+          # TODO fix for Active Record < 6.1
           charset = @checker.instance_variable_get(:@migration).table_options(table)[:charset]
-          maxlen = connection.select_all("SELECT MAXLEN FROM INFORMATION_SCHEMA.CHARACTER_SETS WHERE CHARACTER_SET_NAME = #{connection.quote(charset)}").first["MAXLEN"]
+          maxlen = connection.select_all("SELECT MAXLEN FROM INFORMATION_SCHEMA.CHARACTER_SETS WHERE CHARACTER_SET_NAME = #{connection.quote(charset)}").first&.[]("MAXLEN")
           unless maxlen
             warn "[strong_migrations] Unknown charset: #{charset}"
             maxlen = 4
