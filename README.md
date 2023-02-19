@@ -224,7 +224,7 @@ And some in MySQL and MariaDB:
 
 Type | Safe Changes
 --- | ---
-`string` | Increasing `:limit` from under 63 up to 63, increasing `:limit` from over 63 to the max
+`string` | Increasing `:limit` from under 63 up to 63, increasing `:limit` from over 63 to the max (this threshold may be different if using an encoding other than `utf8mb4`)
 
 #### Good
 
