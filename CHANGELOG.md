@@ -1,3 +1,7 @@
+## 1.4.3 (unreleased)
+
+- Fixed check for `change_column` with MySQL and MariaDB
+
 ## 1.4.2 (2023-01-29)
 
 - Added `alphabetize_schema` option

@@ -19,6 +19,14 @@ class ChangeColumnTest < Minitest::Test
     assert_safe ChangeColumnVarcharIncreaseLimit
   end
 
+  def test_varchar_increase_limit_over_64
+    if postgresql?
+      assert_safe ChangeColumnVarcharIncreaseLimit64
+    elsif mysql? || mariadb?
+      assert_unsafe ChangeColumnVarcharIncreaseLimit64
+    end
+  end
+
   def test_varchar_increase_limit_over_256
     if postgresql?
       assert_safe ChangeColumnVarcharIncreaseLimit256

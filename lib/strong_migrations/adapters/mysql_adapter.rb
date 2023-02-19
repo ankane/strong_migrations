@@ -56,10 +56,22 @@ module StrongMigrations
           # https://mariadb.com/kb/en/innodb-online-ddl-operations-with-the-instant-alter-algorithm/#changing-the-data-type-of-a-column
           # increased limit, but doesn't change number of length bytes
           # 1-255 = 1 byte, 256-65532 = 2 bytes, 65533+ = too big for varchar
+
+          # account for charset
+          # https://dev.mysql.com/doc/refman/8.0/en/charset-mysql.html
+          # https://mariadb.com/kb/en/supported-character-sets-and-collations/
+          charset = @checker.instance_variable_get(:@migration).table_options(table)[:charset]
+          maxlen = connection.select_all("SELECT MAXLEN FROM INFORMATION_SCHEMA.CHARACTER_SETS WHERE CHARACTER_SET_NAME = #{connection.quote(charset)}").first["MAXLEN"]
+          unless maxlen
+            warn "[strong_migrations] Unknown charset: #{charset}"
+            maxlen = 4
+          end
+          threshold = 255 / maxlen
+
           limit = options[:limit] || 255
           safe = ["varchar"].include?(existing_type) &&
             limit >= existing_column.limit &&
-            (limit <= 255 || existing_column.limit > 255)
+            (limit <= threshold || existing_column.limit > threshold)
         end
 
         safe

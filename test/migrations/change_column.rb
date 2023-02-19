@@ -34,6 +34,16 @@ class ChangeColumnVarcharIncreaseLimit < TestMigration
   end
 end
 
+class ChangeColumnVarcharIncreaseLimit64 < TestMigration
+  def up
+    change_column :users, :country, :string, limit: 64
+  end
+
+  def down
+    change_column :users, :country, :string, limit: 20
+  end
+end
+
 class ChangeColumnVarcharIncreaseLimit256 < TestMigration
   def up
     change_column :users, :country, :string, limit: 256
