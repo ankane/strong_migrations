@@ -52,35 +52,31 @@ module StrongMigrations
 
         case type.to_s
         when "string"
-          # https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html
-          # https://mariadb.com/kb/en/innodb-online-ddl-operations-with-the-instant-alter-algorithm/#changing-the-data-type-of-a-column
-          # increased limit, but doesn't change number of length bytes
-          # 1-255 = 1 byte, 256-65532 = 2 bytes, 65533+ = too big for varchar
+          limit = options[:limit] || 255
+          if ["varchar"].include?(existing_type) && limit >= existing_column.limit
+            # https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html
+            # https://mariadb.com/kb/en/innodb-online-ddl-operations-with-the-instant-alter-algorithm/#changing-the-data-type-of-a-column
+            # increased limit, but doesn't change number of length bytes
+            # 1-255 = 1 byte, 256-65532 = 2 bytes, 65533+ = too big for varchar
 
-          # account for charset
-          # https://dev.mysql.com/doc/refman/8.0/en/charset-mysql.html
-          # https://mariadb.com/kb/en/supported-character-sets-and-collations/
-          sql = <<~SQL
-            SELECT cs.MAXLEN
-            FROM INFORMATION_SCHEMA.CHARACTER_SETS cs
-            INNER JOIN INFORMATION_SCHEMA.COLLATIONS c ON c.CHARACTER_SET_NAME = cs.CHARACTER_SET_NAME
-            INNER JOIN INFORMATION_SCHEMA.TABLES t ON t.TABLE_COLLATION = c.COLLATION_NAME
-            WHERE t.TABLE_SCHEMA = database() AND t.TABLE_NAME = #{connection.quote(table)}
-          SQL
-          row = connection.select_all(sql).first
-          maxlen =
+            # account for charset
+            # https://dev.mysql.com/doc/refman/8.0/en/charset-mysql.html
+            # https://mariadb.com/kb/en/supported-character-sets-and-collations/
+            sql = <<~SQL
+              SELECT cs.MAXLEN
+              FROM INFORMATION_SCHEMA.CHARACTER_SETS cs
+              INNER JOIN INFORMATION_SCHEMA.COLLATIONS c ON c.CHARACTER_SET_NAME = cs.CHARACTER_SET_NAME
+              INNER JOIN INFORMATION_SCHEMA.TABLES t ON t.TABLE_COLLATION = c.COLLATION_NAME
+              WHERE t.TABLE_SCHEMA = database() AND t.TABLE_NAME = #{connection.quote(table)}
+            SQL
+            row = connection.select_all(sql).first
             if row
-              row["MAXLEN"]
+              threshold = 255 / row["MAXLEN"]
+              safe = limit <= threshold || existing_column.limit > threshold
             else
               warn "[strong_migrations] Could not determine charset"
-              4
             end
-          threshold = 255 / maxlen
-
-          limit = options[:limit] || 255
-          safe = ["varchar"].include?(existing_type) &&
-            limit >= existing_column.limit &&
-            (limit <= threshold || existing_column.limit > threshold)
+          end
         end
 
         safe
