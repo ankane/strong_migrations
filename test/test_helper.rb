@@ -16,8 +16,11 @@ connection_options = {
   adapter: $adapter,
   database: "strong_migrations_test"
 }
-if $adapter == "mysql2" && ActiveRecord::VERSION::STRING.to_f >= 7.1
-  connection_options[:prepared_statements] = true
+if $adapter == "mysql2"
+  connection_options[:encoding] = "utf8mb4"
+  if ActiveRecord::VERSION::STRING.to_f >= 7.1
+    connection_options[:prepared_statements] = true
+  end
 end
 ActiveRecord::Base.establish_connection(**connection_options)
 
