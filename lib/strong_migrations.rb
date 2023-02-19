@@ -2,22 +2,22 @@
 require "active_support"
 
 # adapters
-require "strong_migrations/adapters/abstract_adapter"
-require "strong_migrations/adapters/mysql_adapter"
-require "strong_migrations/adapters/mariadb_adapter"
-require "strong_migrations/adapters/postgresql_adapter"
+require_relative "strong_migrations/adapters/abstract_adapter"
+require_relative "strong_migrations/adapters/mysql_adapter"
+require_relative "strong_migrations/adapters/mariadb_adapter"
+require_relative "strong_migrations/adapters/postgresql_adapter"
 
 # modules
-require "strong_migrations/checks"
-require "strong_migrations/safe_methods"
-require "strong_migrations/checker"
-require "strong_migrations/database_tasks"
-require "strong_migrations/migration"
-require "strong_migrations/migrator"
-require "strong_migrations/version"
+require_relative "strong_migrations/checks"
+require_relative "strong_migrations/safe_methods"
+require_relative "strong_migrations/checker"
+require_relative "strong_migrations/database_tasks"
+require_relative "strong_migrations/migration"
+require_relative "strong_migrations/migrator"
+require_relative "strong_migrations/version"
 
 # integrations
-require "strong_migrations/railtie" if defined?(Rails)
+require_relative "strong_migrations/railtie" if defined?(Rails)
 
 module StrongMigrations
   class Error < StandardError; end
@@ -86,7 +86,7 @@ module StrongMigrations
 end
 
 # load error messages
-require "strong_migrations/error_messages"
+require_relative "strong_migrations/error_messages"
 
 ActiveSupport.on_load(:active_record) do
   ActiveRecord::Migration.prepend(StrongMigrations::Migration)
@@ -96,6 +96,6 @@ ActiveSupport.on_load(:active_record) do
     ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)
   end
 
-  require "strong_migrations/schema_dumper"
+  require_relative "strong_migrations/schema_dumper"
   ActiveRecord::SchemaDumper.prepend(StrongMigrations::SchemaDumper)
 end
