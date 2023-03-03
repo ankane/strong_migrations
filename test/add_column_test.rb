@@ -57,4 +57,12 @@ class AddColumnTest < Minitest::Test
     skip unless postgresql?
     assert_unsafe AddColumnJson
   end
+
+  def test_with_index
+    assert_unsafe AddColumnWithIndex
+  end
+
+  def test_with_unique_index
+    assert_unsafe AddColumnWithUniqueIndex
+  end
 end

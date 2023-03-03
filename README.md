@@ -157,6 +157,38 @@ end
 
 See the next section for how to backfill.
 
+### Adding a column with an index
+
+#### Bad
+
+When adding a column with an index, two internal operations are performed: adding the column and adding the index. The first is safe, but the second is not.
+
+```ruby
+class AddSomeIndexedColumnToUsers < ActiveRecord::Migration[7.0]
+  def change
+    add_column :users, :some_column, :text, index: true
+  end
+end
+```
+
+#### Good
+
+Instead, add the column without an index, then add the index in a separate migration, using concurrent index creation.
+
+```ruby
+class AddSomeIndexedColumnToUsers < ActiveRecord::Migration[7.0]
+  def up
+    add_column :users, :some_column, :text
+  end
+
+  def down
+    remove_column :users, :some_column
+  end
+end
+```
+
+See the the section lower down on [adding an index concurrently](#adding-an-index-non-concurrently).
+
 ### Backfilling data
 
 #### Bad

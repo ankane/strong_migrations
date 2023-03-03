@@ -234,7 +234,11 @@ end",
 Use disable_ddl_transaction! or a separate migration.",
 
     add_exclusion_constraint:
-"Adding an exclusion constraint blocks reads and writes while every row is checked."
+"Adding an exclusion constraint blocks reads and writes while every row is checked.",
+
+    add_column_with_index:
+"Adding a column with an index blocks writes. Instead, add the column without an index, then
+add the index concurrently in a separate migration."
   }
   self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h
 end

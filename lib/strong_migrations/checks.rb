@@ -71,6 +71,10 @@ Then add the NOT NULL constraint in separate migrations."
         raise_error :add_column_json,
           command: command_str("add_column", [table, column, :jsonb, options])
       end
+
+      if options.key?(:index).present? && options.fetch(:index) != false
+        raise_error :add_column_with_index
+      end
     end
 
     def check_add_exclusion_constraint(*args)

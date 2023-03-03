@@ -40,3 +40,15 @@ class AddColumnJson < TestMigration
     add_column :users, :properties, :json
   end
 end
+
+class AddColumnWithIndex < TestMigration
+  def change
+    add_column :users, :nice, :string, index: true
+  end
+end
+
+class AddColumnWithUniqueIndex < TestMigration
+  def change
+    add_column :users, :nice, :string, index: :unique
+  end
+end
