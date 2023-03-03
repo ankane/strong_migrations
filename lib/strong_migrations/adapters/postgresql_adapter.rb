@@ -54,7 +54,7 @@ module StrongMigrations
           # not safe to decrease limit or add a limit
           case existing_type
           when "character varying"
-            safe = !options[:limit] || (existing_column.limit && options[:limit] >= existing_column.limit)
+            safe = !options[:limit] || (existing_column.limit && options[:limit] >= existing_column.limit && !indexed?(table, column))
           when "text"
             safe = !options[:limit]
           when "citext"

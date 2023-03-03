@@ -19,6 +19,10 @@ class ChangeColumnTest < Minitest::Test
     assert_safe ChangeColumnVarcharIncreaseLimit
   end
 
+  def test_varchar_increase_limit_indexed
+    assert_unsafe ChangeColumnVarcharIncreaseLimitIndexed
+  end
+
   def test_varchar_increase_limit_over_64
     if postgresql?
       assert_safe ChangeColumnVarcharIncreaseLimit64

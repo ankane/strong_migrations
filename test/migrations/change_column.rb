@@ -34,6 +34,18 @@ class ChangeColumnVarcharIncreaseLimit < TestMigration
   end
 end
 
+class ChangeColumnVarcharIncreaseLimitIndexed < TestMigration
+  def up
+    safety_assured { add_index :users, :country }
+    change_column :users, :country, :string, limit: 21
+  end
+
+  def down
+    change_column :users, :country, :string, limit: 20
+    remove_index :users, :country
+  end
+end
+
 class ChangeColumnVarcharIncreaseLimit64 < TestMigration
   def up
     change_column :users, :country, :string, limit: 64
