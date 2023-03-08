@@ -48,10 +48,10 @@ module StrongMigrations
         dir.up do
           @migration.add_foreign_key(from_table, to_table, *args, **options.merge(validate: false))
           disable_transaction
-          @migration.validate_foreign_key(from_table, to_table)
+          @migration.validate_foreign_key(from_table, to_table, **options.slice(:name))
         end
         dir.down do
-          @migration.remove_foreign_key(from_table, to_table)
+          @migration.remove_foreign_key(from_table, to_table, **options.slice(:name))
         end
       end
     end
