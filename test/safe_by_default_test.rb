@@ -83,6 +83,8 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_foreign_key_name
+    skip if ActiveRecord::VERSION::MAJOR < 6
+
     migrate AddForeignKeyName
     foreign_keys = ActiveRecord::Schema.foreign_keys(:users)
     assert_equal 2, foreign_keys.size
