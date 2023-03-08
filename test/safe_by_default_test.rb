@@ -94,6 +94,18 @@ class SafeByDefaultTest < Minitest::Test
     migrate AddForeignKeyName, direction: :down
   end
 
+  def test_add_foreign_key_column
+    skip if ActiveRecord::VERSION::MAJOR < 6
+
+    migrate AddForeignKeyColumn
+    foreign_keys = ActiveRecord::Schema.foreign_keys(:users)
+    assert_equal 2, foreign_keys.size
+    if postgresql?
+      assert foreign_keys.all? { |fk| fk.options[:validate] }
+    end
+    migrate AddForeignKeyColumn, direction: :down
+  end
+
   def test_add_check_constraint
     skip unless check_constraints? && postgresql?
 

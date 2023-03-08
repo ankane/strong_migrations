@@ -38,3 +38,11 @@ class AddForeignKeyName < TestMigration
     add_foreign_key :users, :orders, name: "fk2"
   end
 end
+
+class AddForeignKeyColumn < TestMigration
+  def change
+    add_reference :users, :other_order, index: false
+    add_foreign_key :users, :orders, column: "order_id"
+    add_foreign_key :users, :orders, column: "other_order_id"
+  end
+end
