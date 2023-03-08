@@ -1,6 +1,6 @@
 ## 1.4.4 (unreleased)
 
-- Fixed `add_foreign_key` with `name` option with `safe_by_default`
+- Fixed `add_foreign_key` with `name` and `column` options with `safe_by_default`
 
 ## 1.4.3 (2023-02-19)
 
