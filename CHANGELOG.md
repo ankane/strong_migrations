@@ -1,3 +1,7 @@
+## 1.4.4 (unreleased)
+
+- Fixed `add_foreign_key` with `name` option with `safe_by_default`
+
 ## 1.4.3 (2023-02-19)
 
 - Fixed check for `change_column` to account for charset with MySQL and MariaDB
