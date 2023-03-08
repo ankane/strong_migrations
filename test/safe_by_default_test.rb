@@ -91,6 +91,7 @@ class SafeByDefaultTest < Minitest::Test
     if postgresql?
       assert foreign_keys.all? { |fk| fk.options[:validate] }
     end
+
     migrate AddForeignKeyName, direction: :down
     assert_equal 0, ActiveRecord::Schema.foreign_keys(:users).size
   end
@@ -104,6 +105,7 @@ class SafeByDefaultTest < Minitest::Test
     if postgresql?
       assert foreign_keys.all? { |fk| fk.options[:validate] }
     end
+
     migrate AddForeignKeyColumn, direction: :down
     assert_equal 0, ActiveRecord::Schema.foreign_keys(:users).size
   end
