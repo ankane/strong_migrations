@@ -31,3 +31,10 @@ class AddForeignKeyExtraArguments < TestMigration
     add_foreign_key :users, :orders, :extra
   end
 end
+
+class AddForeignKeyName < TestMigration
+  def change
+    add_foreign_key :users, :orders, name: "fk1"
+    add_foreign_key :users, :orders, name: "fk2"
+  end
+end
