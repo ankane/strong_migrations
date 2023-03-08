@@ -44,11 +44,12 @@ module StrongMigrations
     end
 
     def safe_add_foreign_key(from_table, to_table, *args, **options)
+      validate_options = options.slice(:column, :name)
+
       @migration.reversible do |dir|
         dir.up do
           @migration.add_foreign_key(from_table, to_table, *args, **options.merge(validate: false))
           disable_transaction
-          validate_options = options.slice(:column, :name)
           if ActiveRecord::VERSION::MAJOR >= 6
             @migration.validate_foreign_key(from_table, to_table, **validate_options)
           else
@@ -56,7 +57,11 @@ module StrongMigrations
           end
         end
         dir.down do
-          @migration.remove_foreign_key(from_table, to_table, **options.slice(:name))
+          if ActiveRecord::VERSION::MAJOR >= 6
+            @migration.remove_foreign_key(from_table, to_table, **validate_options)
+          else
+            @migration.remove_foreign_key(from_table, validate_options.any? ? validate_options : to_table)
+          end
         end
       end
     end
