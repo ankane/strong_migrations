@@ -92,6 +92,7 @@ class SafeByDefaultTest < Minitest::Test
       assert foreign_keys.all? { |fk| fk.options[:validate] }
     end
     migrate AddForeignKeyName, direction: :down
+    assert_equal 0, ActiveRecord::Schema.foreign_keys(:users).size
   end
 
   def test_add_foreign_key_column
@@ -104,6 +105,7 @@ class SafeByDefaultTest < Minitest::Test
       assert foreign_keys.all? { |fk| fk.options[:validate] }
     end
     migrate AddForeignKeyColumn, direction: :down
+    assert_equal 0, ActiveRecord::Schema.foreign_keys(:users).size
   end
 
   def test_add_check_constraint
