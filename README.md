@@ -208,7 +208,7 @@ end
 
 #### Good
 
-[Let us know](https://github.com/ankane/strong_migrations/issues/new) if you have a safe way to do this.
+Add a non-generated column and use callbacks or triggers instead (or a virtual generated column with MySQL and MariaDB).
 
 ### Changing the type of a column
 
