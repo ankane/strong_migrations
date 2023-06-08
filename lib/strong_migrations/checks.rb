@@ -71,6 +71,10 @@ Then add the NOT NULL constraint in separate migrations."
         raise_error :add_column_json,
           command: command_str("add_column", [table, column, :jsonb, options])
       end
+
+      if type.to_s == "virtual" && options[:stored]
+        raise_error :add_column_generated_stored, rewrite_blocks: adapter.rewrite_blocks
+      end
     end
 
     def check_add_exclusion_constraint(*args)

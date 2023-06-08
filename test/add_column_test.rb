@@ -57,4 +57,8 @@ class AddColumnTest < Minitest::Test
     skip unless postgresql?
     assert_unsafe AddColumnJson
   end
+
+  def test_generated_stored
+    assert_unsafe AddColumnGeneratedStored
+  end
 end

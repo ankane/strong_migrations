@@ -1,3 +1,7 @@
+## 1.5.0 (unreleased)
+
+- Added check for `add_column` with stored generated columns
+
 ## 1.4.4 (2023-03-08)
 
 - Fixed `add_foreign_key` with `name` and `column` options with `safe_by_default`

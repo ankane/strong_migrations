@@ -40,3 +40,9 @@ class AddColumnJson < TestMigration
     add_column :users, :properties, :json
   end
 end
+
+class AddColumnGeneratedStored < TestMigration
+  def change
+    add_column :users, :nice, :virtual, type: :string, as: "LOWER(city)", stored: true
+  end
+end
