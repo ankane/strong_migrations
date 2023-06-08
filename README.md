@@ -62,6 +62,7 @@ Potentially dangerous operations:
 - [removing a column](#removing-a-column)
 - [adding a column with a default value](#adding-a-column-with-a-default-value)
 - [backfilling data](#backfilling-data)
+- [adding a stored generated column](#adding-a-stored-generated-column) [unreleased]
 - [changing the type of a column](#changing-the-type-of-a-column)
 - [renaming a column](#renaming-a-column)
 - [renaming a table](#renaming-a-table)
@@ -190,6 +191,24 @@ class BackfillSomeColumn < ActiveRecord::Migration[7.0]
   end
 end
 ```
+
+### Adding a stored generated column
+
+#### Bad
+
+Adding a stored generated column causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and writes are blocked in MySQL and MariaDB.
+
+```ruby
+class AddSomeColumnToUsers < ActiveRecord::Migration[7.0]
+  def change
+    add_column :users, :some_column, :virtual, type: :string, as: "...", stored: true
+  end
+end
+```
+
+#### Good
+
+[Let us know](https://github.com/ankane/strong_migrations/issues/new) if you have a safe way to do this.
 
 ### Changing the type of a column
 
