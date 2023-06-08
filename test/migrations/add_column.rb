@@ -46,3 +46,9 @@ class AddColumnGeneratedStored < TestMigration
     add_column :users, :nice, :virtual, type: :string, as: "LOWER(city)", stored: true
   end
 end
+
+class AddColumnGeneratedVirtual < TestMigration
+  def change
+    add_column :users, :nice, :virtual, type: :string, as: "LOWER(city)"
+  end
+end
