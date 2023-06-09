@@ -1,6 +1,7 @@
 ## 1.5.0 (unreleased)
 
 - Added check for `add_column` with stored generated columns
+- Fixed `add_reference` with `foreign_key` and `index: false`
 
 ## 1.4.4 (2023-03-08)
 

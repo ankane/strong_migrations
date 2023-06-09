@@ -151,7 +151,7 @@ Then add the NOT NULL constraint in separate migrations."
         if bad_index || options[:foreign_key]
           if index_value.is_a?(Hash)
             options[:index] = options[:index].merge(algorithm: :concurrently)
-          else
+          elsif index_value
             options = options.merge(index: {algorithm: :concurrently})
           end
 
