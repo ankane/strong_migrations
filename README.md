@@ -177,14 +177,20 @@ Also, running a single query to update data can cause issues for large tables.
 
 #### Good
 
-There are three keys to backfilling safely: batching, throttling, and running it outside a transaction. Use the Rails console or a separate migration with `disable_ddl_transaction!`.
+There are three keys to backfilling safely: batching, throttling, and running it outside a transaction. Use the Rails console or a separate migration with `disable_ddl_transaction!`.  
+
+If you need to use ActiveRecord in your migration, you have two options: use `User.unscoped` or define a temporary model. However, defining a temporary model is the preferred approach as it ensures your migrations are not tied to application logic and remain functional even if the original model is later removed.
 
 ```ruby
 class BackfillSomeColumn < ActiveRecord::Migration[7.0]
   disable_ddl_transaction!
 
+  class BackfillUser < ActiveRecord::Base
+    self.table_name = 'users'
+  end
+
   def up
-    User.unscoped.in_batches do |relation|
+    BackfillUser.in_batches do |relation|
       relation.update_all some_column: "default_value"
       sleep(0.01) # throttle
     end
