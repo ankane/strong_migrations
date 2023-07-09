@@ -62,7 +62,7 @@ Potentially dangerous operations:
 - [removing a column](#removing-a-column)
 - [adding a column with a default value](#adding-a-column-with-a-default-value)
 - [backfilling data](#backfilling-data)
-- [adding a stored generated column](#adding-a-stored-generated-column) [unreleased]
+- [adding a stored generated column](#adding-a-stored-generated-column)
 - [changing the type of a column](#changing-the-type-of-a-column)
 - [renaming a column](#renaming-a-column)
 - [renaming a table](#renaming-a-table)
