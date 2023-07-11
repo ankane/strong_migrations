@@ -203,11 +203,13 @@ Then add the foreign key in separate migrations."
 
     def check_change_column_default(*args)
       table, column, _default_or_changes = args
-      unless new_column?(table, column)
+
+      # just check ActiveRecord::Base, even though can override on model
+      partial_inserts = ar_version >= 7 ? ActiveRecord::Base.partial_inserts : ActiveRecord::Base.partial_writes
+
+      if partial_inserts && !new_column?(table, column)
         raise_error :change_column_default,
-          model: args[0].to_s.classify,
-          code: "before_create do\n    attribute_will_change!(#{column.inspect})\n  end",
-          command: command_str(:change_column_default, args)
+          config: ar_version >= 7 ? "partial_inserts" : "partial_writes"
       end
     end
 

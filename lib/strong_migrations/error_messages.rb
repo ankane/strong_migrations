@@ -162,21 +162,11 @@ execute call, so cannot help you here. Please make really sure that what
 you're doing is safe before proceeding, then wrap it in a safety_assured { ... } block.",
 
     change_column_default:
-"Changing the default value of a column can cause records to be
-created with the new value when the old value is specifically set.
-Tell Active Record to always pass the attribute value to the database:
+"Partial writes are enabled, which can cause incorrect values
+to be inserted when changing the default value of a column.
+Disable partial writes in config/application.rb:
 
-class %{model} < %{base_model}
-  %{code}
-end
-
-Deploy the code, then wrap this step in a safety_assured { ... } block.
-
-class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
-  def change
-    safety_assured { %{command} }
-  end
-end",
+config.active_record.%{config} = false",
 
     change_column_null:
 "Passing a default value to change_column_null runs a single UPDATE query,

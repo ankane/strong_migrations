@@ -63,7 +63,6 @@ Potentially dangerous operations:
 - [adding a column with a default value](#adding-a-column-with-a-default-value)
 - [backfilling data](#backfilling-data)
 - [adding a stored generated column](#adding-a-stored-generated-column)
-- [changing the default value of a column](#changing-the-default-value-of-a-column) [unreleased]
 - [changing the type of a column](#changing-the-type-of-a-column)
 - [renaming a column](#renaming-a-column)
 - [renaming a table](#renaming-a-table)
@@ -79,6 +78,10 @@ Postgres-specific checks:
 - [adding an exclusion constraint](#adding-an-exclusion-constraint)
 - [adding a json column](#adding-a-json-column)
 - [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
+
+Config-specific checks:
+
+- [changing the default value of a column](#changing-the-default-value-of-a-column) [unreleased]
 
 Best practices:
 
@@ -210,46 +213,6 @@ end
 #### Good
 
 Add a non-generated column and use callbacks or triggers instead (or a virtual generated column with MySQL and MariaDB).
-
-### Changing the default value of a column
-
-#### Bad
-
-Changing the default value of a column can cause records to be created with the new value when the old value is specifically set.
-
-```ruby
-class ChangeSomeColumnDefault < ActiveRecord::Migration[7.0]
-  def change
-    change_column_default :users, :some_column, "default_value"
-  end
-end
-```
-
-#### Good
-
-1. Tell Active Record to always pass the attribute value to the database
-
-  ```ruby
-  class User < ApplicationRecord
-    before_create do
-      attribute_will_change!(:some_column)
-    end
-  end
-  ```
-
-2. Deploy the code
-3. Write a migration to change the default value (wrap in `safety_assured` block)
-
-  ```ruby
-  class ChangeSomeColumnDefault < ActiveRecord::Migration[7.0]
-    def change
-      safety_assured { change_column_default :users, :some_column, "default_value" }
-    end
-  end
-  ```
-
-4. Deploy and run the migration
-5. Remove the code added in step 1
 
 ### Changing the type of a column
 
@@ -667,6 +630,36 @@ class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
     end
   end
 end
+```
+
+### Changing the default value of a column
+
+#### Bad
+
+Rails < 7 enables partial writes by default, which can cause incorrect values to be inserted when changing the default value of a column.
+
+```ruby
+class ChangeSomeColumnDefault < ActiveRecord::Migration[7.0]
+  def change
+    change_column_default :users, :some_column, "default_value"
+  end
+end
+```
+
+#### Good
+
+Disable partial writes in `config/application.rb`.
+
+For Rails < 7, use:
+
+```ruby
+config.active_record.partial_writes = false
+```
+
+For Rails 7, use:
+
+```ruby
+config.active_record.partial_inserts = false
 ```
 
 ### Keeping non-unique indexes to three columns or less
