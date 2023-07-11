@@ -639,7 +639,7 @@ end
 Rails < 7 enables partial writes by default, which can cause incorrect values to be inserted when changing the default value of a column.
 
 ```ruby
-class ChangeSomeColumnDefault < ActiveRecord::Migration[7.0]
+class ChangeSomeColumnDefault < ActiveRecord::Migration[6.1]
   def change
     change_column_default :users, :some_column, from: "old", to: "new"
   end
