@@ -641,9 +641,11 @@ Rails < 7 enables partial writes by default, which can cause incorrect values to
 ```ruby
 class ChangeSomeColumnDefault < ActiveRecord::Migration[7.0]
   def change
-    change_column_default :users, :some_column, "default_value"
+    change_column_default :users, :some_column, from: "old", to: "new"
   end
 end
+
+User.create!(some_column: "old") # can insert "new"
 ```
 
 #### Good
