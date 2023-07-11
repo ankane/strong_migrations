@@ -23,6 +23,12 @@ class ChangeColumnDefaultTest < Minitest::Test
     assert_safe ChangeColumnDefaultNewColumn
   end
 
+  def test_default
+    # Rails 7 disables partial inserts by default
+    # but Active Record 7 by itself does not
+    assert_unsafe ChangeColumnDefault
+  end
+
   def with_partial_inserts(value, &block)
     if ActiveRecord::VERSION::MAJOR >= 7
       ActiveRecord::Base.stub(:partial_inserts, value, &block)
