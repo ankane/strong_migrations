@@ -1,3 +1,7 @@
+## 1.6.0 (unreleased)
+
+- Added check for `change_column_default`
+
 ## 1.5.0 (2023-07-02)
 
 - Added check for `add_column` with stored generated columns

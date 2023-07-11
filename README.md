@@ -63,6 +63,7 @@ Potentially dangerous operations:
 - [adding a column with a default value](#adding-a-column-with-a-default-value)
 - [backfilling data](#backfilling-data)
 - [adding a stored generated column](#adding-a-stored-generated-column)
+- [changing the default value of a column](#changing-the-default-value-of-a-column) [unreleased]
 - [changing the type of a column](#changing-the-type-of-a-column)
 - [renaming a column](#renaming-a-column)
 - [renaming a table](#renaming-a-table)
@@ -209,6 +210,46 @@ end
 #### Good
 
 Add a non-generated column and use callbacks or triggers instead (or a virtual generated column with MySQL and MariaDB).
+
+### Changing the default value of a column
+
+#### Bad
+
+Changing the default value of a column can cause records to be created with the new value when the old value is specifically set.
+
+```ruby
+class ChangeSomeColumnDefault < ActiveRecord::Migration[7.0]
+  def change
+    change_column_default :users, :some_column, "default_value"
+  end
+end
+```
+
+#### Good
+
+1. Tell Active Record to always pass the attribute value to the database
+
+  ```ruby
+  class User < ApplicationRecord
+    before_create do
+      attribute_will_change!(:some_column)
+    end
+  end
+  ```
+
+2. Deploy the code
+3. Write a migration to change the default value (wrap in `safety_assured` block)
+
+  ```ruby
+  class ChangeSomeColumnDefault < ActiveRecord::Migration[7.0]
+    def change
+      safety_assured { change_column_default :users, :some_column, "default_value" }
+    end
+  end
+  ```
+
+4. Deploy and run the migration
+5. Remove the line added in step 1
 
 ### Changing the type of a column
 

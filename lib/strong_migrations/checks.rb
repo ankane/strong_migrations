@@ -32,6 +32,9 @@ module StrongMigrations
       table, column, type = args
       default = options[:default]
 
+      # keep track of new columns of change_column_default check
+      @new_columns << [table.to_s, column.to_s]
+
       # Check key since DEFAULT NULL behaves differently from no default
       #
       # Also, Active Record has special case for uuid columns that allows function default values
@@ -196,6 +199,16 @@ Then add the foreign key in separate migrations."
       end
 
       raise_error :change_column, rewrite_blocks: adapter.rewrite_blocks unless safe
+    end
+
+    def check_change_column_default(*args)
+      table, column, _default_or_changes = args
+      unless new_column?(table, column)
+        raise_error :change_column_default,
+          model: args[0].to_s.classify,
+          code: "before_create do\n    attribute_will_change!(#{column.inspect})\n  end",
+          command: command_str(:change_column_default, args)
+      end
     end
 
     def check_change_column_null(*args)
@@ -459,6 +472,10 @@ Then add the foreign key in separate migrations."
 
     def new_table?(table)
       @new_tables.include?(table.to_s)
+    end
+
+    def new_column?(table, column)
+      new_table?(table) || @new_columns.include?([table.to_s, column.to_s])
     end
   end
 end

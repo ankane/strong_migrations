@@ -8,6 +8,7 @@ module StrongMigrations
     def initialize(migration)
       @migration = migration
       @new_tables = []
+      @new_columns = []
       @safe = false
       @timeouts_set = false
       @committed = false
@@ -46,6 +47,8 @@ module StrongMigrations
           check_add_reference(method, *args)
         when :change_column
           check_change_column(*args)
+        when :change_column_default
+          check_change_column_default(*args)
         when :change_column_null
           check_change_column_null(*args)
         when :change_table
