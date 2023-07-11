@@ -648,9 +648,7 @@ end
 
 #### Good
 
-Disable partial writes in `config/application.rb`.
-
-For Rails < 7, use:
+Disable partial writes in `config/application.rb`. For Rails < 7, use:
 
 ```ruby
 config.active_record.partial_writes = false
