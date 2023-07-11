@@ -249,7 +249,7 @@ end
   ```
 
 4. Deploy and run the migration
-5. Remove the line added in step 1
+5. Remove the code added in step 1
 
 ### Changing the type of a column
 
