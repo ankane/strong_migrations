@@ -81,7 +81,7 @@ Postgres-specific checks:
 
 Config-specific checks:
 
-- [changing the default value of a column](#changing-the-default-value-of-a-column) [unreleased]
+- [changing the default value of a column](#changing-the-default-value-of-a-column)
 
 Best practices:
 

@@ -1,4 +1,4 @@
-## 1.6.0 (unreleased)
+## 1.6.0 (2023-07-22)
 
 - Added check for `change_column_default`
 
