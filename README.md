@@ -605,11 +605,11 @@ For Rails 6.1, use:
 ```ruby
 class ValidateSomeColumnNotNull < ActiveRecord::Migration[7.0]
   def change
-    validate_check_constraint :users, name: "users_some_column_null"
+    up_only { validate_check_constraint :users, name: "users_some_column_null" }
 
     # in Postgres 12+, you can then safely set NOT NULL on the column
     change_column_null :users, :some_column, false
-    remove_check_constraint :users, name: "users_some_column_null"
+    remove_check_constraint :users, "some_column IS NOT NULL", name: "users_some_column_null"
   end
 end
 ```
