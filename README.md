@@ -195,6 +195,7 @@ class BackfillSomeColumn < ActiveRecord::Migration[7.0]
   end
 end
 ```
+Note: When introducing new columns to models with a default_scope (e.g., with soft deletion), employ `unscoped` to backfill and update all rows comprehensively. This guards against potential problems when executing unscoped queries without the default column being appropriately set.
 
 ### Adding a stored generated column
 
