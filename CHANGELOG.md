@@ -1,3 +1,7 @@
+## 1.6.1 (unreleased)
+
+- Fixed `safety_assured` for custom checks with `safe_by_default`
+
 ## 1.6.0 (2023-07-22)
 
 - Added check for `change_column_default`

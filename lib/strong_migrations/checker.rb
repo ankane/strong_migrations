@@ -78,9 +78,11 @@ module StrongMigrations
           @committed = true
         end
 
-        # custom checks
-        StrongMigrations.checks.each do |check|
-          @migration.instance_exec(method, args, &check)
+        if !safe?
+          # custom checks
+          StrongMigrations.checks.each do |check|
+            @migration.instance_exec(method, args, &check)
+          end
         end
       end
 
