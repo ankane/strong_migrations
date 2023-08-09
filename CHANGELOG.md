@@ -1,4 +1,4 @@
-## 1.6.1 (unreleased)
+## 1.6.1 (2023-08-09)
 
 - Fixed `safety_assured` for custom checks with `safe_by_default`
 
