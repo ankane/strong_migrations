@@ -41,3 +41,21 @@ class Custom < TestMigration
     add_column :users, :forbidden, :string
   end
 end
+
+class CustomAction < TestMigration
+  disable_ddl_transaction!
+
+  def change
+    add_index :devices, :forbidden, algorithm: :concurrently
+  end
+end
+
+class CustomVersion < TestMigration
+  def change
+    add_column :orders, :forbidden, :string
+  end
+
+  def version
+    20170101000000
+  end
+end

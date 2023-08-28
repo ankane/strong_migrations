@@ -79,6 +79,7 @@ ActiveRecord::Schema.define do
   end
 
   create_table :devices do |t|
+    t.string :forbidden
   end
 end
 
@@ -109,7 +110,7 @@ class Minitest::Test
       schema_migration.delete_all
     end
     migration = migration.new unless migration.is_a?(TestMigration)
-    migration.version ||= 123
+    migration.version ||= 20170101000001
     if direction == :down
       if ActiveRecord::VERSION::STRING.to_f >= 7.1
         schema_migration.create_version(migration.version)
@@ -179,8 +180,8 @@ class Minitest::Test
   end
 end
 
-StrongMigrations.add_check do |method, args|
-  if method == :add_column && args[1].to_s == "forbidden"
+StrongMigrations.add_check(:add_column, start_after: 20170101000000) do |method, args|
+  if args[1].to_s == "forbidden"
     stop! "Cannot add forbidden column"
   end
 end

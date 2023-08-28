@@ -29,6 +29,14 @@ class MiscTest < Minitest::Test
     assert_unsafe Custom, "Cannot add forbidden column"
   end
 
+  def test_custom_action
+    assert_safe CustomAction
+  end
+
+  def test_custom_version
+    assert_safe CustomVersion
+  end
+
   def test_unsupported_version
     error = assert_raises(StrongMigrations::UnsupportedVersion) do
       with_target_version(1) do

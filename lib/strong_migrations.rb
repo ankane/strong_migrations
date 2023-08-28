@@ -63,8 +63,16 @@ module StrongMigrations
     @lock_timeout_limit
   end
 
-  def self.add_check(&block)
-    checks << block
+  def self.add_check(only_action = nil, start_after: nil, &block)
+    check_id = ["__custom_check", *only_action, block.hash.to_s(16)].join("_").to_sym
+    enable_check(check_id, start_after: start_after)
+
+    checks << proc do |action, args|
+      next unless StrongMigrations.check_enabled?(check_id, version: version)
+      next unless only_action.nil? || action == only_action
+
+      instance_exec(action, args, &block)
+    end
   end
 
   def self.enable_check(check, start_after: nil)
