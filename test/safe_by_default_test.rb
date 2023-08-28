@@ -66,6 +66,10 @@ class SafeByDefaultTest < Minitest::Test
     assert_safe AddReferenceForeignKeyToTable
   end
 
+  def test_add_reference_foreign_key_on_delete
+    assert_safe AddReferenceForeignKeyOnDelete
+  end
+
   def test_add_reference_extra_arguments
     assert_argument_error AddReferenceExtraArguments
   end
