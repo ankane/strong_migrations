@@ -4,10 +4,15 @@ module StrongMigrations
       StrongMigrations.safe_by_default && [:add_index, :add_belongs_to, :add_reference, :remove_index, :add_foreign_key, :add_check_constraint, :change_column_null].include?(method)
     end
 
-    # TODO check if invalid index with expected name exists and remove if needed
-    def safe_add_index(*args, **options)
+    def safe_add_index(table, columns, **options)
+      index_name = options.fetch(:name, connection.index_name(table, columns))
+      if postgresql? && adapter.invalid_index?(index_name)
+        safe_remove_index(table, columns, **options)
+      end
+
       disable_transaction
-      @migration.add_index(*args, **options.merge(algorithm: :concurrently))
+
+      @migration.add_index(table, columns, **options.merge(algorithm: :concurrently))
     end
 
     def safe_remove_index(*args, **options)
@@ -123,6 +128,12 @@ module StrongMigrations
 
     def in_transaction?
       @migration.connection.open_transactions > 0
+    end
+
+    private
+
+    def postgresql?
+      adapter.instance_of?(Adapters::PostgreSQLAdapter)
     end
   end
 end

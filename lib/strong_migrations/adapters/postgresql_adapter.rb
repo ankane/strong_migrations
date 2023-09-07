@@ -169,6 +169,22 @@ module StrongMigrations
         rows.empty? || rows.any? { |r| r["provolatile"] == "v" }
       end
 
+      def invalid_index?(index_name)
+        query = <<~SQL
+          SELECT
+            pg_class.relname
+          FROM
+            pg_class
+          INNER JOIN
+            pg_index ON pg_index.indexrelid = pg_class.oid
+          WHERE
+            pg_index.indisvalid = false AND
+            pg_class.relname = #{connection.quote(index_name)}
+        SQL
+
+        select_all(query.squish).any?
+      end
+
       private
 
       def set_timeout(setting, timeout)

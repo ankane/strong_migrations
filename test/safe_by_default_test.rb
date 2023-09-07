@@ -152,4 +152,21 @@ class SafeByDefaultTest < Minitest::Test
   ensure
     User.delete_all
   end
+
+  def test_add_index_with_invalid_present
+    skip unless postgresql?
+
+    User.create(name: 'same')
+    duplicate = User.create(name: 'same')
+
+    assert_raises(ActiveRecord::RecordNotUnique) do
+      migrate SafeAddIndexColumnsUnique
+    end
+
+    duplicate.delete
+
+    assert_safe SafeAddIndexColumnsUnique
+  ensure
+    User.delete_all
+  end
 end
