@@ -29,11 +29,12 @@ module StrongMigrations
               else
                 (ActiveRecord::Base.pluralize_table_names ? reference.to_s.pluralize : reference).to_sym
               end
-
+            
+            foreign_key_opts = foreign_key.is_a?(Hash) ? foreign_key.except(:to_table) : {}
             if reference
-              @migration.add_foreign_key(table, name, column: "#{reference}_id")
+              @migration.add_foreign_key(table, name, column: "#{reference}_id", **foreign_key_opts)
             else
-              @migration.add_foreign_key(table, name)
+              @migration.add_foreign_key(table, name, **foreign_key_opts)
             end
           end
         end

@@ -34,6 +34,12 @@ class AddReferenceForeignKeyToTable < TestMigration
   end
 end
 
+class AddReferenceForeignKeyOnDelete < TestMigration
+  def change
+    add_reference :users, :device, foreign_key: {on_delete: :nullify}, index: false
+  end
+end
+
 class AddReferenceConcurrently < TestMigration
   disable_ddl_transaction!
 
