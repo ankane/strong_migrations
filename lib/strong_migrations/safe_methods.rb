@@ -7,7 +7,7 @@ module StrongMigrations
     def safe_add_index(table, columns, **options)
       index_name = options.fetch(:name, connection.index_name(table, columns))
       if postgresql? && adapter.invalid_index?(index_name)
-        safe_remove_index(table, columns, **options)
+        safe_remove_index(table, name: index_name)
       end
 
       disable_transaction
