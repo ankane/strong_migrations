@@ -5,22 +5,25 @@ module StrongMigrations
 
     attr_accessor :direction, :transaction_disabled, :timeouts_set
 
+    class << self
+      attr_accessor :safe
+    end
+
     def initialize(migration)
       @migration = migration
       @new_tables = []
       @new_columns = []
-      @safe = false
       @timeouts_set = false
       @committed = false
     end
 
-    def safety_assured
-      previous_value = @safe
+    def self.safety_assured
+      previous_value = safe
       begin
-        @safe = true
+        self.safe = true
         yield
       ensure
-        @safe = previous_value
+        self.safe = previous_value
       end
     end
 
@@ -160,7 +163,7 @@ module StrongMigrations
     end
 
     def safe?
-      @safe || ENV["SAFETY_ASSURED"] || (direction == :down && !StrongMigrations.check_down) || version_safe?
+      self.class.safe || ENV["SAFETY_ASSURED"] || (direction == :down && !StrongMigrations.check_down) || version_safe?
     end
 
     def version_safe?

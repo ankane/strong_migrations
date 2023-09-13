@@ -25,6 +25,12 @@ class MiscTest < Minitest::Test
     assert_unsafe CreateJoinTableForce
   end
 
+  def test_revert
+    migrate AddReferenceNoIndex
+    assert_unsafe RevertAddReference
+    migrate RevertAddReferenceSafetyAssured
+  end
+
   def test_custom
     assert_unsafe Custom, "Cannot add forbidden column"
   end

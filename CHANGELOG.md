@@ -1,6 +1,7 @@
 ## 1.6.2 (unreleased)
 
 - Fixed foreign key options with `add_reference` and `safe_by_default`
+- Fixed `safety_assured` with `revert`
 
 ## 1.6.1 (2023-08-09)
 

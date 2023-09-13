@@ -36,6 +36,18 @@ class CreateJoinTableForce < TestMigration
   end
 end
 
+class RevertAddReference < TestMigration
+  def change
+    revert AddReferenceNoIndex
+  end
+end
+
+class RevertAddReferenceSafetyAssured < TestMigration
+  def change
+    safety_assured { revert AddReferenceNoIndex }
+  end
+end
+
 class Custom < TestMigration
   def change
     add_column :users, :forbidden, :string

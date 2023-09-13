@@ -21,7 +21,7 @@ module StrongMigrations
     ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
 
     def safety_assured
-      strong_migrations_checker.safety_assured do
+      strong_migrations_checker.class.safety_assured do
         yield
       end
     end
