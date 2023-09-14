@@ -1,3 +1,7 @@
+## 1.6.3 (unreleased)
+
+- Added support for Trilogy
+
 ## 1.6.2 (2023-09-13)
 
 - Fixed foreign key options with `add_reference` and `safe_by_default`

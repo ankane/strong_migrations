@@ -180,7 +180,7 @@ module StrongMigrations
           case connection.adapter_name
           when /postg/i # PostgreSQL, PostGIS
             Adapters::PostgreSQLAdapter
-          when /mysql/i
+          when /mysql|trilogy/i
             if connection.try(:mariadb?)
               Adapters::MariaDBAdapter
             else

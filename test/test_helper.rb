@@ -21,6 +21,12 @@ if $adapter == "mysql2"
   if ActiveRecord::VERSION::STRING.to_f >= 7.1
     connection_options[:prepared_statements] = true
   end
+elsif $adapter == "trilogy"
+  if ActiveRecord::VERSION::STRING.to_f < 7.1
+    require "trilogy_adapter/connection"
+    ActiveRecord::Base.public_send :extend, TrilogyAdapter::Connection
+  end
+  connection_options[:host] = "127.0.0.1"
 end
 ActiveRecord::Base.establish_connection(**connection_options)
 
@@ -91,11 +97,11 @@ module Helpers
   end
 
   def mysql?
-    $adapter == "mysql2" && !ActiveRecord::Base.connection.mariadb?
+    ($adapter == "mysql2" || $adapter == "trilogy") && !ActiveRecord::Base.connection.mariadb?
   end
 
   def mariadb?
-    $adapter == "mysql2" && ActiveRecord::Base.connection.mariadb?
+    ($adapter == "mysql2" || $adapter == "trilogy") && ActiveRecord::Base.connection.mariadb?
   end
 end
 
