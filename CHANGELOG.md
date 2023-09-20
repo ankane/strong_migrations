@@ -1,4 +1,4 @@
-## 1.6.3 (unreleased)
+## 1.6.3 (2023-09-20)
 
 - Added support for Trilogy
 
