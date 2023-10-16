@@ -123,6 +123,10 @@ module StrongMigrations
       end
     end
 
+    def version_safe?
+      version && version <= StrongMigrations.start_after
+    end
+
     private
 
     def check_version_supported
@@ -164,10 +168,6 @@ module StrongMigrations
 
     def safe?
       self.class.safe || ENV["SAFETY_ASSURED"] || (direction == :down && !StrongMigrations.check_down) || version_safe?
-    end
-
-    def version_safe?
-      version && version <= StrongMigrations.start_after
     end
 
     def version
