@@ -793,25 +793,6 @@ ALTER ROLE myuser SET statement_timeout = '1h';
 
 Note: If you use PgBouncer in transaction mode, you must set timeouts on the database user.
 
-## Lock Timeout Retries [experimental]
-
-There’s the option to automatically retry statements when the lock timeout is reached. Here’s how it works:
-
-- If a lock timeout happens outside a transaction, the statement is retried
-- If it happens inside the DDL transaction, the entire migration is retried (only applicable to Postgres)
-
-Add to `config/initializers/strong_migrations.rb`:
-
-```ruby
-StrongMigrations.lock_timeout_retries = 3
-```
-
-Set the delay between retries with:
-
-```ruby
-StrongMigrations.lock_timeout_retry_delay = 10.seconds
-```
-
 ## App Timeouts
 
 We recommend adding timeouts to `config/database.yml` to prevent connections from hanging and individual queries from taking up too many resources in controllers, jobs, the Rails console, and other places.
@@ -854,6 +835,25 @@ production:
 ```
 
 For HTTP connections, Redis, and other services, check out [this guide](https://github.com/ankane/the-ultimate-guide-to-ruby-timeouts).
+
+## Lock Timeout Retries [experimental]
+
+There’s the option to automatically retry statements when the lock timeout is reached. Here’s how it works:
+
+- If a lock timeout happens outside a transaction, the statement is retried
+- If it happens inside the DDL transaction, the entire migration is retried (only applicable to Postgres)
+
+Add to `config/initializers/strong_migrations.rb`:
+
+```ruby
+StrongMigrations.lock_timeout_retries = 3
+```
+
+Set the delay between retries with:
+
+```ruby
+StrongMigrations.lock_timeout_retry_delay = 10.seconds
+```
 
 ## Existing Migrations
 
