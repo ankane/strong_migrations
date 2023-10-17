@@ -838,7 +838,7 @@ For HTTP connections, Redis, and other services, check out [this guide](https://
 
 ## Lock Timeout Retries [experimental]
 
-There’s the option to automatically retry statements in migrations when the lock timeout is reached. Here’s how it works:
+There’s the option to automatically retry statements for migrations when the lock timeout is reached. Here’s how it works:
 
 - If a lock timeout happens outside a transaction, the statement is retried
 - If it happens inside the DDL transaction, the entire migration is retried (only applicable to Postgres)
