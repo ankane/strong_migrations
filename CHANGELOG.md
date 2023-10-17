@@ -1,4 +1,4 @@
-## 1.6.4 (unreleased)
+## 1.6.4 (2023-10-17)
 
 - Fixed false positives with `revert`
 
