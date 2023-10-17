@@ -108,14 +108,14 @@ end
 class Minitest::Test
   include Helpers
 
-  def migrate(migration, direction: :up)
+  def migrate(migration, direction: :up, version: 123)
     if ActiveRecord::VERSION::STRING.to_f >= 7.1
       schema_migration.delete_all_versions
     else
       schema_migration.delete_all
     end
     migration = migration.new unless migration.is_a?(TestMigration)
-    migration.version ||= 123
+    migration.version ||= version
     if direction == :down
       if ActiveRecord::VERSION::STRING.to_f >= 7.1
         schema_migration.create_version(migration.version)
@@ -146,12 +146,12 @@ class Minitest::Test
     assert_match message, error.message if message
   end
 
-  def assert_safe(migration, direction: nil)
+  def assert_safe(migration, direction: nil, **options)
     if direction
-      assert migrate(migration, direction: direction)
+      assert migrate(migration, direction: direction, **options)
     else
-      assert migrate(migration, direction: :up)
-      assert migrate(migration, direction: :down)
+      assert migrate(migration, direction: :up, **options)
+      assert migrate(migration, direction: :down, **options)
     end
   end
 
