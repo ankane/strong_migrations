@@ -48,9 +48,25 @@ class RevertAddReferenceSafetyAssured < TestMigration
   end
 end
 
+class RevertAddReferenceInline < TestMigration
+  def change
+    revert { add_reference :users, :country, index: false }
+  end
+end
+
 class RevertCreateTableForce < TestMigration
   def change
     revert CreateTableForce
+  end
+end
+
+class RevertCreateTableForceInline < TestMigration
+  def change
+    revert do
+      create_table :admins, force: :cascade do |t|
+        t.string :name
+      end
+    end
   end
 end
 
