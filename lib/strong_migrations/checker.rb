@@ -163,7 +163,7 @@ module StrongMigrations
     end
 
     def safe?
-      self.class.safe || ENV["SAFETY_ASSURED"] || (direction == :down && !StrongMigrations.check_down) || version_safe?
+      self.class.safe || ENV["SAFETY_ASSURED"] || (direction == :down && !StrongMigrations.check_down) || version_safe? || @migration.reverting?
     end
 
     def version_safe?

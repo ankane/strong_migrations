@@ -1,3 +1,7 @@
+## 1.6.4 (unreleased)
+
+- Fixed false positives with `revert`
+
 ## 1.6.3 (2023-09-20)
 
 - Added support for Trilogy

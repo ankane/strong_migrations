@@ -174,6 +174,12 @@ class Minitest::Test
     StrongMigrations.target_version = nil
   end
 
+  def with_safety_assured
+    StrongMigrations::Checker.stub(:safe, true) do
+      yield
+    end
+  end
+
   def outside_developer_env
     StrongMigrations.stub(:developer_env?, false) do
       yield

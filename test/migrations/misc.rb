@@ -18,7 +18,7 @@ end
 
 class CreateTableForce < TestMigration
   def change
-    create_table :users, force: :cascade do |t|
+    create_table :admins, force: :cascade do |t|
       t.string :name
     end
   end
@@ -45,6 +45,12 @@ end
 class RevertAddReferenceSafetyAssured < TestMigration
   def change
     safety_assured { revert AddReferenceNoIndex }
+  end
+end
+
+class RevertCreateTableForce < TestMigration
+  def change
+    revert CreateTableForce
   end
 end
 

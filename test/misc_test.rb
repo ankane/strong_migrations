@@ -31,6 +31,17 @@ class MiscTest < Minitest::Test
     migrate RevertAddReferenceSafetyAssured
   end
 
+  def test_revert_safe
+    with_safety_assured do
+      migrate CreateTableForce
+    end
+    migrate RevertCreateTableForce
+  end
+
+  def test_revert_down
+    assert_unsafe RevertCreateTableForce, direction: :down
+  end
+
   def test_custom
     assert_unsafe Custom, "Cannot add forbidden column"
   end
