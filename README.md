@@ -576,7 +576,7 @@ end
 
 Instead, add a check constraint.
 
-For Rails 6.1, use:
+For Rails 6.1+, use:
 
 ```ruby
 class SetSomeColumnNotNull < ActiveRecord::Migration[7.1]
@@ -600,7 +600,7 @@ end
 
 Then validate it in a separate migration. A `NOT NULL` check constraint is [functionally equivalent](https://medium.com/doctolib/adding-a-not-null-constraint-on-pg-faster-with-minimal-locking-38b2c00c4d1c) to setting `NOT NULL` on the column (but it won’t show up in `schema.rb` in Rails < 6.1). In Postgres 12+, once the check constraint is validated, you can safely set `NOT NULL` on the column and drop the check constraint.
 
-For Rails 6.1, use:
+For Rails 6.1+, use:
 
 ```ruby
 class ValidateSomeColumnNotNull < ActiveRecord::Migration[7.1]
@@ -656,7 +656,7 @@ Disable partial writes in `config/application.rb`. For Rails < 7, use:
 config.active_record.partial_writes = false
 ```
 
-For Rails 7, use:
+For Rails 7+, use:
 
 ```ruby
 config.active_record.partial_inserts = false
