@@ -245,7 +245,7 @@ Other
 ## 0.2.2 (2018-02-14)
 
 - Friendlier output
-- Better method of hooking into ActiveRecord
+- Better method of hooking into Active Record
 
 ## 0.2.1 (2018-02-07)
 
