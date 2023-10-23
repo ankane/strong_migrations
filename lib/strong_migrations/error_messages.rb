@@ -88,7 +88,7 @@ in your application. A safer approach is to:
 
 1. Create a new column
 2. Write to both columns
-3. Backfill data from the old column to new column
+3. Backfill data from the old column to the new column
 4. Move reads from the old column to the new column
 5. Stop writing to the old column
 6. Drop the old column",
@@ -99,7 +99,7 @@ in your application. A safer approach is to:
 
 1. Create a new table. Don't forget to recreate indexes from the old table
 2. Write to both tables
-3. Backfill data from the old table to new table
+3. Backfill data from the old table to the new table
 4. Move reads from the old table to the new table
 5. Stop writing to the old table
 6. Drop the old table",
