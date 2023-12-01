@@ -8,7 +8,7 @@ Supports PostgreSQL, MySQL, and MariaDB
 
 :tangerine: Battle-tested at [Instacart](https://www.instacart.com/opensource)
 
-[![Build Status](https://github.com/ankane/strong_migrations/workflows/build/badge.svg?branch=master)](https://github.com/ankane/strong_migrations/actions)
+[![Build Status](https://github.com/ankane/strong_migrations/actions/workflows/build.yml/badge.svg)](https://github.com/ankane/strong_migrations/actions)
 
 ## Installation
 
