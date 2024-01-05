@@ -180,6 +180,21 @@ Then add the foreign key in separate migrations."
       end
     end
 
+    def check_add_unique_constraint(*args)
+      args.extract_options!
+      table, column = args
+
+      # column and using_index cannot be used together
+      # check for column to ensure error message can be generated
+      if column && !new_table?(table)
+        index_name = connection.index_name(table, {column: column})
+        raise_error :add_unique_constraint,
+          index_command: command_str(:add_index, [table, column, {unique: true, algorithm: :concurrently}]),
+          constraint_command: command_str(:add_unique_constraint, [table, {using_index: index_name}]),
+          remove_command: command_str(:remove_unique_constraint, [table, column])
+      end
+    end
+
     def check_change_column(*args)
       options = args.extract_options!
       table, column, type = args

@@ -244,7 +244,24 @@ end",
 Use disable_ddl_transaction! or a separate migration.",
 
     add_exclusion_constraint:
-"Adding an exclusion constraint blocks reads and writes while every row is checked."
+"Adding an exclusion constraint blocks reads and writes while every row is checked.",
+
+    add_unique_constraint:
+"Adding a unique constraint creates a unique index, which blocks reads and writes.
+Instead, create a unique index concurrently, then use it for the constraint.
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  disable_ddl_transaction!
+
+  def up
+    %{index_command}
+    %{constraint_command}
+  end
+
+  def down
+    %{remove_command}
+  end
+end"
   }
   self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h
 end

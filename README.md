@@ -75,6 +75,7 @@ Postgres-specific checks:
 - [adding an index non-concurrently](#adding-an-index-non-concurrently)
 - [adding a reference](#adding-a-reference)
 - [adding a foreign key](#adding-a-foreign-key)
+- [adding a unique constraint](#adding-a-unique-constraint) [unreleased]
 - [adding an exclusion constraint](#adding-an-exclusion-constraint)
 - [adding a json column](#adding-a-json-column)
 - [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
@@ -508,6 +509,39 @@ Then validate them in a separate migration.
 class ValidateForeignKeyOnUsers < ActiveRecord::Migration[7.1]
   def change
     validate_foreign_key :users, :orders
+  end
+end
+```
+
+### Adding a unique constraint
+
+#### Bad
+
+In Postgres, adding a unique constraint creates a unique index, which blocks reads and writes.
+
+```ruby
+class AddUniqueContraint < ActiveRecord::Migration[7.1]
+  def change
+    add_unique_constraint :users, :some_column
+  end
+end
+```
+
+#### Good
+
+Create a unique index concurrently, then use it for the constraint.
+
+```ruby
+class AddUniqueContraint < ActiveRecord::Migration[7.1]
+  disable_ddl_transaction!
+
+  def up
+    add_index :users, :some_column, unique: true, algorithm: :concurrently
+    add_unique_constraint :users, using_index: "index_users_on_some_column"
+  end
+
+  def down
+    remove_unique_constraint :users, :some_column
   end
 end
 ```

@@ -1,3 +1,7 @@
+## 1.7.0 (unreleased)
+
+- Added check for `add_unique_constraint`
+
 ## 1.6.4 (2023-10-17)
 
 - Fixed false positives with `revert`

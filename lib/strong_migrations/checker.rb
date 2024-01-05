@@ -48,6 +48,8 @@ module StrongMigrations
           check_add_index(*args)
         when :add_reference, :add_belongs_to
           check_add_reference(method, *args)
+        when :add_unique_constraint
+          check_add_unique_constraint(*args)
         when :change_column
           check_change_column(*args)
         when :change_column_default
