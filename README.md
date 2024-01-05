@@ -75,7 +75,7 @@ Postgres-specific checks:
 - [adding an index non-concurrently](#adding-an-index-non-concurrently)
 - [adding a reference](#adding-a-reference)
 - [adding a foreign key](#adding-a-foreign-key)
-- [adding a unique constraint](#adding-a-unique-constraint) [unreleased]
+- [adding a unique constraint](#adding-a-unique-constraint)
 - [adding an exclusion constraint](#adding-an-exclusion-constraint)
 - [adding a json column](#adding-a-json-column)
 - [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)

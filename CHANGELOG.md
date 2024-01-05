@@ -1,4 +1,4 @@
-## 1.7.0 (unreleased)
+## 1.7.0 (2024-01-05)
 
 - Added check for `add_unique_constraint`
 
