@@ -353,7 +353,7 @@ Then add the foreign key in separate migrations."
           cols
         end
 
-      code = "self.ignored_columns = #{columns.inspect}"
+      code = "self.ignored_columns += #{columns.inspect}"
 
       raise_error :remove_column,
         model: args[0].to_s.classify,

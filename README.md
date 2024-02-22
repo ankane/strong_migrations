@@ -38,7 +38,7 @@ Active Record caches attributes, which causes problems
 when removing columns. Be sure to ignore the column:
 
 class User < ApplicationRecord
-  self.ignored_columns = ["name"]
+  self.ignored_columns += ["name"]
 end
 
 Deploy the code, then wrap this step in a safety_assured { ... } block.
@@ -110,7 +110,7 @@ end
 
   ```ruby
   class User < ApplicationRecord
-    self.ignored_columns = ["some_column"]
+    self.ignored_columns += ["some_column"]
   end
   ```
 
