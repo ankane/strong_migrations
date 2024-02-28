@@ -797,6 +797,14 @@ By default, checks are disabled when migrating down. Enable them with:
 StrongMigrations.check_down = true
 ```
 
+## Multiple Databases
+
+Disable all functionality for specific databases with: [unreleased]
+
+```ruby
+StrongMigrations.ignored_databases += [:catalog]
+```
+
 ## Custom Messages
 
 To customize specific messages, create an initializer with:

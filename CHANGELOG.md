@@ -1,5 +1,7 @@
 ## 1.7.1 (unreleased)
 
+- Added `ignored_databases` option
+- Added warning for unsupported adapter
 - Updated instructions for removing a column to append to `ignored_columns`
 
 ## 1.7.0 (2024-01-05)

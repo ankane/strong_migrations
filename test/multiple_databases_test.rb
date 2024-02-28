@@ -40,6 +40,30 @@ class MultipleDatabasesTest < Minitest::Test
     end
   end
 
+  def test_ignored_databases
+    skip unless multiple_dbs?
+
+    with_ignored_databases([:animals]) do
+      with_database(:primary) do
+        assert_unsafe ExecuteArbitrarySQL
+      end
+      with_database(:animals) do
+        assert_safe ExecuteArbitrarySQL
+      end
+    end
+  end
+
+  def test_ignored_databases_unsupported
+    skip if multiple_dbs?
+
+    with_ignored_databases([:animals]) do
+      error = assert_raises(StrongMigrations::Error) do
+        assert_safe ExecuteArbitrarySQL
+      end
+      assert_equal "StrongMigrations.ignored_databases is not supported for Active Record < 6.1", error.message
+    end
+  end
+
   private
 
   def with_database(database, &block)
@@ -57,6 +81,13 @@ class MultipleDatabasesTest < Minitest::Test
   ensure
     ActiveRecord::Base.configurations = previous_configurations if previous_configurations
     ActiveRecord::Base.establish_connection(previous_db_config) if previous_db_config
+  end
+
+  def with_ignored_databases(databases)
+    StrongMigrations.ignored_databases = databases
+    yield
+  ensure
+    StrongMigrations.ignored_databases = []
   end
 
   def multiple_dbs?

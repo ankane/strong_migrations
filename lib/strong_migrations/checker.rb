@@ -28,6 +28,8 @@ module StrongMigrations
     end
 
     def perform(method, *args)
+      return if !enabled?
+      check_adapter
       check_version_supported
       set_timeouts
       check_lock_timeout
@@ -130,6 +132,28 @@ module StrongMigrations
     end
 
     private
+
+    def enabled?
+      return true if StrongMigrations.ignored_databases.empty?
+
+      # Active Record 6.0 supports multiple databases
+      # but connection.pool.spec.name always returns "primary"
+      # in migrations with rails db:migrate
+      if ActiveRecord::VERSION::STRING.to_f < 6.1
+        # error class is not shown in db:migrate output so ensure message is descriptive
+        raise StrongMigrations::Error, "StrongMigrations.ignored_databases is not supported for Active Record < 6.1"
+      end
+
+      !StrongMigrations.ignored_databases.map(&:to_s).include?(connection.pool.db_config.name)
+    end
+
+    def check_adapter
+      if adapter.instance_of?(Adapters::AbstractAdapter)
+        # TODO raise error in 2.0
+        # TODO add database name for Active Record 6.1+
+        warn "[strong_migrations] Unsupported adapter: #{connection.adapter_name}. Use StrongMigrations.ignored_databases to silence this warning."
+      end
+    end
 
     def check_version_supported
       return if defined?(@version_checked)
