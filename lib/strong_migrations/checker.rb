@@ -28,6 +28,7 @@ module StrongMigrations
     end
 
     def perform(method, *args)
+      return if !enabled?
       check_version_supported
       set_timeouts
       check_lock_timeout
@@ -130,6 +131,10 @@ module StrongMigrations
     end
 
     private
+
+    def enabled?
+      !adapter.instance_of?(Adapters::AbstractAdapter)
+    end
 
     def check_version_supported
       return if defined?(@version_checked)
