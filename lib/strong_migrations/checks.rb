@@ -170,9 +170,7 @@ module StrongMigrations
 
           if options.delete(:foreign_key)
             headline = "Adding a foreign key blocks writes on both tables."
-            append = "
-
-Then add the foreign key in separate migrations."
+            append = "\n\nThen add the foreign key in separate migrations."
           else
             headline = "Adding an index non-concurrently locks the table."
           end
