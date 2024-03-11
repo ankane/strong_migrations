@@ -42,9 +42,7 @@ module StrongMigrations
       if options.key?(:default) && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()") && adapter.default_volatile?(default))))
         if options[:null] == false
           options = options.except(:null)
-          append = "
-
-Then add the NOT NULL constraint in separate migrations."
+          append = "\n\nThen add the NOT NULL constraint in separate migrations."
         end
 
         if default.nil?
