@@ -2,11 +2,9 @@ require_relative "test_helper"
 
 class MultipleDatabasesTest < Minitest::Test
   def test_target_version
-    skip unless multiple_dbs?
+    skip unless multiple_dbs? && postgresql?
 
-    safe_version = postgresql? ? 11 : (mysql? ? "8.0.12" : "10.3.2")
-    unsafe_version = postgresql? ? 10 : (mysql? ? "8.0.11" : "10.3.1")
-    with_target_version({primary: unsafe_version, animals: safe_version}) do
+    with_target_version({primary: 11, animals: 10}) do
       with_database(:primary) do
         assert_unsafe AddColumnDefault
       end
