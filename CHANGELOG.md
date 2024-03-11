@@ -1,6 +1,7 @@
 ## 1.7.1 (unreleased)
 
 - Updated instructions for removing a column to append to `ignored_columns`
+- Fixed check for adding a column with a default value for MySQL and MariaDB
 
 ## 1.7.0 (2024-01-05)
 

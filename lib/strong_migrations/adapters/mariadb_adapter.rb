@@ -25,7 +25,7 @@ module StrongMigrations
       end
 
       def add_column_default_safe?
-        server_version >= Gem::Version.new("10.3.2")
+        true
       end
     end
   end
