@@ -4,7 +4,7 @@ class MultipleDatabasesTest < Minitest::Test
   def test_target_version
     skip unless multiple_dbs? && postgresql?
 
-    with_target_version({primary: 11, animals: 10}) do
+    with_target_version({primary: 10, animals: 11}) do
       with_database(:primary) do
         assert_unsafe AddColumnDefault
       end
