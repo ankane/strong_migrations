@@ -60,11 +60,11 @@ An operation is classified as dangerous if it either:
 Potentially dangerous operations:
 
 - [removing a column](#removing-a-column)
-- [adding a stored generated column](#adding-a-stored-generated-column)
 - [changing the type of a column](#changing-the-type-of-a-column)
 - [renaming a column](#renaming-a-column)
 - [renaming a table](#renaming-a-table)
 - [creating a table with the force option](#creating-a-table-with-the-force-option)
+- [adding a stored generated column](#adding-a-stored-generated-column)
 - [adding a check constraint](#adding-a-check-constraint)
 - [executing SQL directly](#executing-SQL-directly)
 - [backfilling data](#backfilling-data)
@@ -127,24 +127,6 @@ end
 
 4. Deploy and run the migration
 5. Remove the line added in step 1
-
-### Adding a stored generated column
-
-#### Bad
-
-Adding a stored generated column causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and writes are blocked in MySQL and MariaDB.
-
-```ruby
-class AddSomeColumnToUsers < ActiveRecord::Migration[7.1]
-  def change
-    add_column :users, :some_column, :virtual, type: :string, as: "...", stored: true
-  end
-end
-```
-
-#### Good
-
-Add a non-generated column and use callbacks or triggers instead (or a virtual generated column with MySQL and MariaDB).
 
 ### Changing the type of a column
 
@@ -273,6 +255,24 @@ end
 ```
 
 If you intend to drop an existing table, run `drop_table` first.
+
+### Adding a stored generated column
+
+#### Bad
+
+Adding a stored generated column causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and writes are blocked in MySQL and MariaDB.
+
+```ruby
+class AddSomeColumnToUsers < ActiveRecord::Migration[7.1]
+  def change
+    add_column :users, :some_column, :virtual, type: :string, as: "...", stored: true
+  end
+end
+```
+
+#### Good
+
+Add a non-generated column and use callbacks or triggers instead (or a virtual generated column with MySQL and MariaDB).
 
 ### Adding a check constraint
 
