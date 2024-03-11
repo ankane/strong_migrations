@@ -78,6 +78,13 @@ Then add the NOT NULL constraint in separate migrations."
       if type.to_s == "virtual" && options[:stored]
         raise_error :add_column_generated_stored, rewrite_blocks: adapter.rewrite_blocks
       end
+
+      if adapter.auto_incrementing_types.include?(type.to_s)
+        append = (mysql? || mariadb?) ? "\n\nIf using statement-based replication, this can also generate different values on replicas." : ""
+        raise_error :add_column_auto_incrementing,
+          rewrite_blocks: adapter.rewrite_blocks,
+          append: append
+      end
     end
 
     def check_add_exclusion_constraint(*args)

@@ -53,6 +53,9 @@ end",
     add_column_generated_stored:
 "Adding a stored generated column blocks %{rewrite_blocks} while the entire table is rewritten.",
 
+    add_column_auto_incrementing:
+"Adding an auto-incrementing column blocks %{rewrite_blocks} while the entire table is rewritten.",
+
     change_column:
 "Changing the type of an existing column blocks %{rewrite_blocks}
 while the entire table is rewritten. A safer approach is to:

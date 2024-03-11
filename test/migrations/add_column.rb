@@ -52,3 +52,21 @@ class AddColumnGeneratedVirtual < TestMigration
     add_column :users, :nice, :virtual, type: :string, as: "LOWER(city)"
   end
 end
+
+class AddColumnPrimaryKey < TestMigration
+  def change
+    add_column :users, :nice, :primary_key
+  end
+end
+
+class AddColumnSerial < TestMigration
+  def change
+    add_column :users, :nice, :serial
+  end
+end
+
+class AddColumnBigserial < TestMigration
+  def change
+    add_column :users, :nice, :bigserial
+  end
+end

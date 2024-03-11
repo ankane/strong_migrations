@@ -71,4 +71,22 @@ class AddColumnTest < Minitest::Test
     skip if postgresql?
     assert_safe AddColumnGeneratedVirtual
   end
+
+  def test_primary_key
+    if mysql? || mariadb?
+      assert_unsafe AddColumnPrimaryKey, "statement-based replication"
+    else
+      assert_unsafe AddColumnPrimaryKey
+    end
+  end
+
+  def test_serial
+    skip unless postgresql?
+    assert_unsafe AddColumnSerial
+  end
+
+  def test_bigserial
+    skip unless postgresql?
+    assert_unsafe AddColumnBigserial
+  end
 end

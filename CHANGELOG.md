@@ -1,5 +1,6 @@
-## 1.7.1 (unreleased)
+## 1.8.0 (unreleased)
 
+- Added check for `add_column` with auto-incrementing columns
 - Updated instructions for removing a column to append to `ignored_columns`
 - Fixed check for adding a column with a default value for MySQL and MariaDB
 

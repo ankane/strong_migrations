@@ -169,6 +169,10 @@ module StrongMigrations
         rows.empty? || rows.any? { |r| r["provolatile"] == "v" }
       end
 
+      def auto_incrementing_types
+        ["primary_key", "serial", "bigserial"]
+      end
+
       private
 
       def set_timeout(setting, timeout)

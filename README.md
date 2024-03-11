@@ -64,6 +64,7 @@ Potentially dangerous operations:
 - [renaming a column](#renaming-a-column)
 - [renaming a table](#renaming-a-table)
 - [creating a table with the force option](#creating-a-table-with-the-force-option)
+- [adding an auto-incrementing column](#adding-an-auto-incrementing-column) [unreleased]
 - [adding a stored generated column](#adding-a-stored-generated-column)
 - [adding a check constraint](#adding-a-check-constraint)
 - [executing SQL directly](#executing-SQL-directly)
@@ -255,6 +256,26 @@ end
 ```
 
 If you intend to drop an existing table, run `drop_table` first.
+
+### Adding an auto-incrementing column
+
+#### Bad
+
+Adding an auto-incrementing column (`serial`/`bigserial` in Postgres and `AUTO_INCREMENT` in MySQL and MariaDB) causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and writes are blocked in MySQL and MariaDB.
+
+```ruby
+class AddIdToCitiesUsers < ActiveRecord::Migration[7.1]
+  def change
+    add_column :cities_users, :id, :primary_key
+  end
+end
+```
+
+With MySQL and MariaDB, this can also [generate different values on replicas](https://dev.mysql.com/doc/mysql-replication-excerpt/8.0/en/replication-features-auto-increment.html) if using statement-based replication.
+
+#### Good
+
+Create a new table and migrate the data with the same steps as [renaming a table](#renaming-a-table).
 
 ### Adding a stored generated column
 

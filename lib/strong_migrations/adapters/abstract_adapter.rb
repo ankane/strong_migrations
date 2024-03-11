@@ -36,6 +36,10 @@ module StrongMigrations
         "reads and writes"
       end
 
+      def auto_incrementing_types
+        ["primary_key"]
+      end
+
       private
 
       def connection
