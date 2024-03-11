@@ -59,6 +59,12 @@ class AddIndexColumnsUnique < TestMigration
   end
 end
 
+class SafeAddIndexColumnsUnique < TestMigration
+  def change
+    add_index :users, :name, unique: true
+  end
+end
+
 class AddIndexName < TestMigration
   def change
     add_index :users, :name, name: "my_index"
