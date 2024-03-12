@@ -64,7 +64,7 @@ Potentially dangerous operations:
 - [renaming a column](#renaming-a-column)
 - [renaming a table](#renaming-a-table)
 - [creating a table with the force option](#creating-a-table-with-the-force-option)
-- [adding an auto-incrementing column](#adding-an-auto-incrementing-column) [unreleased]
+- [adding an auto-incrementing column](#adding-an-auto-incrementing-column)
 - [adding a stored generated column](#adding-a-stored-generated-column)
 - [adding a check constraint](#adding-a-check-constraint)
 - [executing SQL directly](#executing-SQL-directly)
