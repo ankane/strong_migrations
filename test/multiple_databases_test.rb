@@ -48,7 +48,7 @@ class MultipleDatabasesTest < Minitest::Test
         assert_unsafe ExecuteArbitrarySQL
       end
       with_database(:animals) do
-        assert_safe ExecuteArbitrarySQL
+        assert_safe ExecuteArbitrarySQL, direction: :up
       end
     end
   end
@@ -58,7 +58,7 @@ class MultipleDatabasesTest < Minitest::Test
 
     with_ignored_databases([:animals]) do
       error = assert_raises(StrongMigrations::Error) do
-        assert_safe ExecuteArbitrarySQL
+        assert_safe ExecuteArbitrarySQL, direction: :up
       end
       assert_equal "StrongMigrations.ignored_databases is not supported for Active Record < 6.1", error.message
     end

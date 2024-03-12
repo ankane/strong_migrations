@@ -1,9 +1,6 @@
 class ExecuteArbitrarySQL < TestMigration
-  def up
+  def change
     execute 'SELECT CURRENT_TIMESTAMP'
-  end
-
-  def down
   end
 end
 
