@@ -28,7 +28,8 @@ module StrongMigrations
     end
 
     def perform(method, *args)
-      return if !enabled?
+      # yield will execute migration, but stops the checks
+      return yield unless enabled?
       check_adapter
       check_version_supported
       set_timeouts
