@@ -1,4 +1,4 @@
-## 1.8.0 (unreleased)
+## 1.8.0 (2024-03-11)
 
 - Added check for `add_column` with auto-incrementing columns
 - Updated instructions for removing a column to append to `ignored_columns`
