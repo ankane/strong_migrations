@@ -506,7 +506,7 @@ end
 In Postgres, adding a unique constraint creates a unique index, which blocks reads and writes.
 
 ```ruby
-class AddUniqueContraint < ActiveRecord::Migration[7.1]
+class AddUniqueConstraint < ActiveRecord::Migration[7.1]
   def change
     add_unique_constraint :users, :some_column
   end
@@ -518,7 +518,7 @@ end
 Create a unique index concurrently, then use it for the constraint.
 
 ```ruby
-class AddUniqueContraint < ActiveRecord::Migration[7.1]
+class AddUniqueConstraint < ActiveRecord::Migration[7.1]
   disable_ddl_transaction!
 
   def up
@@ -539,7 +539,7 @@ end
 In Postgres, adding an exclusion constraint blocks reads and writes while every row is checked.
 
 ```ruby
-class AddExclusionContraint < ActiveRecord::Migration[7.1]
+class AddExclusionConstraint < ActiveRecord::Migration[7.1]
   def change
     add_exclusion_constraint :users, "number WITH =", using: :gist
   end
