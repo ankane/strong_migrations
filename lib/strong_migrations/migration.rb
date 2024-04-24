@@ -28,13 +28,22 @@ module StrongMigrations
       end
     end
 
-    def safety_assured
-      strong_migrations_checker.class.safety_assured do
-        yield
+    def create_table(table_name, **options, &block)
+      if block_given?
+        super do |t|
+          table_definition = StrongMigrations::TableDefinition.new(compatible_table_definition(t))
+          yield table_definition
+        end
+      else
+        super
       end
     end
 
-    def stop!(message, header: "Custom check")
+    def safety_assured(&block)
+      strong_migrations_checker.class.safety_assured(&block)
+    end
+
+    def stop!(message, header: 'Custom check')
       raise StrongMigrations::UnsafeMigration, "\n=== #{header} #strong_migrations ===\n\n#{message}\n"
     end
 
