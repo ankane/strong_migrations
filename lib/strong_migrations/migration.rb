@@ -31,7 +31,8 @@ module StrongMigrations
     def create_table(table_name, **options, &block)
       if block_given?
         super do |t|
-          table_definition = StrongMigrations::TableDefinition.new(compatible_table_definition(t))
+          table_definition = StrongMigrations::TableDefinition.new(compatible_table_definition(t), self,
+                                                                   strong_migrations_checker)
           yield table_definition
         end
       else

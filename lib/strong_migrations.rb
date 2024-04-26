@@ -26,7 +26,7 @@ module StrongMigrations
   class UnsupportedVersion < Error; end
 
   class << self
-    attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
+    attr_accessor :auto_analyze, :start_after, :checks, :table_checks, :error_messages,
                   :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
                   :enabled_checks, :lock_timeout, :statement_timeout, :check_down, :target_version,
                   :safe_by_default, :target_sql_mode, :lock_timeout_retries, :lock_timeout_retry_delay,
@@ -38,6 +38,7 @@ module StrongMigrations
   self.lock_timeout_retries = 0
   self.lock_timeout_retry_delay = 10 # seconds
   self.checks = []
+  self.table_checks = []
   self.safe_by_default = false
   self.check_down = false
   self.alphabetize_schema = false
@@ -62,6 +63,10 @@ module StrongMigrations
       @lock_timeout_limit = developer_env? ? false : 10
     end
     @lock_timeout_limit
+  end
+
+  def self.add_table_check(&block)
+    table_checks << block
   end
 
   def self.add_check(&block)
@@ -92,7 +97,6 @@ require_relative 'strong_migrations/error_messages'
 ActiveSupport.on_load(:active_record) do
   ActiveRecord::Migration.prepend(StrongMigrations::Migration)
   ActiveRecord::Migrator.prepend(StrongMigrations::Migrator)
-  # ActiveRecord::ConnectionAdapters::TableDefinition.prepend(StrongMigrations::TableDefinition)
 
   if defined?(ActiveRecord::Tasks::DatabaseTasks)
     ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)
