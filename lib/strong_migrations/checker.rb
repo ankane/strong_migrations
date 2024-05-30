@@ -27,13 +27,13 @@ module StrongMigrations
       end
     end
 
-    def perform(method, *args)
+    def perform(method, *args, &block)
       check_version_supported
       set_timeouts
       check_lock_timeout
 
       if !safe? || safe_by_default_method?(method)
-        # TODO better pattern
+        # TODO: better pattern
         # see checks.rb for methods
         case method
         when :add_check_constraint
@@ -83,7 +83,7 @@ module StrongMigrations
           @committed = true
         end
 
-        if !safe?
+        unless safe?
           # custom checks
           StrongMigrations.checks.each do |check|
             @migration.instance_exec(method, args, &check)
@@ -93,18 +93,16 @@ module StrongMigrations
 
       result =
         if retry_lock_timeouts?(method)
-          # TODO figure out how to handle methods that generate multiple statements
+          # TODO: figure out how to handle methods that generate multiple statements
           # like add_reference(table, ref, index: {algorithm: :concurrently})
           # lock timeout after first statement will cause retry to fail
-          retry_lock_timeouts { yield }
+          retry_lock_timeouts(&block)
         else
           yield
         end
 
       # outdated statistics + a new index can hurt performance of existing queries
-      if StrongMigrations.auto_analyze && direction == :up && method == :add_index
-        adapter.analyze_table(args[0])
-      end
+      adapter.analyze_table(args[0]) if StrongMigrations.auto_analyze && direction == :up && method == :add_index
 
       result
     end
@@ -129,6 +127,10 @@ module StrongMigrations
       version && version <= StrongMigrations.start_after
     end
 
+    def safe?
+      self.class.safe || ENV['SAFETY_ASSURED'] || (direction == :down && !StrongMigrations.check_down) || version_safe? || @migration.reverting?
+    end
+
     private
 
     def check_version_supported
@@ -138,7 +140,8 @@ module StrongMigrations
       if min_version
         version = adapter.server_version
         if version < Gem::Version.new(min_version)
-          raise UnsupportedVersion, "#{adapter.name} version (#{version}) not supported in this version of Strong Migrations (#{StrongMigrations::VERSION})"
+          raise UnsupportedVersion,
+                "#{adapter.name} version (#{version}) not supported in this version of Strong Migrations (#{StrongMigrations::VERSION})"
         end
       end
 
@@ -148,12 +151,8 @@ module StrongMigrations
     def set_timeouts
       return if @timeouts_set
 
-      if StrongMigrations.statement_timeout
-        adapter.set_statement_timeout(StrongMigrations.statement_timeout)
-      end
-      if StrongMigrations.lock_timeout
-        adapter.set_lock_timeout(StrongMigrations.lock_timeout)
-      end
+      adapter.set_statement_timeout(StrongMigrations.statement_timeout) if StrongMigrations.statement_timeout
+      adapter.set_lock_timeout(StrongMigrations.lock_timeout) if StrongMigrations.lock_timeout
 
       @timeouts_set = true
     end
@@ -161,15 +160,9 @@ module StrongMigrations
     def check_lock_timeout
       return if defined?(@lock_timeout_checked)
 
-      if StrongMigrations.lock_timeout_limit
-        adapter.check_lock_timeout(StrongMigrations.lock_timeout_limit)
-      end
+      adapter.check_lock_timeout(StrongMigrations.lock_timeout_limit) if StrongMigrations.lock_timeout_limit
 
       @lock_timeout_checked = true
-    end
-
-    def safe?
-      self.class.safe || ENV["SAFETY_ASSURED"] || (direction == :down && !StrongMigrations.check_down) || version_safe? || @migration.reverting?
     end
 
     def version
@@ -201,11 +194,9 @@ module StrongMigrations
     end
 
     def retry_lock_timeouts?(method)
-      (
-        StrongMigrations.lock_timeout_retries > 0 &&
+      StrongMigrations.lock_timeout_retries > 0 &&
         !in_transaction? &&
         method != :transaction
-      )
     end
   end
 end

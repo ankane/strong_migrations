@@ -1,4 +1,4 @@
-# TODO better pattern
+# TODO: better pattern
 module StrongMigrations
   module Checks
     private
@@ -7,23 +7,24 @@ module StrongMigrations
       options = args.extract_options!
       table, expression = args
 
-      if !new_table?(table)
-        if postgresql? && options[:validate] != false
-          add_options = options.merge(validate: false)
-          name = options[:name] || @migration.check_constraint_options(table, expression, options)[:name]
-          validate_options = {name: name}
+      return if new_table?(table)
 
-          if StrongMigrations.safe_by_default
-            safe_add_check_constraint(*args, add_options, validate_options)
-            throw :safe
-          end
+      if postgresql? && options[:validate] != false
+        add_options = options.merge(validate: false)
+        name = options[:name] || @migration.check_constraint_options(table, expression, options)[:name]
+        validate_options = { name: name }
 
-          raise_error :add_check_constraint,
-            add_check_constraint_code: command_str("add_check_constraint", [table, expression, add_options]),
-            validate_check_constraint_code: command_str("validate_check_constraint", [table, validate_options])
-        elsif mysql? || mariadb?
-          raise_error :add_check_constraint_mysql
+        if StrongMigrations.safe_by_default
+          safe_add_check_constraint(*args, add_options, validate_options)
+          throw :safe
         end
+
+        raise_error :add_check_constraint,
+                    add_check_constraint_code: command_str('add_check_constraint', [table, expression, add_options]),
+                    validate_check_constraint_code: command_str('validate_check_constraint',
+                                                                [table, validate_options])
+      elsif mysql? || mariadb?
+        raise_error :add_check_constraint_mysql
       end
     end
 
@@ -39,7 +40,7 @@ module StrongMigrations
       #
       # Also, Active Record has special case for uuid columns that allows function default values
       # https://github.com/rails/rails/blob/v7.0.3.1/activerecord/lib/active_record/connection_adapters/postgresql/quoting.rb#L92-L93
-      if options.key?(:default) && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()") && adapter.default_volatile?(default))))
+      if options.key?(:default) && (!adapter.add_column_default_safe? || (volatile = postgresql? && type.to_s == 'uuid' && default.to_s.include?('()') && adapter.default_volatile?(default)))
         if options[:null] == false
           options = options.except(:null)
           append = "\n\nThen add the NOT NULL constraint in separate migrations."
@@ -47,18 +48,18 @@ module StrongMigrations
 
         if default.nil?
           raise_error :add_column_default_null,
-            command: command_str("add_column", [table, column, type, options.except(:default)]),
-            append: append,
-            rewrite_blocks: adapter.rewrite_blocks
+                      command: command_str('add_column', [table, column, type, options.except(:default)]),
+                      append: append,
+                      rewrite_blocks: adapter.rewrite_blocks
         else
           raise_error :add_column_default,
-            add_command: command_str("add_column", [table, column, type, options.except(:default)]),
-            change_command: command_str("change_column_default", [table, column, default]),
-            remove_command: command_str("remove_column", [table, column]),
-            code: backfill_code(table, column, default, volatile),
-            append: append,
-            rewrite_blocks: adapter.rewrite_blocks,
-            default_type: (volatile ? "volatile" : "non-null")
+                      add_command: command_str('add_column', [table, column, type, options.except(:default)]),
+                      change_command: command_str('change_column_default', [table, column, default]),
+                      remove_command: command_str('remove_column', [table, column]),
+                      code: backfill_code(table, column, default, volatile),
+                      append: append,
+                      rewrite_blocks: adapter.rewrite_blocks,
+                      default_type: (volatile ? 'volatile' : 'non-null')
         end
       elsif default.is_a?(Proc) && postgresql?
         # adding a column with a VOLATILE default is not safe
@@ -68,29 +69,29 @@ module StrongMigrations
         raise_error :add_column_default_callable
       end
 
-      if type.to_s == "json" && postgresql?
+      if type.to_s == 'json' && postgresql?
         raise_error :add_column_json,
-          command: command_str("add_column", [table, column, :jsonb, options])
+                    command: command_str('add_column', [table, column, :jsonb, options])
       end
 
-      if type.to_s == "virtual" && options[:stored]
+      if type.to_s == 'virtual' && options[:stored]
         raise_error :add_column_generated_stored, rewrite_blocks: adapter.rewrite_blocks
       end
 
-      if adapter.auto_incrementing_types.include?(type.to_s)
-        append = (mysql? || mariadb?) ? "\n\nIf using statement-based replication, this can also generate different values on replicas." : ""
-        raise_error :add_column_auto_incrementing,
-          rewrite_blocks: adapter.rewrite_blocks,
-          append: append
-      end
+      return unless adapter.auto_incrementing_types.include?(type.to_s)
+
+      append = mysql? || mariadb? ? "\n\nIf using statement-based replication, this can also generate different values on replicas." : ''
+      raise_error :add_column_auto_incrementing,
+                  rewrite_blocks: adapter.rewrite_blocks,
+                  append: append
     end
 
     def check_add_exclusion_constraint(*args)
       table = args[0]
 
-      unless new_table?(table)
-        raise_error :add_exclusion_constraint
-      end
+      return if new_table?(table)
+
+      raise_error :add_exclusion_constraint
     end
 
     # unlike add_index, we don't make an exception here for new tables
@@ -110,16 +111,17 @@ module StrongMigrations
       from_table, to_table = args
 
       validate = options.fetch(:validate, true)
-      if postgresql? && validate
-        if StrongMigrations.safe_by_default
-          safe_add_foreign_key(*args, **options)
-          throw :safe
-        end
+      return unless postgresql? && validate
 
-        raise_error :add_foreign_key,
-          add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options.merge(validate: false)]),
-          validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
+      if StrongMigrations.safe_by_default
+        safe_add_foreign_key(*args, **options)
+        throw :safe
       end
+
+      raise_error :add_foreign_key,
+                  add_foreign_key_code: command_str('add_foreign_key',
+                                                    [from_table, to_table, options.merge(validate: false)]),
+                  validate_foreign_key_code: command_str('validate_foreign_key', [from_table, to_table])
     end
 
     def check_add_index(*args)
@@ -127,7 +129,7 @@ module StrongMigrations
       table, columns = args
 
       if columns.is_a?(Array) && columns.size > 3 && !options[:unique]
-        raise_error :add_index_columns, header: "Best practice"
+        raise_error :add_index_columns, header: 'Best practice'
       end
 
       # safe_by_default goes through this path as well
@@ -137,50 +139,51 @@ module StrongMigrations
 
       # safe to add non-concurrently to new tables (even after inserting data)
       # since the table won't be in use by the application
-      if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
-        if StrongMigrations.safe_by_default
-          safe_add_index(*args, **options)
-          throw :safe
-        end
+      return unless postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
 
-        raise_error :add_index, command: command_str("add_index", [table, columns, options.merge(algorithm: :concurrently)])
+      if StrongMigrations.safe_by_default
+        safe_add_index(*args, **options)
+        throw :safe
       end
+
+      raise_error :add_index,
+                  command: command_str('add_index', [table, columns, options.merge(algorithm: :concurrently)])
     end
 
     def check_add_reference(method, *args)
       options = args.extract_options!
       table, reference = args
 
-      if postgresql?
-        index_value = options.fetch(:index, true)
-        concurrently_set = index_value.is_a?(Hash) && index_value[:algorithm] == :concurrently
-        bad_index = index_value && !concurrently_set
+      return unless postgresql?
 
-        if bad_index || options[:foreign_key]
-          if index_value.is_a?(Hash)
-            options[:index] = options[:index].merge(algorithm: :concurrently)
-          elsif index_value
-            options = options.merge(index: {algorithm: :concurrently})
-          end
+      index_value = options.fetch(:index, true)
+      concurrently_set = index_value.is_a?(Hash) && index_value[:algorithm] == :concurrently
+      bad_index = index_value && !concurrently_set
 
-          if StrongMigrations.safe_by_default
-            safe_add_reference(*args, **options)
-            throw :safe
-          end
+      return unless bad_index || options[:foreign_key]
 
-          if options.delete(:foreign_key)
-            headline = "Adding a foreign key blocks writes on both tables."
-            append = "\n\nThen add the foreign key in separate migrations."
-          else
-            headline = "Adding an index non-concurrently locks the table."
-          end
-
-          raise_error :add_reference,
-            headline: headline,
-            command: command_str(method, [table, reference, options]),
-            append: append
-        end
+      if index_value.is_a?(Hash)
+        options[:index] = options[:index].merge(algorithm: :concurrently)
+      elsif index_value
+        options = options.merge(index: { algorithm: :concurrently })
       end
+
+      if StrongMigrations.safe_by_default
+        safe_add_reference(*args, **options)
+        throw :safe
+      end
+
+      if options.delete(:foreign_key)
+        headline = 'Adding a foreign key blocks writes on both tables.'
+        append = "\n\nThen add the foreign key in separate migrations."
+      else
+        headline = 'Adding an index non-concurrently locks the table.'
+      end
+
+      raise_error :add_reference,
+                  headline: headline,
+                  command: command_str(method, [table, reference, options]),
+                  append: append
     end
 
     def check_add_unique_constraint(*args)
@@ -189,13 +192,13 @@ module StrongMigrations
 
       # column and using_index cannot be used together
       # check for column to ensure error message can be generated
-      if column && !new_table?(table)
-        index_name = connection.index_name(table, {column: column})
-        raise_error :add_unique_constraint,
-          index_command: command_str(:add_index, [table, column, {unique: true, algorithm: :concurrently}]),
-          constraint_command: command_str(:add_unique_constraint, [table, {using_index: index_name}]),
-          remove_command: command_str(:remove_unique_constraint, [table, column])
-      end
+      return unless column && !new_table?(table)
+
+      index_name = connection.index_name(table, { column: column })
+      raise_error :add_unique_constraint,
+                  index_command: command_str(:add_index, [table, column, { unique: true, algorithm: :concurrently }]),
+                  constraint_command: command_str(:add_unique_constraint, [table, { using_index: index_name }]),
+                  remove_command: command_str(:remove_unique_constraint, [table, column])
     end
 
     def check_change_column(*args)
@@ -203,18 +206,20 @@ module StrongMigrations
       table, column, type = args
 
       safe = false
-      table_columns = connection.columns(table) rescue []
+      table_columns = begin
+        connection.columns(table)
+      rescue StandardError
+        []
+      end
       existing_column = table_columns.find { |c| c.name.to_s == column.to_s }
       if existing_column
-        existing_type = existing_column.sql_type.sub(/\(\d+(,\d+)?\)/, "")
+        existing_type = existing_column.sql_type.sub(/\(\d+(,\d+)?\)/, '')
         safe = adapter.change_type_safe?(table, column, type, options, existing_column, existing_type)
       end
 
       # unsafe to set NOT NULL for safe types with Postgres
       # TODO check if safe for MySQL and MariaDB
-      if safe && existing_column.null && options[:null] == false
-        raise_error :change_column_with_not_null
-      end
+      raise_error :change_column_with_not_null if safe && existing_column.null && options[:null] == false
 
       raise_error :change_column, rewrite_blocks: adapter.rewrite_blocks unless safe
     end
@@ -225,90 +230,94 @@ module StrongMigrations
       # just check ActiveRecord::Base, even though can override on model
       partial_inserts = ar_version >= 7 ? ActiveRecord::Base.partial_inserts : ActiveRecord::Base.partial_writes
 
-      if partial_inserts && !new_column?(table, column)
-        raise_error :change_column_default,
-          config: ar_version >= 7 ? "partial_inserts" : "partial_writes"
-      end
+      return unless partial_inserts && !new_column?(table, column)
+
+      raise_error :change_column_default,
+                  config: ar_version >= 7 ? 'partial_inserts' : 'partial_writes'
     end
 
     def check_change_column_null(*args)
       table, column, null, default = args
-      if !null
-        if postgresql?
-          safe = false
-          safe_with_check_constraint = adapter.server_version >= Gem::Version.new("12")
+      return if null
+
+      if postgresql?
+        safe = false
+        safe_with_check_constraint = adapter.server_version >= Gem::Version.new('12')
+        if safe_with_check_constraint
+          safe = adapter.constraints(table).any? do |c|
+            c['def'] == "CHECK ((#{column} IS NOT NULL))" || c['def'] == "CHECK ((#{connection.quote_column_name(column)} IS NOT NULL))"
+          end
+        end
+
+        unless safe
+          # match https://github.com/nullobject/rein
+          constraint_name = "#{table}_#{column}_null"
+
+          add_code = constraint_str('ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID',
+                                    [table, constraint_name, column])
+          validate_code = constraint_str('ALTER TABLE %s VALIDATE CONSTRAINT %s', [table, constraint_name])
+          remove_code = constraint_str('ALTER TABLE %s DROP CONSTRAINT %s', [table, constraint_name])
+
+          constraint_methods = ar_version >= 6.1
+
+          validate_constraint_code =
+            if constraint_methods
+              String.new(command_str(:validate_check_constraint, [table, { name: constraint_name }]))
+            else
+              String.new(safety_assured_str(validate_code))
+            end
+
           if safe_with_check_constraint
-            safe = adapter.constraints(table).any? { |c| c["def"] == "CHECK ((#{column} IS NOT NULL))" || c["def"] == "CHECK ((#{connection.quote_column_name(column)} IS NOT NULL))" }
+            change_args = [table, column, null]
+
+            validate_constraint_code << "\n    #{command_str(:change_column_null, change_args)}"
+
+            if constraint_methods
+              validate_constraint_code << "\n    #{command_str(:remove_check_constraint,
+                                                               [table, { name: constraint_name }])}"
+            else
+              validate_constraint_code << "\n    #{safety_assured_str(remove_code)}"
+            end
           end
 
-          unless safe
-            # match https://github.com/nullobject/rein
-            constraint_name = "#{table}_#{column}_null"
+          if StrongMigrations.safe_by_default
+            safe_change_column_null(add_code, validate_code, change_args, remove_code, default)
+            throw :safe
+          end
 
-            add_code = constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column])
-            validate_code = constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
-            remove_code = constraint_str("ALTER TABLE %s DROP CONSTRAINT %s", [table, constraint_name])
+          add_constraint_code =
+            if constraint_methods
+              command_str(:add_check_constraint,
+                          [table, "#{quote_column_if_needed(column)} IS NOT NULL",
+                           { name: constraint_name, validate: false }])
+            else
+              safety_assured_str(add_code)
+            end
 
-            constraint_methods = ar_version >= 6.1
-
-            validate_constraint_code =
-              if constraint_methods
-                String.new(command_str(:validate_check_constraint, [table, {name: constraint_name}]))
-              else
-                String.new(safety_assured_str(validate_code))
-              end
-
+          validate_constraint_code =
             if safe_with_check_constraint
-              change_args = [table, column, null]
-
-              validate_constraint_code << "\n    #{command_str(:change_column_null, change_args)}"
-
-              if constraint_methods
-                validate_constraint_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
-              else
-                validate_constraint_code << "\n    #{safety_assured_str(remove_code)}"
-              end
+              down_code = "#{add_constraint_code}\n    #{command_str(:change_column_null, [table, column, true])}"
+              "def up\n    #{validate_constraint_code}\n  end\n\n  def down\n    #{down_code}\n  end"
+            else
+              "def change\n    #{validate_constraint_code}\n  end"
             end
 
-            if StrongMigrations.safe_by_default
-              safe_change_column_null(add_code, validate_code, change_args, remove_code, default)
-              throw :safe
-            end
-
-            add_constraint_code =
-              if constraint_methods
-                command_str(:add_check_constraint, [table, "#{quote_column_if_needed(column)} IS NOT NULL", {name: constraint_name, validate: false}])
-              else
-                safety_assured_str(add_code)
-              end
-
-            validate_constraint_code =
-              if safe_with_check_constraint
-                down_code = "#{add_constraint_code}\n    #{command_str(:change_column_null, [table, column, true])}"
-                "def up\n    #{validate_constraint_code}\n  end\n\n  def down\n    #{down_code}\n  end"
-              else
-                "def change\n    #{validate_constraint_code}\n  end"
-              end
-
-            raise_error :change_column_null_postgresql,
-              add_constraint_code: add_constraint_code,
-              validate_constraint_code: validate_constraint_code
-          end
-        elsif mysql? || mariadb?
-          unless adapter.strict_mode?
-            raise_error :change_column_null_mysql
-          end
+          raise_error :change_column_null_postgresql,
+                      add_constraint_code: add_constraint_code,
+                      validate_constraint_code: validate_constraint_code
         end
-
-        if !default.nil?
-          raise_error :change_column_null,
-            code: backfill_code(table, column, default)
-        end
+      elsif mysql? || mariadb?
+        raise_error :change_column_null_mysql unless adapter.strict_mode?
       end
+
+      return if default.nil?
+
+      raise_error :change_column_null,
+                  code: backfill_code(table, column, default)
     end
 
     def check_change_table
-      raise_error :change_table, header: "Possibly dangerous operation"
+      raise_error :change_table, header: 'Possibly dangerous operation'
     end
 
     def check_create_join_table(*args)
@@ -316,12 +325,12 @@ module StrongMigrations
 
       raise_error :create_table if options[:force]
 
-      # TODO keep track of new table of add_index check
+      # TODO: keep track of new table of add_index check
     end
 
     def check_create_table(*args)
       options = args.extract_options!
-      table, _ = args
+      table, = args
 
       raise_error :create_table if options[:force]
 
@@ -330,14 +339,14 @@ module StrongMigrations
     end
 
     def check_execute
-      raise_error :execute, header: "Possibly dangerous operation"
+      raise_error :execute, header: 'Possibly dangerous operation'
     end
 
     def check_remove_column(method, *args)
       columns =
         case method
         when :remove_timestamps
-          ["created_at", "updated_at"]
+          %w[created_at updated_at]
         when :remove_column
           [args[1].to_s]
         when :remove_columns
@@ -359,33 +368,34 @@ module StrongMigrations
       code = "self.ignored_columns += #{columns.inspect}"
 
       raise_error :remove_column,
-        model: args[0].to_s.classify,
-        code: code,
-        command: command_str(method, args),
-        column_suffix: columns.size > 1 ? "s" : ""
+                  model: args[0].to_s.classify,
+                  code: code,
+                  command: command_str(method, args),
+                  column_suffix: columns.size > 1 ? 's' : ''
     end
 
     def check_remove_index(*args)
       options = args.extract_options!
-      table, _ = args
+      table, = args
 
-      if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
-        # avoid suggesting extra (invalid) args
-        args = args[0..1] unless StrongMigrations.safe_by_default
+      return unless postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
 
-        # Active Record < 6.1 only supports two arguments (including options)
-        if args.size == 2 && ar_version < 6.1
-          # arg takes precedence over option
-          options[:column] = args.pop
-        end
+      # avoid suggesting extra (invalid) args
+      args = args[0..1] unless StrongMigrations.safe_by_default
 
-        if StrongMigrations.safe_by_default
-          safe_remove_index(*args, **options)
-          throw :safe
-        end
-
-        raise_error :remove_index, command: command_str("remove_index", args + [options.merge(algorithm: :concurrently)])
+      # Active Record < 6.1 only supports two arguments (including options)
+      if args.size == 2 && ar_version < 6.1
+        # arg takes precedence over option
+        options[:column] = args.pop
       end
+
+      if StrongMigrations.safe_by_default
+        safe_remove_index(*args, **options)
+        throw :safe
+      end
+
+      raise_error :remove_index,
+                  command: command_str('remove_index', args + [options.merge(algorithm: :concurrently)])
     end
 
     def check_rename_column
@@ -397,15 +407,15 @@ module StrongMigrations
     end
 
     def check_validate_check_constraint
-      if postgresql? && adapter.writes_blocked?
-        raise_error :validate_check_constraint
-      end
+      return unless postgresql? && adapter.writes_blocked?
+
+      raise_error :validate_check_constraint
     end
 
     def check_validate_foreign_key
-      if postgresql? && adapter.writes_blocked?
-        raise_error :validate_foreign_key
-      end
+      return unless postgresql? && adapter.writes_blocked?
+
+      raise_error :validate_foreign_key
     end
 
     # helpers
@@ -429,16 +439,16 @@ module StrongMigrations
     def raise_error(message_key, header: nil, append: nil, **vars)
       return unless StrongMigrations.check_enabled?(message_key, version: version)
 
-      message = StrongMigrations.error_messages[message_key] || "Missing message"
-      message = message + append if append
+      message = StrongMigrations.error_messages[message_key] || 'Missing message'
+      message += append if append
 
       vars[:migration_name] = @migration.class.name
       vars[:migration_suffix] = "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]"
-      vars[:base_model] = "ApplicationRecord"
+      vars[:base_model] = 'ApplicationRecord'
 
       # escape % not followed by {
-      message = message.gsub(/%(?!{)/, "%%") % vars if message.include?("%")
-      @migration.stop!(message, header: header || "Dangerous operation detected")
+      message = message.gsub(/%(?!{)/, '%%') % vars if message.include?('%')
+      @migration.stop!(message, header: header || 'Dangerous operation detected')
     end
 
     def constraint_str(statement, identifiers)
@@ -460,17 +470,17 @@ module StrongMigrations
           str_args << last_arg.map do |k, v|
             if v.is_a?(Hash)
               # pretty index: {algorithm: :concurrently}
-              "#{k}: {#{v.map { |k2, v2| "#{k2}: #{v2.inspect}" }.join(", ")}}"
+              "#{k}: {#{v.map { |k2, v2| "#{k2}: #{v2.inspect}" }.join(', ')}}"
             else
               "#{k}: #{v.inspect}"
             end
-          end.join(", ")
+          end.join(', ')
         end
       else
         str_args << last_arg.inspect
       end
 
-      "#{command} #{str_args.join(", ")}"
+      "#{command} #{str_args.join(', ')}"
     end
 
     def backfill_code(table, column, default, function = false)

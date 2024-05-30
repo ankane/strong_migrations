@@ -1,36 +1,34 @@
-require "bundler/setup"
+require 'bundler/setup'
 Bundler.require(:default)
-require "minitest/autorun"
-require "minitest/pride"
-require "active_record"
+require 'minitest/autorun'
+require 'minitest/pride'
+require 'active_record'
 
 # needed for target_version
 module Rails
   def self.env
-    ActiveSupport::StringInquirer.new("test")
+    ActiveSupport::StringInquirer.new('test')
   end
 end
 
-$adapter = ENV["ADAPTER"] || "postgresql"
+$adapter = ENV['ADAPTER'] || 'postgresql'
 connection_options = {
   adapter: $adapter,
-  database: "strong_migrations_test"
+  database: 'strong_migrations_test'
 }
-if $adapter == "mysql2"
-  connection_options[:encoding] = "utf8mb4"
-  if ActiveRecord::VERSION::STRING.to_f >= 7.1
-    connection_options[:prepared_statements] = true
-  end
-elsif $adapter == "trilogy"
+if $adapter == 'mysql2'
+  connection_options[:encoding] = 'utf8mb4'
+  connection_options[:prepared_statements] = true if ActiveRecord::VERSION::STRING.to_f >= 7.1
+elsif $adapter == 'trilogy'
   if ActiveRecord::VERSION::STRING.to_f < 7.1
-    require "trilogy_adapter/connection"
-    ActiveRecord::Base.public_send :extend, TrilogyAdapter::Connection
+    require 'trilogy_adapter/connection'
+    ActiveRecord::Base.extend TrilogyAdapter::Connection
   end
-  connection_options[:host] = "127.0.0.1"
+  connection_options[:host] = '127.0.0.1'
 end
 ActiveRecord::Base.establish_connection(**connection_options)
 
-if ENV["VERBOSE"]
+if ENV['VERBOSE']
   ActiveRecord::Base.logger = ActiveSupport::Logger.new($stdout)
 else
   ActiveRecord::Migration.verbose = false
@@ -62,18 +60,18 @@ end
 schema_migration.create_table
 
 ActiveRecord::Schema.define do
-  if $adapter == "postgresql"
+  if $adapter == 'postgresql'
     # for change column
-    enable_extension "citext"
+    enable_extension 'citext'
 
     # for exclusion constraints
-    enable_extension "btree_gist"
+    enable_extension 'btree_gist'
 
     # for gen_random_uuid() in Postgres < 13
-    enable_extension "pgcrypto"
+    enable_extension 'pgcrypto'
   end
 
-  [:users, :new_users, :orders, :devices, :cities_users].each do |table|
+  %i[users new_users orders devices cities_users test_table].each do |table|
     drop_table(table) if table_exists?(table)
   end
 
@@ -85,7 +83,7 @@ ActiveRecord::Schema.define do
     t.string :country, limit: 20
     t.string :interval
     t.text :description
-    t.citext :code if $adapter == "postgresql"
+    t.citext :code if $adapter == 'postgresql'
     t.references :order
   end
 
@@ -101,15 +99,15 @@ end
 
 module Helpers
   def postgresql?
-    $adapter == "postgresql"
+    $adapter == 'postgresql'
   end
 
   def mysql?
-    ($adapter == "mysql2" || $adapter == "trilogy") && !ActiveRecord::Base.connection.mariadb?
+    ($adapter == 'mysql2' || $adapter == 'trilogy') && !ActiveRecord::Base.connection.mariadb?
   end
 
   def mariadb?
-    ($adapter == "mysql2" || $adapter == "trilogy") && ActiveRecord::Base.connection.mariadb?
+    ($adapter == 'mysql2' || $adapter == 'trilogy') && ActiveRecord::Base.connection.mariadb?
   end
 end
 
@@ -141,8 +139,9 @@ class Minitest::Test
       end
     ActiveRecord::Migrator.new(direction, [migration], *args).migrate
     true
-  rescue => e
+  rescue StandardError => e
     raise e.cause if e.cause
+
     raise e
   end
 
@@ -150,7 +149,7 @@ class Minitest::Test
     error = assert_raises(StrongMigrations::UnsafeMigration) do
       migrate(migration, **options)
     end
-    puts error.message if ENV["VERBOSE"]
+    puts error.message if ENV['VERBOSE']
     assert_match message, error.message if message
   end
 
@@ -182,16 +181,12 @@ class Minitest::Test
     StrongMigrations.target_version = nil
   end
 
-  def with_safety_assured
-    StrongMigrations::Checker.stub(:safe, true) do
-      yield
-    end
+  def with_safety_assured(&block)
+    StrongMigrations::Checker.stub(:safe, true, &block)
   end
 
-  def outside_developer_env
-    StrongMigrations.stub(:developer_env?, false) do
-      yield
-    end
+  def outside_developer_env(&block)
+    StrongMigrations.stub(:developer_env?, false, &block)
   end
 
   def check_constraints?
@@ -200,11 +195,17 @@ class Minitest::Test
 end
 
 StrongMigrations.add_check do |method, args|
-  if method == :add_column && args[1].to_s == "forbidden"
-    stop! "Cannot add forbidden column"
+  stop! 'Cannot add forbidden column' if method == :add_column && args[1].to_s == 'forbidden'
+end
+
+StrongMigrations.add_table_check do |method, args, _kwargs|
+  stop!('Use bigint instead to avoid overflow') if method == :integer
+
+  if method == :column && (args[1].to_sym == :integer || args[1].to_sym == :int)
+    stop!('Use bigint instead to avoid overflow')
   end
 end
 
-Dir.glob("migrations/*.rb", base: __dir__).sort.each do |file|
+Dir.glob('migrations/*.rb', base: __dir__).sort.each do |file|
   require_relative file
 end
