@@ -45,9 +45,17 @@ TestSchema = ActiveRecord::Schema
 
 def schema_migration
   if ActiveRecord::VERSION::STRING.to_f >= 7.1
-    ActiveRecord::Base.connection.schema_migration
+    connection_class.schema_migration
   else
     ActiveRecord::SchemaMigration
+  end
+end
+
+def connection_class
+  if ActiveRecord::VERSION::STRING.to_f >= 7.2
+    ActiveRecord::Base.connection_pool
+  else
+    ActiveRecord::Base.connection
   end
 end
 
@@ -125,7 +133,7 @@ class Minitest::Test
     end
     args =
       if ActiveRecord::VERSION::STRING.to_f >= 7.1
-        [schema_migration, ActiveRecord::Base.connection.internal_metadata]
+        [schema_migration, connection_class.internal_metadata]
       elsif ActiveRecord::VERSION::MAJOR >= 6
         [schema_migration]
       else

@@ -30,7 +30,7 @@ class AlphabetizeSchemaTest < Minitest::Test
     require "stringio"
 
     io = StringIO.new
-    ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, io)
+    ActiveRecord::SchemaDumper.dump(connection_class, io)
     io.string
   end
 end
