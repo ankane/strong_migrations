@@ -33,8 +33,10 @@ jobs:
         with:
           database: strong_migrations_test
       - run: ADAPTER=mysql2 bundle exec rake test
+      - run: ADAPTER=trilogy bundle exec rake test
 
       - uses: ankane/setup-mariadb@v1
         with:
           database: strong_migrations_test
       - run: ADAPTER=mysql2 bundle exec rake test
+      - run: ADAPTER=trilogy bundle exec rake test
