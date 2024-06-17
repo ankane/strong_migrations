@@ -738,7 +738,7 @@ Instead, start an index with columns that narrow down the results the most.
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration[7.1]
   def change
-    add_index :users, [:b, :d]
+    add_index :users, [:d, :b]
   end
 end
 ```
