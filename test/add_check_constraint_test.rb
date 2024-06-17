@@ -1,11 +1,6 @@
 require_relative "test_helper"
 
 class AddCheckConstraintTest < Minitest::Test
-  def setup
-    skip unless check_constraints?
-    super
-  end
-
   def test_basic
     assert_unsafe AddCheckConstraint
   end

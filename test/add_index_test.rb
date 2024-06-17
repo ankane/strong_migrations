@@ -73,10 +73,8 @@ class AddIndexTest < Minitest::Test
   def test_extra_arguments
     if postgresql?
       assert_unsafe AddIndexExtraArguments
-    elsif ActiveRecord::VERSION::STRING.to_f != 6.0
-      assert_argument_error AddIndexExtraArguments
     else
-      assert_type_error AddIndexExtraArguments
+      assert_argument_error AddIndexExtraArguments
     end
   end
 

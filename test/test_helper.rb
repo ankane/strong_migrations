@@ -134,10 +134,8 @@ class Minitest::Test
     args =
       if ActiveRecord::VERSION::STRING.to_f >= 7.1
         [schema_migration, connection_class.internal_metadata]
-      elsif ActiveRecord::VERSION::MAJOR >= 6
-        [schema_migration]
       else
-        []
+        [schema_migration]
       end
     ActiveRecord::Migrator.new(direction, [migration], *args).migrate
     true
@@ -169,12 +167,6 @@ class Minitest::Test
     end
   end
 
-  def assert_type_error(migration)
-    assert_raises(TypeError) do
-      migrate(migration)
-    end
-  end
-
   def with_target_version(version)
     StrongMigrations.target_version = version
     yield
@@ -192,10 +184,6 @@ class Minitest::Test
     StrongMigrations.stub(:developer_env?, false) do
       yield
     end
-  end
-
-  def check_constraints?
-    ActiveRecord::VERSION::STRING.to_f >= 6.1
   end
 end
 

@@ -249,25 +249,13 @@ module StrongMigrations
             validate_code = constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
             remove_code = constraint_str("ALTER TABLE %s DROP CONSTRAINT %s", [table, constraint_name])
 
-            constraint_methods = ar_version >= 6.1
-
-            validate_constraint_code =
-              if constraint_methods
-                String.new(command_str(:validate_check_constraint, [table, {name: constraint_name}]))
-              else
-                String.new(safety_assured_str(validate_code))
-              end
+            validate_constraint_code = String.new(command_str(:validate_check_constraint, [table, {name: constraint_name}]))
 
             if safe_with_check_constraint
               change_args = [table, column, null]
 
               validate_constraint_code << "\n    #{command_str(:change_column_null, change_args)}"
-
-              if constraint_methods
-                validate_constraint_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
-              else
-                validate_constraint_code << "\n    #{safety_assured_str(remove_code)}"
-              end
+              validate_constraint_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
             end
 
             if StrongMigrations.safe_by_default
@@ -275,12 +263,7 @@ module StrongMigrations
               throw :safe
             end
 
-            add_constraint_code =
-              if constraint_methods
-                command_str(:add_check_constraint, [table, "#{quote_column_if_needed(column)} IS NOT NULL", {name: constraint_name, validate: false}])
-              else
-                safety_assured_str(add_code)
-              end
+            add_constraint_code = command_str(:add_check_constraint, [table, "#{quote_column_if_needed(column)} IS NOT NULL", {name: constraint_name, validate: false}])
 
             validate_constraint_code =
               if safe_with_check_constraint
@@ -372,12 +355,6 @@ module StrongMigrations
       if postgresql? && options[:algorithm] != :concurrently && !new_table?(table)
         # avoid suggesting extra (invalid) args
         args = args[0..1] unless StrongMigrations.safe_by_default
-
-        # Active Record < 6.1 only supports two arguments (including options)
-        if args.size == 2 && ar_version < 6.1
-          # arg takes precedence over option
-          options[:column] = args.pop
-        end
 
         if StrongMigrations.safe_by_default
           safe_remove_index(*args, **options)

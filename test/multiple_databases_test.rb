@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 class MultipleDatabasesTest < Minitest::Test
   def test_target_version
-    skip unless multiple_dbs? && postgresql?
+    skip unless postgresql?
 
     with_target_version({primary: 10, animals: 11}) do
       with_database(:primary) do
@@ -15,8 +15,6 @@ class MultipleDatabasesTest < Minitest::Test
   end
 
   def test_target_version_unconfigured
-    skip unless multiple_dbs?
-
     error = assert_raises(StrongMigrations::Error) do
       with_target_version({primary: 10}) do
         with_database(:animals) do
@@ -25,17 +23,6 @@ class MultipleDatabasesTest < Minitest::Test
       end
     end
     assert_equal "StrongMigrations.target_version is not configured for :animals database", error.message
-  end
-
-  def test_target_version_unsupported
-    skip if multiple_dbs?
-
-    with_target_version({primary: 10, animals: 15}) do
-      error = assert_raises(StrongMigrations::Error) do
-        assert_safe AddColumnDefault
-      end
-      assert_equal "StrongMigrations.target_version does not support multiple databases for Active Record < 6.1", error.message
-    end
   end
 
   private
@@ -55,9 +42,5 @@ class MultipleDatabasesTest < Minitest::Test
   ensure
     ActiveRecord::Base.configurations = previous_configurations if previous_configurations
     ActiveRecord::Base.establish_connection(previous_db_config) if previous_db_config
-  end
-
-  def multiple_dbs?
-    ActiveRecord::VERSION::STRING.to_f >= 6.1
   end
 end

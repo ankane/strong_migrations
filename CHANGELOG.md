@@ -1,3 +1,7 @@
+## 2.0.0 (unreleased)
+
+- Dropped support for Ruby < 3 and Active Record < 6.1
+
 ## 1.8.0 (2024-03-11)
 
 - Added check for `add_column` with auto-incrementing columns

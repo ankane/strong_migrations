@@ -14,11 +14,7 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_index_extra_arguments
-    if postgresql? || ActiveRecord::VERSION::STRING.to_f != 6.0
-      assert_argument_error AddIndexExtraArguments
-    else
-      assert_type_error AddIndexExtraArguments
-    end
+    assert_argument_error AddIndexExtraArguments
   end
 
   def test_add_index_corruption
@@ -45,8 +41,6 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_remove_index_options
-    skip if ActiveRecord::VERSION::STRING.to_f < 6.1
-
     migrate RemoveIndexOptions
   end
 
@@ -79,16 +73,10 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_foreign_key_extra_arguments
-    if postgresql? || ActiveRecord::VERSION::MAJOR >= 6
-      assert_argument_error AddForeignKeyExtraArguments
-    else
-      assert_type_error AddForeignKeyExtraArguments
-    end
+    assert_argument_error AddForeignKeyExtraArguments
   end
 
   def test_add_foreign_key_name
-    skip if ActiveRecord::VERSION::MAJOR < 6
-
     migrate AddForeignKeyName
     foreign_keys = ActiveRecord::Schema.foreign_keys(:users)
     assert_equal 2, foreign_keys.size
@@ -101,8 +89,6 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_foreign_key_column
-    skip if ActiveRecord::VERSION::MAJOR < 6
-
     migrate AddForeignKeyColumn
     foreign_keys = ActiveRecord::Schema.foreign_keys(:users)
     assert_equal 2, foreign_keys.size
@@ -115,13 +101,13 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_check_constraint
-    skip unless check_constraints? && postgresql?
+    skip unless postgresql?
 
     assert_safe AddCheckConstraint
   end
 
   def test_add_check_constraint_extra_arguments
-    skip unless check_constraints? && postgresql?
+    skip unless postgresql?
 
     assert_argument_error AddCheckConstraintExtraArguments
   end

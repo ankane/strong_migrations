@@ -15,10 +15,6 @@ jobs:
             gemfile: gemfiles/activerecord70.gemfile
           - ruby: "3.0"
             gemfile: gemfiles/activerecord61.gemfile
-          - ruby: 2.7
-            gemfile: gemfiles/activerecord60.gemfile
-          - ruby: 2.6
-            gemfile: gemfiles/activerecord52.gemfile
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:
