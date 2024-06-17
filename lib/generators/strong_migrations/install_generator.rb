@@ -21,7 +21,7 @@ module StrongMigrations
 
       def target_version
         case adapter
-        when /mysql/
+        when /mysql|trilogy/
           # could try to connect to database and check for MariaDB
           # but this should be fine
           '"8.0.12"'
