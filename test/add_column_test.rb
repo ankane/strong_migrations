@@ -30,6 +30,11 @@ class AddColumnTest < Minitest::Test
     assert_unsafe AddColumnDefaultUUID
   end
 
+  def test_default_uuid_safe
+    skip unless postgresql?
+    assert_safe AddColumnDefaultUUIDSafe
+  end
+
   def test_json
     skip unless postgresql?
     assert_unsafe AddColumnJson

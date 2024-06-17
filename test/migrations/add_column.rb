@@ -35,6 +35,13 @@ class AddColumnDefaultUUID < TestMigration
   end
 end
 
+class AddColumnDefaultUUIDSafe < TestMigration
+  def change
+    add_column :users, :nice, :uuid
+    change_column_default :users, :nice, from: nil, to: "gen_random_uuid()"
+  end
+end
+
 class AddColumnJson < TestMigration
   def change
     add_column :users, :properties, :json
