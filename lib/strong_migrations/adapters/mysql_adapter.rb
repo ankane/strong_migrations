@@ -8,7 +8,7 @@ module StrongMigrations
       end
 
       def min_version
-        "5.7"
+        "8.0"
       end
 
       def server_version

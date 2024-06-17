@@ -6,7 +6,7 @@ module StrongMigrations
       end
 
       def min_version
-        "10.2"
+        "10.5"
       end
 
       def server_version

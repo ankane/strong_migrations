@@ -12,7 +12,7 @@ end
 
 class AddColumnDefaultNotNull < TestMigration
   def change
-    add_column :users, :nice, :boolean, default: true, null: false
+    add_column :users, :nice, :uuid, default: "gen_random_uuid()", null: false
   end
 end
 

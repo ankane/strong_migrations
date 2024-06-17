@@ -115,17 +115,7 @@ class SafeByDefaultTest < Minitest::Test
   def test_change_column_null
     skip unless postgresql?
 
-    with_target_version(12) do
-      assert_safe ChangeColumnNull
-    end
-  end
-
-  def test_change_column_null_constraint
-    skip unless postgresql?
-
-    with_target_version(11) do
-      assert_safe ChangeColumnNull
-    end
+    assert_safe ChangeColumnNull
   end
 
   def test_change_column_null_default
@@ -134,9 +124,7 @@ class SafeByDefaultTest < Minitest::Test
     # TODO add
     # User.create!
     error = assert_raises(StrongMigrations::Error) do
-      with_target_version(12) do
-        assert_safe ChangeColumnNullDefault
-      end
+      assert_safe ChangeColumnNullDefault
     end
     assert_match "default value not supported yet with safe_by_default", error.message
   ensure

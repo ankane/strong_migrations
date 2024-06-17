@@ -6,7 +6,7 @@ module StrongMigrations
       end
 
       def min_version
-        "10"
+        "12"
       end
 
       def server_version
@@ -42,7 +42,7 @@ module StrongMigrations
       end
 
       def add_column_default_safe?
-        server_version >= Gem::Version.new("11")
+        true
       end
 
       def change_type_safe?(table, column, type, options, existing_column, existing_type)
@@ -103,7 +103,7 @@ module StrongMigrations
             # resolve with fallback
             new_type = type_map[new_type] || new_type
 
-            safe = new_type == existing_type || (server_version >= Gem::Version.new("12") && time_zone == "UTC")
+            safe = new_type == existing_type || time_zone == "UTC"
           end
         when "time"
           precision = options[:precision] || options[:limit] || 6

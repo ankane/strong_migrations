@@ -25,16 +25,6 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
-    add_column_default_null:
-"Adding a column with a null default blocks %{rewrite_blocks} while the entire table is rewritten.
-Instead, add the column without a default value.
-
-class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
-  def change
-    %{command}
-  end
-end",
-
     add_column_default_callable:
 "Strong Migrations does not support inspecting callable default values.
 Please make really sure you're not calling a VOLATILE function,

@@ -39,27 +39,20 @@ module StrongMigrations
       #
       # Also, Active Record has special case for uuid columns that allows function default values
       # https://github.com/rails/rails/blob/v7.0.3.1/activerecord/lib/active_record/connection_adapters/postgresql/quoting.rb#L92-L93
-      if options.key?(:default) && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()") && adapter.default_volatile?(default))))
+      if !default.nil? && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()") && adapter.default_volatile?(default))))
         if options[:null] == false
           options = options.except(:null)
           append = "\n\nThen add the NOT NULL constraint in separate migrations."
         end
 
-        if default.nil?
-          raise_error :add_column_default_null,
-            command: command_str("add_column", [table, column, type, options.except(:default)]),
-            append: append,
-            rewrite_blocks: adapter.rewrite_blocks
-        else
-          raise_error :add_column_default,
-            add_command: command_str("add_column", [table, column, type, options.except(:default)]),
-            change_command: command_str("change_column_default", [table, column, default]),
-            remove_command: command_str("remove_column", [table, column]),
-            code: backfill_code(table, column, default, volatile),
-            append: append,
-            rewrite_blocks: adapter.rewrite_blocks,
-            default_type: (volatile ? "volatile" : "non-null")
-        end
+        raise_error :add_column_default,
+          add_command: command_str("add_column", [table, column, type, options.except(:default)]),
+          change_command: command_str("change_column_default", [table, column, default]),
+          remove_command: command_str("remove_column", [table, column]),
+          code: backfill_code(table, column, default, volatile),
+          append: append,
+          rewrite_blocks: adapter.rewrite_blocks,
+          default_type: (volatile ? "volatile" : "non-null")
       elsif default.is_a?(Proc) && postgresql?
         # adding a column with a VOLATILE default is not safe
         # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
@@ -235,11 +228,7 @@ module StrongMigrations
       table, column, null, default = args
       if !null
         if postgresql?
-          safe = false
-          safe_with_check_constraint = adapter.server_version >= Gem::Version.new("12")
-          if safe_with_check_constraint
-            safe = adapter.constraints(table).any? { |c| c["def"] == "CHECK ((#{column} IS NOT NULL))" || c["def"] == "CHECK ((#{connection.quote_column_name(column)} IS NOT NULL))" }
-          end
+          safe = adapter.constraints(table).any? { |c| c["def"] == "CHECK ((#{column} IS NOT NULL))" || c["def"] == "CHECK ((#{connection.quote_column_name(column)} IS NOT NULL))" }
 
           unless safe
             # match https://github.com/nullobject/rein
@@ -251,12 +240,10 @@ module StrongMigrations
 
             validate_constraint_code = String.new(command_str(:validate_check_constraint, [table, {name: constraint_name}]))
 
-            if safe_with_check_constraint
-              change_args = [table, column, null]
+            change_args = [table, column, null]
 
-              validate_constraint_code << "\n    #{command_str(:change_column_null, change_args)}"
-              validate_constraint_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
-            end
+            validate_constraint_code << "\n    #{command_str(:change_column_null, change_args)}"
+            validate_constraint_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
 
             if StrongMigrations.safe_by_default
               safe_change_column_null(add_code, validate_code, change_args, remove_code, default)
@@ -265,13 +252,8 @@ module StrongMigrations
 
             add_constraint_code = command_str(:add_check_constraint, [table, "#{quote_column_if_needed(column)} IS NOT NULL", {name: constraint_name, validate: false}])
 
-            validate_constraint_code =
-              if safe_with_check_constraint
-                down_code = "#{add_constraint_code}\n    #{command_str(:change_column_null, [table, column, true])}"
-                "def up\n    #{validate_constraint_code}\n  end\n\n  def down\n    #{down_code}\n  end"
-              else
-                "def change\n    #{validate_constraint_code}\n  end"
-              end
+            down_code = "#{add_constraint_code}\n    #{command_str(:change_column_null, [table, column, true])}"
+            validate_constraint_code = "def up\n    #{validate_constraint_code}\n  end\n\n  def down\n    #{down_code}\n  end"
 
             raise_error :change_column_null_postgresql,
               add_constraint_code: add_constraint_code,

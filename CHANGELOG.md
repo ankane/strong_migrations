@@ -1,8 +1,9 @@
-## 1.9.0 (unreleased)
+## 2.0.0 (unreleased)
 
 - Improved install generator for Trilogy
 - Fixed charset check for MariaDB 11.4
 - Dropped support for Ruby < 3.1 and Active Record < 6.1
+- Dropped support for Postgres < 12, MySQL < 8.0, and MariaDB < 10.5
 
 ## 1.8.0 (2024-03-11)
 
