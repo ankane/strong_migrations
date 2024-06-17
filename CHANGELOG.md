@@ -1,7 +1,7 @@
 ## 1.9.0 (unreleased)
 
 - Fixed charset check for MariaDB 11.4
-- Dropped support for Ruby < 3 and Active Record < 6.1
+- Dropped support for Ruby < 3.1 and Active Record < 6.1
 
 ## 1.8.0 (2024-03-11)
 
