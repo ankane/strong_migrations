@@ -65,9 +65,10 @@ module StrongMigrations
             sql = <<~SQL
               SELECT cs.MAXLEN
               FROM INFORMATION_SCHEMA.CHARACTER_SETS cs
-              INNER JOIN INFORMATION_SCHEMA.COLLATIONS c ON c.CHARACTER_SET_NAME = cs.CHARACTER_SET_NAME
-              INNER JOIN INFORMATION_SCHEMA.TABLES t ON t.TABLE_COLLATION = c.COLLATION_NAME
-              WHERE t.TABLE_SCHEMA = database() AND t.TABLE_NAME = #{connection.quote(table)}
+              INNER JOIN INFORMATION_SCHEMA.COLUMNS c ON c.CHARACTER_SET_NAME = cs.CHARACTER_SET_NAME
+              WHERE c.TABLE_SCHEMA = database() AND
+              c.TABLE_NAME = #{connection.quote(table)} AND
+              c.COLUMN_NAME = #{connection.quote(column)}
             SQL
             row = connection.select_all(sql).first
             if row
