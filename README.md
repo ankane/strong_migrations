@@ -79,7 +79,7 @@ Postgres-specific checks:
 - [adding an exclusion constraint](#adding-an-exclusion-constraint)
 - [adding a json column](#adding-a-json-column)
 - [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
-- [adding a column with a default value](#adding-a-column-with-a-default-value)
+- [adding a column with a volatile default value](#adding-a-column-with-a-volatile-default-value)
 
 Config-specific checks:
 
@@ -596,8 +596,6 @@ end
 
 Instead, add a check constraint.
 
-For Rails 6.1+, use:
-
 ```ruby
 class SetSomeColumnNotNull < ActiveRecord::Migration[7.1]
   def change
@@ -606,67 +604,31 @@ class SetSomeColumnNotNull < ActiveRecord::Migration[7.1]
 end
 ```
 
-For Rails < 6.1, use:
-
-```ruby
-class SetSomeColumnNotNull < ActiveRecord::Migration[6.0]
-  def change
-    safety_assured do
-      execute 'ALTER TABLE "users" ADD CONSTRAINT "users_some_column_null" CHECK ("some_column" IS NOT NULL) NOT VALID'
-    end
-  end
-end
-```
-
-Then validate it in a separate migration. A `NOT NULL` check constraint is [functionally equivalent](https://medium.com/doctolib/adding-a-not-null-constraint-on-pg-faster-with-minimal-locking-38b2c00c4d1c) to setting `NOT NULL` on the column (but it won’t show up in `schema.rb` in Rails < 6.1). In Postgres 12+, once the check constraint is validated, you can safely set `NOT NULL` on the column and drop the check constraint.
-
-For Rails 6.1+, use:
+Then validate it in a separate migration. Once the check constraint is validated, you can safely set `NOT NULL` on the column and drop the check constraint.
 
 ```ruby
 class ValidateSomeColumnNotNull < ActiveRecord::Migration[7.1]
   def change
     validate_check_constraint :users, name: "users_some_column_null"
-
-    # in Postgres 12+, you can then safely set NOT NULL on the column
     change_column_null :users, :some_column, false
     remove_check_constraint :users, name: "users_some_column_null"
   end
 end
 ```
 
-For Rails < 6.1, use:
-
-```ruby
-class ValidateSomeColumnNotNull < ActiveRecord::Migration[6.0]
-  def change
-    safety_assured do
-      execute 'ALTER TABLE "users" VALIDATE CONSTRAINT "users_some_column_null"'
-    end
-
-    # in Postgres 12+, you can then safely set NOT NULL on the column
-    change_column_null :users, :some_column, false
-    safety_assured do
-      execute 'ALTER TABLE "users" DROP CONSTRAINT "users_some_column_null"'
-    end
-  end
-end
-```
-
-### Adding a column with a default value
+### Adding a column with a volatile default value
 
 #### Bad
 
-In earlier versions of Postgres, adding a column with a default value to an existing table causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres.
+Adding a column with a volatile default value to an existing table causes the entire table to be rewritten. During this time, reads and writes are blocked.
 
 ```ruby
 class AddSomeColumnToUsers < ActiveRecord::Migration[7.1]
   def change
-    add_column :users, :some_column, :text, default: "default_value"
+    add_column :users, :some_column, :uuid, default: "gen_random_uuid()"
   end
 end
 ```
-
-In Postgres 11+, this no longer requires a table rewrite and is safe (except for volatile functions like `gen_random_uuid()`).
 
 #### Good
 
@@ -675,8 +637,8 @@ Instead, add the column without a default value, then change the default.
 ```ruby
 class AddSomeColumnToUsers < ActiveRecord::Migration[7.1]
   def up
-    add_column :users, :some_column, :text
-    change_column_default :users, :some_column, "default_value"
+    add_column :users, :some_column, :uuid
+    change_column_default :users, :some_column, from: nil, to: "gen_random_uuid()"
   end
 
   def down
@@ -932,7 +894,7 @@ The major version works well for Postgres, while the major and minor version is 
 
 For safety, this option only affects development and test environments. In other environments, the actual server version is always used.
 
-If your app has multiple databases with different versions, with Rails 6.1+, you can use:
+If your app has multiple databases with different versions, you can use:
 
 ```ruby
 StrongMigrations.target_version = {primary: 13, catalog: 15}
