@@ -95,7 +95,7 @@ module StrongMigrations
             "timestamp" => "timestamp without time zone",
             "timestamptz" => "timestamp with time zone"
           }
-          maybe_safe = type_map.values.include?(existing_type) && precision >= existing_precision
+          maybe_safe = type_map.value?(existing_type) && precision >= existing_precision
 
           if maybe_safe
             new_type = type.to_s == "datetime" ? datetime_type : type.to_s

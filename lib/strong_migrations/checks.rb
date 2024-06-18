@@ -446,7 +446,7 @@ module StrongMigrations
     # only quote when needed
     # important! only use for display purposes
     def quote_column_if_needed(column)
-      column.to_s =~ /\A[a-z0-9_]+\z/ ? column : connection.quote_column_name(column)
+      /\A[a-z0-9_]+\z/.match?(column.to_s) ? column : connection.quote_column_name(column)
     end
 
     def new_table?(table)
