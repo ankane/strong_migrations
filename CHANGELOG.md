@@ -1,4 +1,4 @@
-## 2.0.0 (unreleased)
+## 2.0.0 (2024-06-28)
 
 - Improved install generator for Trilogy
 - Fixed charset check for MariaDB 11.4
