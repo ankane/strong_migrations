@@ -943,6 +943,10 @@ You probably don’t need this gem for smaller projects, as operations that are 
 
 Thanks to Bob Remeika and David Waller for the [original code](https://github.com/foobarfighter/safe-migrations) and [Sean Huber](https://github.com/LendingHome/zero_downtime_migrations) for the bad/good readme format.
 
+## History
+
+View the [changelog](https://github.com/ankane/strong_migrations/blob/master/CHANGELOG.md)
+
 ## Contributing
 
 Everyone is encouraged to help improve this project. Here are a few ways you can help:
