@@ -1,9 +1,16 @@
 module StrongMigrations
   module SchemaDumper
-    def initialize(connection, *args, **options)
-      return super unless StrongMigrations.alphabetize_schema
+    extend ActiveSupport::Concern
 
-      super(WrappedConnection.new(connection), *args, **options)
+    prepended do
+      alias original_initialize initialize
+
+      def initialize(connection, *args, **options)
+
+        return original_initialize(connection, *args, **options) unless StrongMigrations.alphabetize_schema
+
+        original_initialize(WrappedConnection.new(connection), *args, **options)
+      end
     end
   end
 
