@@ -6,7 +6,6 @@ module StrongMigrations
       alias original_initialize initialize
 
       def initialize(connection, *args, **options)
-
         return original_initialize(connection, *args, **options) unless StrongMigrations.alphabetize_schema
 
         original_initialize(WrappedConnection.new(connection), *args, **options)
