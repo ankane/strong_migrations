@@ -106,6 +106,23 @@ class SafeByDefaultTest < Minitest::Test
     assert_safe AddCheckConstraint
   end
 
+  def test_add_check_constraint_after_failed_attempt
+    skip unless postgresql?
+
+    user = User.create!(credit_score: -1)
+
+    error = assert_raises(ActiveRecord::StatementInvalid) do
+      assert_safe AddCheckConstraint
+    end
+    assert_match  "PG::CheckViolation: ERROR:  check constraint \"users_credit_score_positive\" of relation \"users\" is violated by some row\n", error.message
+
+    user.update!(credit_score: 1)
+
+    assert_safe AddCheckConstraint
+  ensure
+    User.delete_all
+  end
+
   def test_add_check_constraint_extra_arguments
     skip unless postgresql?
 

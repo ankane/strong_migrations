@@ -60,11 +60,22 @@ module StrongMigrations
     end
 
     def safe_add_check_constraint(table, expression, *args, add_options, validate_options)
+      invalid_constraint_exist = adapter.constraints(table, include_invalid: true, constraint_name: validate_options[:name]).any?
+
       @migration.reversible do |dir|
         dir.up do
-          @migration.add_check_constraint(table, expression, *args, **add_options)
+          unless invalid_constraint_exist
+            @migration.add_check_constraint(table, expression, *args, **add_options)
+          end
+
           disable_transaction
-          @migration.validate_check_constraint(table, **validate_options)
+
+          begin
+            @migration.validate_check_constraint(table, **validate_options)
+          rescue(ActiveRecord::StatementInvalid)
+            @migration.remove_check_constraint(table, expression, **add_options.except(:validate))
+            raise
+          end
         end
         dir.down do
           @migration.remove_check_constraint(table, expression, **add_options.except(:validate))
