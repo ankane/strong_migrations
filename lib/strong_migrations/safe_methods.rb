@@ -80,9 +80,18 @@ module StrongMigrations
           end
 
           @migration.safety_assured do
-            @migration.execute(add_code)
-            disable_transaction
-            @migration.execute(validate_code)
+            if add_code
+              @migration.execute(add_code)
+              disable_transaction
+            else
+              self.transaction_disabled = true
+            end
+            begin
+              @migration.execute(validate_code)
+            rescue ActiveRecord::StatementInvalid
+              @migration.execute(remove_code)
+              raise
+            end
           end
           if change_args
             @migration.change_column_null(*change_args)
