@@ -72,6 +72,27 @@ class SafeByDefaultTest < Minitest::Test
     assert_safe AddForeignKey
   end
 
+  def test_add_foreign_key_after_failed_attempt
+    skip unless postgresql?
+
+    order = Order.create!
+    invalid_order_id = order.id + 999
+    user = User.create(order_id: invalid_order_id)
+
+    error = assert_raises(ActiveRecord::StatementInvalid) do
+      assert_safe AddForeignKeyName
+    end
+
+    assert_match "PG::ForeignKeyViolation: ERROR:  insert or update on table \"users\" violates foreign key constraint \"fk1\"\nDETAIL:  Key (order_id)=(#{invalid_order_id}) is not present in table \"orders\".\n", error.message
+
+    user.update!(order_id: order.id)
+
+    assert_safe AddForeignKeyName
+  ensure
+    User.delete_all
+    Order.delete_all
+  end
+
   def test_add_foreign_key_extra_arguments
     assert_argument_error AddForeignKeyExtraArguments
   end
