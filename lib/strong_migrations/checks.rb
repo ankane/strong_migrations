@@ -53,7 +53,7 @@ module StrongMigrations
           append: append,
           rewrite_blocks: adapter.rewrite_blocks,
           default_type: (volatile ? "volatile" : "non-null")
-      elsif default.is_a?(Proc) && postgresql?
+      elsif (default.is_a?(Proc) || default == false) && postgresql?
         # adding a column with a VOLATILE default is not safe
         # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
         # functions like random() and clock_timestamp() are VOLATILE
