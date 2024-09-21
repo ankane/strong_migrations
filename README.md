@@ -936,7 +936,7 @@ You probably don’t need this gem for smaller projects, as operations that are 
 
 - [Zero downtime migrations with ActiveRecord](https://medium.com/klaxit-techblog/zero-downtime-migrations-with-activerecord-47528abe5136/)
 - [PostgreSQL at Scale: Database Schema Changes Without Downtime](https://medium.com/braintree-product-technology/postgresql-at-scale-database-schema-changes-without-downtime-20d3749ed680)
-- [An Overview of DDL Algorithms in MySQL](https://mydbops.wordpress.com/2020/03/04/an-overview-of-ddl-algorithms-in-mysql-covers-mysql-8/)
+- [An Overview of DDL Algorithms in MySQL](https://www.mydbops.com/blog/an-overview-of-ddl-algorithms-in-mysql-covers-mysql-8/)
 - [MariaDB InnoDB Online DDL Overview](https://mariadb.com/kb/en/innodb-online-ddl-overview/)
 
 ## Credits
