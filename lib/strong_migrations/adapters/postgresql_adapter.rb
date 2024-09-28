@@ -127,7 +127,7 @@ module StrongMigrations
         safe
       end
 
-      def constraints(table_name)
+      def constraints(table_name, include_invalid: false)
         query = <<~SQL
           SELECT
             conname AS name,
@@ -135,8 +135,7 @@ module StrongMigrations
           FROM
             pg_constraint
           WHERE
-            contype = 'c' AND
-            convalidated AND
+            contype = 'c' #{ "AND convalidated" if !include_invalid } AND
             conrelid = #{connection.quote(connection.quote_table_name(table_name))}::regclass
         SQL
         select_all(query.squish).to_a

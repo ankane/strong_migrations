@@ -228,13 +228,15 @@ module StrongMigrations
       table, column, null, default = args
       if !null
         if postgresql?
-          safe = adapter.constraints(table).any? { |c| c["def"] == "CHECK ((#{column} IS NOT NULL))" || c["def"] == "CHECK ((#{connection.quote_column_name(column)} IS NOT NULL))" }
+          table_constraints = adapter.constraints(table, include_invalid: true)
+          safe = table_constraints.any? { |c| c["def"] == "CHECK ((#{column} IS NOT NULL))" || c["def"] == "CHECK ((#{connection.quote_column_name(column)} IS NOT NULL))" }
 
           unless safe
             # match https://github.com/nullobject/rein
             constraint_name = "#{table}_#{column}_null"
+            invalid_constraint_exist = table_constraints.any? { |c| c['name'] == constraint_name }
 
-            add_code = constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column])
+            add_code = constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column]) unless invalid_constraint_exist
             validate_code = constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
             remove_code = constraint_str("ALTER TABLE %s DROP CONSTRAINT %s", [table, constraint_name])
 
