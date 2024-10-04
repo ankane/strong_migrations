@@ -1,6 +1,6 @@
 class AddCheckConstraint < TestMigration
   def change
-    add_check_constraint :users, "credit_score > 0"
+    add_check_constraint :users, "credit_score > 0", name: 'users_credit_score_positive'
   end
 end
 
