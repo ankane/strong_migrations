@@ -1,3 +1,7 @@
+## 2.0.1 (unreleased)
+
+- Fixed issue with `alphabetize_schema` and virtual columns
+
 ## 2.0.0 (2024-06-28)
 
 - Improved install generator for Trilogy

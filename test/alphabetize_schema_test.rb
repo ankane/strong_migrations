@@ -24,6 +24,18 @@ class AlphabetizeSchemaTest < Minitest::Test
     assert_match expected_columns, schema
   end
 
+  def test_virtual_column
+    skip unless mysql? || mariadb?
+
+    migrate AddColumnGeneratedVirtual
+    schema =
+      StrongMigrations.stub(:alphabetize_schema, true) do
+        dump_schema
+      end
+    migrate AddColumnGeneratedVirtual, direction: :down
+    assert_match "t.virtual", schema
+  end
+
   private
 
   def dump_schema
