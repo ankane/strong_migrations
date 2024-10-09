@@ -18,7 +18,7 @@ connection_options = {
 }
 if $adapter == "mysql2"
   connection_options[:encoding] = "utf8mb4"
-  if ActiveRecord::VERSION::STRING.to_f >= 7.1
+  if ActiveRecord::VERSION::STRING.to_f >= 7.1 && ActiveRecord::VERSION::MAJOR < 8
     connection_options[:prepared_statements] = true
   end
 elsif $adapter == "trilogy"
