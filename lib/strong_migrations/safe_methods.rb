@@ -45,15 +45,25 @@ module StrongMigrations
     end
 
     def safe_add_foreign_key(from_table, to_table, *args, **options)
+      validate_options = remove_options = options.slice(:column, :name)
       @migration.reversible do |dir|
         dir.up do
-          @migration.add_foreign_key(from_table, to_table, *args, **options.merge(validate: false))
+          # https://github.com/rails/rails/blob/main/activerecord/lib/active_record/connection_adapters/abstract/schema_statements.rb#L1154C96-L1154C120
+          # if_not_exists does not check again `name` option.
+          unless @migration.foreign_key_exists?(from_table, to_table, **validate_options)
+            @migration.add_foreign_key(from_table, to_table, *args, **options.without(:if_not_exists).merge(validate: false))
+          end
+
           disable_transaction
-          validate_options = options.slice(:column, :name)
-          @migration.validate_foreign_key(from_table, to_table, **validate_options)
+
+          begin
+            @migration.validate_foreign_key(from_table, to_table, **validate_options)
+          rescue ActiveRecord::StatementInvalid
+            @migration.remove_foreign_key(from_table, to_table, **remove_options)
+            raise
+          end
         end
         dir.down do
-          remove_options = options.slice(:column, :name)
           @migration.remove_foreign_key(from_table, to_table, **remove_options)
         end
       end
