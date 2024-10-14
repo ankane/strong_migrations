@@ -115,7 +115,31 @@ class SafeByDefaultTest < Minitest::Test
   def test_change_column_null
     skip unless postgresql?
 
+    User.create!(name: 'Jeff')
+
     assert_safe ChangeColumnNull
+  ensure
+    User.delete_all
+  end
+
+  def test_change_column_null_cleanup_constraint
+    skip unless postgresql?
+
+    # Create a user without a name
+    user = User.create!(name: nil)
+    temporary_constraint_name = 'users_name_null'
+
+    error = assert_raises(ActiveRecord::StatementInvalid) do
+      assert_safe ChangeColumnNull
+    end
+
+    assert_match  "PG::CheckViolation: ERROR:  check constraint \"#{temporary_constraint_name}\" of relation \"users\" is violated by some row\n", error.message
+
+    user.update!(name: 'jeff')
+
+    assert_safe ChangeColumnNull
+  ensure
+    User.delete_all
   end
 
   def test_change_column_null_default
