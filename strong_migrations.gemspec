@@ -10,6 +10,11 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Andrew Kane", "Bob Remeika", "David Waller"]
   spec.email         = ["andrew@ankane.org", "bob.remeika@gmail.com"]
 
+  spec.metadata = {
+    "changelog_uri"     => "https://github.com/ankane/strong_migrations/blob/v#{StrongMigrations::VERSION}/CHANGELOG.md",
+    "source_code_uri"   => "https://github.com/ankane/strong_migrations",
+  }
+
   spec.files         = Dir["*.{md,txt}", "{lib}/**/*"]
   spec.require_path  = "lib"
 
