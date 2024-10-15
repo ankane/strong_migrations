@@ -1,4 +1,4 @@
-## 2.0.1 (unreleased)
+## 2.0.1 (2024-10-14)
 
 - Fixed issue with `alphabetize_schema` and virtual columns
 
