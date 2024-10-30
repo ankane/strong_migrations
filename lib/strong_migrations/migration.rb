@@ -6,19 +6,18 @@ module StrongMigrations
       connection.begin_db_transaction if strong_migrations_checker.transaction_disabled
     end
 
-    def method_missing(method, *args)
+    def method_missing(method, *args, **options)
       return super if is_a?(ActiveRecord::Schema)
 
       # Active Record 7.0.2+ versioned schema
       return super if defined?(ActiveRecord::Schema::Definition) && is_a?(ActiveRecord::Schema::Definition)
 
       catch(:safe) do
-        strong_migrations_checker.perform(method, *args) do
+        strong_migrations_checker.perform(method, *args, **options) do
           super
         end
       end
     end
-    ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
 
     def revert(*)
       if strong_migrations_checker.version_safe?
