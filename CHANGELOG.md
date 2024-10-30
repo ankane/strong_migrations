@@ -1,6 +1,6 @@
 ## 2.0.2 (unreleased)
 
-- Fixed issue with Active Record 8 rc2
+- Fixed migrations not running with Active Record 8 rc2
 
 ## 2.0.1 (2024-10-14)
 
