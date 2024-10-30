@@ -1,3 +1,7 @@
+## 2.0.2 (unreleased)
+
+- Fixed issue with Active Record 8 rc2
+
 ## 2.0.1 (2024-10-14)
 
 - Fixed issue with `alphabetize_schema` and virtual columns
