@@ -1,9 +1,9 @@
 module StrongMigrations
   module SchemaDumper
-    def initialize(connection, *args, **options)
+    def initialize(connection, ...)
       return super unless StrongMigrations.alphabetize_schema
 
-      super(WrappedConnection.new(connection), *args, **options)
+      super(WrappedConnection.new(connection), ...)
     end
   end
 
@@ -14,8 +14,8 @@ module StrongMigrations
       @connection = connection
     end
 
-    def columns(*args, **options)
-      @connection.columns(*args, **options).sort_by(&:name)
+    def columns(...)
+      @connection.columns(...).sort_by(&:name)
     end
 
     # forward private methods with send

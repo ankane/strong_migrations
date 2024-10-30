@@ -1,6 +1,6 @@
 module StrongMigrations
   module Migrator
-    def ddl_transaction(migration, *args)
+    def ddl_transaction(migration, ...)
       return super unless StrongMigrations.lock_timeout_retries > 0 && use_transaction?(migration)
 
       # handle MigrationProxy class
@@ -12,7 +12,7 @@ module StrongMigrations
         # failed transaction reverts timeout, so need to re-apply
         checker.timeouts_set = false
 
-        super(migration, *args)
+        super(migration, ...)
       end
     end
   end
