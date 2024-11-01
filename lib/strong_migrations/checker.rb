@@ -28,6 +28,8 @@ module StrongMigrations
     end
 
     def perform(method, *args)
+      return yield if skip?
+
       check_version_supported
       set_timeouts
       check_lock_timeout
@@ -127,6 +129,10 @@ module StrongMigrations
 
     def version_safe?
       version && version <= StrongMigrations.start_after
+    end
+
+    def skip?
+      StrongMigrations.skip_databases.map(&:to_s).include?(connection.pool.db_config.name)
     end
 
     private

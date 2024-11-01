@@ -26,6 +26,20 @@ class MultipleDatabasesTest < Minitest::Test
     assert_equal "StrongMigrations.target_version is not configured for :animals database", error.message
   end
 
+  def test_skip_databases
+    with_skip_databases([:animals]) do
+      with_database(:primary) do
+        assert_unsafe CreateTableForce
+      end
+      with_database(:animals) do
+        assert_safe CreateTableForce, direction: :up
+      end
+    end
+    # confirm migration ran
+    assert ActiveRecord::Base.connection.table_exists?("admins")
+    migrate CreateTableForce, direction: :down
+  end
+
   private
 
   def with_database(database, &block)
@@ -43,5 +57,11 @@ class MultipleDatabasesTest < Minitest::Test
   ensure
     ActiveRecord::Base.configurations = previous_configurations if previous_configurations
     ActiveRecord::Base.establish_connection(previous_db_config) if previous_db_config
+  end
+
+  def with_skip_databases(skip_databases)
+    StrongMigrations.stub(:skip_databases, skip_databases) do
+      yield
+    end
   end
 end
