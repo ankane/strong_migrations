@@ -788,6 +788,8 @@ Skip checks for specific databases with: [unreleased]
 StrongMigrations.skip_databases += [:catalog]
 ```
 
+Note: This also skips other functionality besides `alphabetize_schema`
+
 ## Custom Messages
 
 To customize specific messages, create an initializer with:
