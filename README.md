@@ -853,7 +853,9 @@ production:
 
 For HTTP connections, Redis, and other services, check out [this guide](https://github.com/ankane/the-ultimate-guide-to-ruby-timeouts).
 
-## Lock Timeout Retries [experimental]
+## Lock Timeout Retries
+
+Note: This feature is experimental.
 
 There’s the option to automatically retry statements for migrations when the lock timeout is reached. Here’s how it works:
 
