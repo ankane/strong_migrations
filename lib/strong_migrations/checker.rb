@@ -133,15 +133,19 @@ module StrongMigrations
     end
 
     def skip?
-      StrongMigrations.skip_databases.map(&:to_s).include?(connection.pool.db_config.name)
+      StrongMigrations.skip_databases.map(&:to_s).include?(db_config_name)
     end
 
     private
 
     def check_adapter
+      return if defined?(@adapter_checked)
+
       if adapter.instance_of?(Adapters::AbstractAdapter)
-        warn "[strong_migrations] Unsupported adapter: #{connection.adapter_name}. Use StrongMigrations.skip_databases to silence this warning."
+        warn "[strong_migrations] Unsupported adapter: #{connection.adapter_name}. Use StrongMigrations.skip_databases += #{[db_config_name.to_sym].inspect} to silence this warning."
       end
+
+      @adapter_checked = true
     end
 
     def check_version_supported
@@ -211,6 +215,10 @@ module StrongMigrations
 
     def connection
       @migration.connection
+    end
+
+    def db_config_name
+      connection.pool.db_config.name
     end
 
     def retry_lock_timeouts?(method)
