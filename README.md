@@ -782,13 +782,13 @@ StrongMigrations.check_down = true
 
 ## Multiple Databases
 
-Skip checks for specific databases with: [unreleased]
+Skip checks and other functionality for specific databases with: [unreleased]
 
 ```ruby
 StrongMigrations.skip_databases += [:catalog]
 ```
 
-Note: This also skips all other functionality besides `alphabetize_schema`
+Note: This does not affect `alphabetize_schema`
 
 ## Custom Messages
 
