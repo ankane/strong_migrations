@@ -13,9 +13,11 @@ module StrongMigrations
       end
 
       def set_statement_timeout(timeout)
+        # do nothing
       end
 
       def set_lock_timeout(timeout)
+        # do nothing
       end
 
       def check_lock_timeout(limit)
