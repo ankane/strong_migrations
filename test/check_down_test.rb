@@ -12,6 +12,13 @@ class CheckDownTest < Minitest::Test
     migrate CheckDown, direction: :down
   end
 
+  def test_check_down_safe
+    migrate CheckDownSafe
+    with_check_down do
+      assert_safe CheckDownSafe, direction: :down
+    end
+  end
+
   def test_check_down_change
     skip unless postgresql?
 

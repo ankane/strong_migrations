@@ -8,6 +8,18 @@ class CheckDown < TestMigration
   end
 end
 
+class CheckDownSafe < TestMigration
+  def up
+    add_column :users, :age, :integer
+  end
+
+  def down
+    safety_assured do
+      remove_column :users, :age
+    end
+  end
+end
+
 class CheckDownChange < TestMigration
   disable_ddl_transaction!
 
