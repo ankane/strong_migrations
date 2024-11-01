@@ -13,11 +13,9 @@ module StrongMigrations
       end
 
       def set_statement_timeout(timeout)
-        raise StrongMigrations::Error, "Statement timeout not supported for this database"
       end
 
       def set_lock_timeout(timeout)
-        raise StrongMigrations::Error, "Lock timeout not supported for this database"
       end
 
       def check_lock_timeout(limit)

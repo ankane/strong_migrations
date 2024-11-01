@@ -30,6 +30,7 @@ module StrongMigrations
     def perform(method, *args)
       return yield if skip?
 
+      check_adapter
       check_version_supported
       set_timeouts
       check_lock_timeout
@@ -136,6 +137,12 @@ module StrongMigrations
     end
 
     private
+
+    def check_adapter
+      if adapter.instance_of?(Adapters::AbstractAdapter)
+        warn "[strong_migrations] Unsupported adapter: #{connection.adapter_name}. Use StrongMigrations.skip_databases to silence this warning."
+      end
+    end
 
     def check_version_supported
       return if defined?(@version_checked)

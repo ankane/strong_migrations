@@ -1,6 +1,7 @@
 ## 2.1.0 (unreleased)
 
 - Added `skip_databases` option
+- Added warning for unsupported adapters
 
 ## 2.0.2 (2024-10-30)
 
