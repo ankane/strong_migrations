@@ -780,7 +780,7 @@ By default, checks are disabled when migrating down. Enable them with:
 StrongMigrations.check_down = true
 ```
 
-## Multiple Databases
+## Skip Databases
 
 Skip checks and other functionality for specific databases with: [unreleased]
 
