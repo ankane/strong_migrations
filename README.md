@@ -610,10 +610,15 @@ Then validate it in a separate migration. Once the check constraint is validated
 
 ```ruby
 class ValidateSomeColumnNotNull < ActiveRecord::Migration[7.2]
-  def change
-    up_only { validate_check_constraint :users, name: "users_some_column_null" }
-    change_column_null :users, :some_column, false
-    remove_check_constraint :users, "some_column IS NOT NULL", name: "users_some_column_null"
+  def up
+    validate_check_constraint :users, name: "users_name_null"
+    change_column_null :users, :name, false
+    remove_check_constraint :users, name: "users_name_null"
+  end
+
+  def down
+    add_check_constraint :users, "name IS NOT NULL", name: "users_name_null", validate: false
+    change_column_null :users, :name, true
   end
 end
 ```
