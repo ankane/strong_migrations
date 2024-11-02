@@ -77,4 +77,15 @@ class MiscTest < Minitest::Test
       end
     end
   end
+
+  def test_unsupported_adapter
+    previous_db_config = ActiveRecord::Base.connection_db_config.configuration_hash
+    ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
+    schema_migration.create_table
+    assert_output nil, /Unsupported adapter/ do
+      assert_unsafe CreateTableForce
+    end
+  ensure
+    ActiveRecord::Base.establish_connection(previous_db_config) if previous_db_config
+  end
 end
