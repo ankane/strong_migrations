@@ -11,8 +11,8 @@ require_relative "strong_migrations/adapters/postgresql_adapter"
 require_relative "strong_migrations/checks"
 require_relative "strong_migrations/safe_methods"
 require_relative "strong_migrations/checker"
-require_relative "strong_migrations/database_tasks"
 require_relative "strong_migrations/migration"
+require_relative "strong_migrations/migration_context"
 require_relative "strong_migrations/migrator"
 require_relative "strong_migrations/version"
 
@@ -91,11 +91,8 @@ require_relative "strong_migrations/error_messages"
 
 ActiveSupport.on_load(:active_record) do
   ActiveRecord::Migration.prepend(StrongMigrations::Migration)
+  ActiveRecord::MigrationContext.prepend(StrongMigrations::MigrationContext)
   ActiveRecord::Migrator.prepend(StrongMigrations::Migrator)
-
-  if defined?(ActiveRecord::Tasks::DatabaseTasks)
-    ActiveRecord::Tasks::DatabaseTasks.singleton_class.prepend(StrongMigrations::DatabaseTasks)
-  end
 
   require_relative "strong_migrations/schema_dumper"
   ActiveRecord::SchemaDumper.prepend(StrongMigrations::SchemaDumper)

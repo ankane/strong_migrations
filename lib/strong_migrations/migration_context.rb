@@ -1,8 +1,26 @@
 module StrongMigrations
-  module DatabaseTasks
-    def migrate(...)
+  module MigrationContext
+    def up(...)
       super
     rescue => e
+      strong_migrations_process_exception(e)
+    end
+
+    def down(...)
+      super
+    rescue => e
+      strong_migrations_process_exception(e)
+    end
+
+    def run(...)
+      super
+    rescue => e
+      strong_migrations_process_exception(e)
+    end
+
+    private
+
+    def strong_migrations_process_exception(e)
       if e.cause.is_a?(StrongMigrations::Error)
         # strip cause and clean backtrace
         def e.cause
