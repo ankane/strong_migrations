@@ -351,6 +351,8 @@ end
 
 ### Backfilling data
 
+Note: Strong Migrations does not detect dangerous backfills.
+
 #### Bad
 
 Active Record creates a transaction around each migration, and backfilling in the same transaction that alters a table keeps the table locked for the [duration of the backfill](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/).
