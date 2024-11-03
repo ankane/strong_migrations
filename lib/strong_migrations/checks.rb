@@ -303,7 +303,6 @@ module StrongMigrations
         when :remove_column
           [args[1]]
         when :remove_columns
-          # Active Record 6.1+ supports options
           if args.last.is_a?(Hash)
             args[1..-2]
           else
