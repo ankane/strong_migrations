@@ -236,14 +236,8 @@ module StrongMigrations
 
             add_code = constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column])
             validate_code = constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
-            remove_code = constraint_str("ALTER TABLE %s DROP CONSTRAINT %s", [table, constraint_name])
-
-            validate_constraint_code = String.new(command_str(:validate_check_constraint, [table, {name: constraint_name}]))
-
             change_args = [table, column, null]
-
-            validate_constraint_code << "\n    #{command_str(:change_column_null, change_args)}"
-            validate_constraint_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
+            remove_code = constraint_str("ALTER TABLE %s DROP CONSTRAINT %s", [table, constraint_name])
 
             if StrongMigrations.safe_by_default
               safe_change_column_null(add_code, validate_code, change_args, remove_code, default)
@@ -251,6 +245,10 @@ module StrongMigrations
             end
 
             add_constraint_code = command_str(:add_check_constraint, [table, "#{quote_column_if_needed(column)} IS NOT NULL", {name: constraint_name, validate: false}])
+
+            validate_constraint_code = String.new(command_str(:validate_check_constraint, [table, {name: constraint_name}]))
+            validate_constraint_code << "\n    #{command_str(:change_column_null, change_args)}"
+            validate_constraint_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
 
             down_code = "#{add_constraint_code}\n    #{command_str(:change_column_null, [table, column, true])}"
             validate_constraint_code = "def up\n    #{validate_constraint_code}\n  end\n\n  def down\n    #{down_code}\n  end"
