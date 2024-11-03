@@ -299,31 +299,31 @@ module StrongMigrations
       columns =
         case method
         when :remove_timestamps
-          ["created_at", "updated_at"]
+          [:created_at, :updated_at]
         when :remove_column
-          [args[1].to_s]
+          [args[1]]
         when :remove_columns
           # Active Record 6.1+ supports options
           if args.last.is_a?(Hash)
-            args[1..-2].map(&:to_s)
+            args[1..-2]
           else
-            args[1..-1].map(&:to_s)
+            args[1..-1]
           end
         else
           options = args[2] || {}
           reference = args[1]
           cols = []
-          cols << "#{reference}_type" if options[:polymorphic]
-          cols << "#{reference}_id"
+          cols << "#{reference}_type".to_sym if options[:polymorphic]
+          cols << "#{reference}_id".to_sym
           cols
         end
 
-      code = "self.ignored_columns += #{columns.inspect}"
+      code = "self.ignored_columns += #{columns.map(&:to_s).inspect}"
 
       table_columns = connection.columns(args[0]).index_by(&:name) rescue {}
-      null_columns = columns.select { |c| table_columns[c] && !table_columns[c].null && table_columns[c].default.nil? }
+      null_columns = columns.select { |c| table_columns[c.to_s] && !table_columns[c.to_s].null && table_columns[c.to_s].default.nil? }
       if null_columns.any?
-        commands = null_columns.map { |c| command_str(:change_column_null, [args[0].to_sym, c.to_sym, true]) }
+        commands = null_columns.map { |c| command_str(:change_column_null, [args[0], c, true]) }
         null_code = "First, remove NOT NULL:\n\nclass RemoveNotNull < ActiveRecord::Migration#{migration_suffix}\n  def change\n    #{commands.join("\n    ")}\n  end\nend\n\nDeploy and run the migration. "
       end
 
