@@ -246,12 +246,11 @@ module StrongMigrations
 
             add_constraint_code = command_str(:add_check_constraint, [table, "#{quote_column_if_needed(column)} IS NOT NULL", {name: constraint_name, validate: false}])
 
-            validate_constraint_code = String.new(command_str(:validate_check_constraint, [table, {name: constraint_name}]))
-            validate_constraint_code << "\n    #{command_str(:change_column_null, change_args)}"
-            validate_constraint_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
-
+            up_code = String.new(command_str(:validate_check_constraint, [table, {name: constraint_name}]))
+            up_code << "\n    #{command_str(:change_column_null, change_args)}"
+            up_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
             down_code = "#{add_constraint_code}\n    #{command_str(:change_column_null, [table, column, true])}"
-            validate_constraint_code = "def up\n    #{validate_constraint_code}\n  end\n\n  def down\n    #{down_code}\n  end"
+            validate_constraint_code = "def up\n    #{up_code}\n  end\n\n  def down\n    #{down_code}\n  end"
 
             raise_error :change_column_null_postgresql,
               add_constraint_code: add_constraint_code,
