@@ -93,6 +93,9 @@ ActiveRecord::Schema.define do
   end
 
   create_table :devices do |t|
+    t.string :name, null: false
+    t.string :city, null: false
+    t.string :country, null: false, default: ""
   end
 end
 

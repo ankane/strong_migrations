@@ -61,7 +61,7 @@ while the entire table is rewritten. A safer approach is to:
 "Changing the type is safe, but setting NOT NULL is not.",
 
     remove_column: "Active Record caches attributes, which causes problems
-when removing columns. Be sure to ignore the column%{column_suffix}:
+when removing columns. %{null_code}Ignore the column%{column_suffix}:
 
 class %{model} < %{base_model}
   %{code}

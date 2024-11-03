@@ -129,6 +129,16 @@ end
 4. Deploy and run the migration
 5. Remove the line added in step 1
 
+Note: For columns with `NOT NULL` and no default value, remove `NOT NULL` before any other steps.
+
+```ruby
+class RemoveNotNull < ActiveRecord::Migration[7.2]
+  def change
+    change_column_null :users, :some_column, true
+  end
+end
+```
+
 ### Changing the type of a column
 
 #### Bad

@@ -320,11 +320,19 @@ module StrongMigrations
 
       code = "self.ignored_columns += #{columns.inspect}"
 
+      table_columns = connection.columns(args[0]).index_by(&:name) rescue []
+      null_columns = columns.select { |c| table_columns[c] && !table_columns[c].null && table_columns[c].default.nil? }
+      if null_columns.any?
+        commands = null_columns.map { |c| command_str(:change_column_null, [args[0].to_sym, c.to_sym, true]) }
+        null_code = "First, remove NOT NULL:\n\nclass RemoveNotNull < ActiveRecord::Migration#{migration_suffix}\n  def change\n    #{commands.join("\n    ")}\n  end\nend\n\nDeploy and run the migration. "
+      end
+
       raise_error :remove_column,
         model: args[0].to_s.classify,
         code: code,
         command: command_str(method, args),
-        column_suffix: columns.size > 1 ? "s" : ""
+        column_suffix: columns.size > 1 ? "s" : "",
+        null_code: null_code
     end
 
     def check_remove_index(*args)
@@ -389,7 +397,7 @@ module StrongMigrations
       message = message + append if append
 
       vars[:migration_name] = @migration.class.name
-      vars[:migration_suffix] = "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]"
+      vars[:migration_suffix] = migration_suffix
       vars[:base_model] = "ApplicationRecord"
 
       # escape % not followed by {
@@ -452,6 +460,10 @@ module StrongMigrations
 
     def new_column?(table, column)
       new_table?(table) || @new_columns.include?([table.to_s, column.to_s])
+    end
+
+    def migration_suffix
+      "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]"
     end
   end
 end
