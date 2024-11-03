@@ -320,7 +320,7 @@ module StrongMigrations
 
       code = "self.ignored_columns += #{columns.inspect}"
 
-      table_columns = connection.columns(args[0]).index_by(&:name) rescue []
+      table_columns = connection.columns(args[0]).index_by(&:name) rescue {}
       null_columns = columns.select { |c| table_columns[c] && !table_columns[c].null && table_columns[c].default.nil? }
       if null_columns.any?
         commands = null_columns.map { |c| command_str(:change_column_null, [args[0].to_sym, c.to_sym, true]) }
