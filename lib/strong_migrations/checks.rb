@@ -327,7 +327,7 @@ module StrongMigrations
       end
 
       raise_error :remove_column,
-        model: args[0].to_s.classify,
+        model: model_name(args[0]),
         code: code,
         command: command_str(method, args),
         column_suffix: columns.size > 1 ? "s" : "",
@@ -437,7 +437,7 @@ module StrongMigrations
     end
 
     def backfill_code(table, column, default, function = false)
-      model = table.to_s.classify
+      model = model_name(table)
       if function
         # update_all(column: Arel.sql(default)) also works in newer versions of Active Record
         update_expr = "#{quote_column_if_needed(column)} = #{default}"
@@ -463,6 +463,10 @@ module StrongMigrations
 
     def migration_suffix
       "[#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}]"
+    end
+
+    def model_name(table)
+      table.to_s.classify
     end
   end
 end
