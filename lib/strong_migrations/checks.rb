@@ -319,19 +319,11 @@ module StrongMigrations
 
       code = "self.ignored_columns += #{columns.map(&:to_s).inspect}"
 
-      table_columns = connection.columns(args[0]).index_by(&:name) rescue {}
-      null_columns = columns.select { |c| table_columns[c.to_s] && !table_columns[c.to_s].null && table_columns[c.to_s].default.nil? }
-      if null_columns.any?
-        commands = null_columns.map { |c| command_str(:change_column_null, [args[0], c, true]) }
-        null_code = "First, remove NOT NULL:\n\nclass RemoveNotNull < ActiveRecord::Migration#{migration_suffix}\n  def change\n    #{commands.join("\n    ")}\n  end\nend\n\nDeploy and run the migration. "
-      end
-
       raise_error :remove_column,
         model: model_name(args[0]),
         code: code,
         command: command_str(method, args),
-        column_suffix: columns.size > 1 ? "s" : "",
-        null_code: null_code
+        column_suffix: columns.size > 1 ? "s" : ""
     end
 
     def check_remove_index(*args)

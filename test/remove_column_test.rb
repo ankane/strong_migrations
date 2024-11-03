@@ -28,12 +28,4 @@ class RemoveColumnTest < Minitest::Test
   def test_remove_belongs_to
     assert_unsafe RemoveBelongsTo
   end
-
-  def test_remove_column_null
-    assert_unsafe RemoveColumnNull
-  end
-
-  def test_remove_columns_null
-    assert_unsafe RemoveColumnsNull
-  end
 end

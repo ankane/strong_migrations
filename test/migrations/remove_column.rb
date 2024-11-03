@@ -39,15 +39,3 @@ class RemoveBelongsTo < TestMigration
     remove_belongs_to :users, :device
   end
 end
-
-class RemoveColumnNull < TestMigration
-  def change
-    remove_column :devices, :name, :string
-  end
-end
-
-class RemoveColumnsNull < TestMigration
-  def change
-    remove_columns :devices, :name, :city, :country
-  end
-end

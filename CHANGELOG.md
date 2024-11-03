@@ -2,7 +2,6 @@
 
 - Added `skip_databases` option
 - Added warning for unsupported adapters
-- Improved instructions for removing a column with `NOT NULL` and no default value
 - Improved output for `db:forward`, `db:rollback`, `db:migrate:up`, and `db:migrate:down`
 
 ## 2.0.2 (2024-10-30)
