@@ -84,23 +84,15 @@ module StrongMigrations
             disable_transaction
             @migration.execute(validate_code)
           end
-          if change_args
-            @migration.change_column_null(*change_args)
-            @migration.safety_assured do
-              @migration.execute(remove_code)
-            end
+          @migration.change_column_null(*change_args)
+          @migration.safety_assured do
+            @migration.execute(remove_code)
           end
         end
         dir.down do
-          if change_args
-            down_args = change_args.dup
-            down_args[2] = true
-            @migration.change_column_null(*down_args)
-          else
-            @migration.safety_assured do
-              @migration.execute(remove_code)
-            end
-          end
+          down_args = change_args.dup
+          down_args[2] = true
+          @migration.change_column_null(*down_args)
         end
       end
     end
