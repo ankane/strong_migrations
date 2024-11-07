@@ -1,6 +1,12 @@
 class AddIndex < TestMigration
   def change
     add_index :users, :name
+  end
+end
+
+class AddIndexes < TestMigration
+  def change
+    add_index :users, :name
     add_index :users, :city
   end
 end

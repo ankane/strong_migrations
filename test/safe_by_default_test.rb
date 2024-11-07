@@ -10,7 +10,7 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_index
-    assert_safe AddIndex
+    assert_safe AddIndexes
   end
 
   def test_add_index_invalid
@@ -19,7 +19,7 @@ class SafeByDefaultTest < Minitest::Test
     with_locked_table("users") do
       with_lock_timeout(0.1) do
         assert_raises(ActiveRecord::LockWaitTimeout) do
-          migrate AddIndex
+          migrate AddIndexes
         end
       end
     end
@@ -36,15 +36,15 @@ class SafeByDefaultTest < Minitest::Test
     end
     assert_kind_of PG::DuplicateTable, error.cause
 
-    migrate AddIndex
+    migrate AddIndexes
 
     # fail if trying to add the same index in a future migration
     error = assert_raises(ActiveRecord::StatementInvalid) do
-      migrate AddIndex
+      migrate AddIndexes
     end
     assert_kind_of PG::DuplicateTable, error.cause
 
-    migrate AddIndex, direction: :down
+    migrate AddIndexes, direction: :down
   end
 
   def test_add_index_extra_arguments
