@@ -461,7 +461,7 @@ module StrongMigrations
       table.to_s.classify
     end
 
-    def remove_invalid_index(*args, **options)
+    def remove_invalid_index_if_needed(*args, **options)
       return unless StrongMigrations.remove_invalid_indexes && postgresql? && direction == :up
 
       table, columns = args
