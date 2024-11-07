@@ -10,7 +10,7 @@ module StrongMigrations
       if !new_table?(table)
         if postgresql? && options[:validate] != false
           add_options = options.merge(validate: false)
-          name = options[:name] || @migration.check_constraint_options(table, expression, options)[:name]
+          name = options[:name] || connection.check_constraint_options(table, expression, options)[:name]
           validate_options = {name: name}
 
           if StrongMigrations.safe_by_default
