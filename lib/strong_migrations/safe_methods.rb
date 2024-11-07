@@ -127,6 +127,7 @@ module StrongMigrations
     end
 
     def invalid_index_name(*args, **options)
+      # ensures has same options as existing index
       return nil unless connection.index_exists?(*args, **options.merge(valid: false))
 
       table, columns = args
