@@ -18,9 +18,7 @@ class SafeByDefaultTest < Minitest::Test
 
     with_locked_table("users") do
       assert_raises(ActiveRecord::LockWaitTimeout) do
-        with_lock_timeout(0.1) do
-          migrate AddIndex
-        end
+        migrate AddIndex
       end
     end
   end
@@ -149,7 +147,10 @@ class SafeByDefaultTest < Minitest::Test
 
     connection.transaction do
       connection.execute("LOCK TABLE #{connection.quote_table_name(table)} IN ROW EXCLUSIVE MODE")
-      yield
+
+      with_lock_timeout(0.1) do
+        yield
+      end
     end
   ensure
     pool.checkin(connection) if connection
