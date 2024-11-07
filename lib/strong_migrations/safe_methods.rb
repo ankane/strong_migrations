@@ -133,7 +133,7 @@ module StrongMigrations
       table, columns = args
       index_name = options.fetch(:name, connection.index_name(table, columns))
 
-      # valid option is ignored for Active Record < 7.1, so need to check name as well
+      # valid option is ignored for Active Record < 7.1, so check name as well
       return nil unless ar_version >= 7.1 || adapter.index_invalid?(table, index_name)
 
       index_name
