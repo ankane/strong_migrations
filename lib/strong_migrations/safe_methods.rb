@@ -6,14 +6,7 @@ module StrongMigrations
 
     def safe_add_index(*args, **options)
       disable_transaction
-      if direction == :up && (index_name = invalid_index_name(*args, **options))
-        @migration.safety_assured do
-          # TODO pass index schema for extra safety?
-          @migration.execute("REINDEX INDEX CONCURRENTLY #{connection.quote_table_name(index_name)}")
-        end
-      else
-        @migration.add_index(*args, **options.merge(algorithm: :concurrently))
-      end
+      add_index_or_reindex(*args, **options.merge(algorithm: :concurrently))
     end
 
     def safe_remove_index(*args, **options)
@@ -124,6 +117,17 @@ module StrongMigrations
 
     def in_transaction?
       connection.open_transactions > 0
+    end
+
+    def add_index_or_reindex(*args, **options)
+      if direction == :up && (index_name = invalid_index_name(*args, **options))
+        @migration.safety_assured do
+          # TODO pass index schema for extra safety?
+          @migration.execute("REINDEX INDEX #{connection.index_algorithm(options[:algorithm])} #{connection.quote_table_name(index_name)}")
+        end
+      else
+        @migration.add_index(*args, **options)
+      end
     end
 
     def invalid_index_name(*args, **options)
