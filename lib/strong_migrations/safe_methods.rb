@@ -62,7 +62,7 @@ module StrongMigrations
       @migration.reversible do |dir|
         dir.up do
           # only skip invalid constraints
-          unless adapter.constraints(table).any? { |c| c["name"] == validate_options[:name] && !c["validated"] }
+          unless connection.check_constraints(table).any? { |c| c.options[:name] == validate_options[:name] && !c.options[:validate] }
             @migration.add_check_constraint(table, expression, *args, **add_options)
           end
           disable_transaction
@@ -86,7 +86,7 @@ module StrongMigrations
           remove_options = remove_args.extract_options!
 
           # only skip invalid constraints
-          unless constraints.any? { |c| c["name"] == validate_options[:name] && !c["validated"] }
+          unless constraints.any? { |c| c.options[:name] == validate_options[:name] && !c.options[:validate] }
             @migration.add_check_constraint(*add_args, **add_options)
           end
           disable_transaction

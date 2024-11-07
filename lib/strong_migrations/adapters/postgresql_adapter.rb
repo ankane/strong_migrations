@@ -127,21 +127,6 @@ module StrongMigrations
         safe
       end
 
-      def constraints(table_name)
-        query = <<~SQL
-          SELECT
-            conname AS name,
-            pg_get_constraintdef(oid) AS def,
-            convalidated AS validated
-          FROM
-            pg_constraint
-          WHERE
-            contype = 'c' AND
-            conrelid = #{connection.quote(connection.quote_table_name(table_name))}::regclass
-        SQL
-        select_all(query.squish).to_a
-      end
-
       # TODO use indexes method when Active Record < 7.1 is no longer supported
       def index_invalid?(table_name, index_name)
         query = <<~SQL
