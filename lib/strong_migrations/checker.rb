@@ -11,10 +11,15 @@ module StrongMigrations
 
     def initialize(migration)
       @migration = migration
+      reset
+    end
+
+    def reset
       @new_tables = []
       @new_columns = []
       @timeouts_set = false
       @committed = false
+      @transaction_disabled = false
     end
 
     def self.safety_assured

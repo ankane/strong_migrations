@@ -170,6 +170,22 @@ class TimeoutsTest < Minitest::Test
     migrate AddIndexConcurrently, direction: :down
   end
 
+  def test_lock_timeout_retries_add_index_safe_by_default
+    skip unless postgresql?
+
+    StrongMigrations.safe_by_default = true
+
+    assert_raises(ActiveRecord::LockWaitTimeout) do
+      with_lock_timeout_retries do
+        migrate AddIndex
+      end
+    end
+
+    migrate AddIndex, direction: :down
+  ensure
+    StrongMigrations.safe_by_default = false
+  end
+
   def reset_timeouts
     StrongMigrations.lock_timeout = nil
     StrongMigrations.statement_timeout = nil

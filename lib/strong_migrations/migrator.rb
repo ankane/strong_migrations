@@ -12,7 +12,7 @@ module StrongMigrations
       # retry migration since the entire transaction needs to be rerun
       checker.retry_lock_timeouts(check_committed: true) do
         # failed transaction reverts timeout, so need to re-apply
-        checker.timeouts_set = false
+        checker.reset
 
         super(migration, ...)
       end
