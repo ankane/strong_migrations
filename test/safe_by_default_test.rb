@@ -21,6 +21,8 @@ class SafeByDefaultTest < Minitest::Test
         migrate AddIndex
       end
     end
+
+    assert_safe AddIndex
   end
 
   def test_add_index_extra_arguments
