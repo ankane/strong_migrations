@@ -120,6 +120,30 @@ class SafeByDefaultTest < Minitest::Test
     assert_equal 0, ActiveRecord::Schema.foreign_keys(:users).size
   end
 
+  def test_add_foreign_key_invalid
+    skip unless postgresql? && ActiveRecord::VERSION::STRING.to_f >= 7.1
+
+    user = User.create!(order_id: 1)
+
+    error = assert_raises(ActiveRecord::StatementInvalid) do
+      migrate AddForeignKey
+    end
+    assert_kind_of PG::ForeignKeyViolation, error.cause
+
+    user.update!(order_id: nil)
+
+    migrate AddForeignKey
+
+    # fail if trying to add the same foreign key in a future migration
+    assert_raises(ActiveRecord::StatementInvalid) do
+      migrate AddForeignKey
+    end
+
+    migrate AddForeignKey, direction: :down
+  ensure
+    User.delete_all
+  end
+
   def test_add_check_constraint
     skip unless postgresql?
 

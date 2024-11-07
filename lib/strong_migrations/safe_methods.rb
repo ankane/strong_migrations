@@ -47,7 +47,9 @@ module StrongMigrations
     def safe_add_foreign_key(from_table, to_table, *args, **options)
       @migration.reversible do |dir|
         dir.up do
-          @migration.add_foreign_key(from_table, to_table, *args, **options.merge(validate: false))
+          if ar_version < 7.1 || !@migration.connection.foreign_key_exists?(from_table, to_table, **options.merge(validate: false))
+            @migration.add_foreign_key(from_table, to_table, *args, **options.merge(validate: false))
+          end
           disable_transaction
           @migration.validate_foreign_key(from_table, to_table, **options.slice(:column, :name))
         end
