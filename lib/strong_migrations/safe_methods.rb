@@ -75,7 +75,7 @@ module StrongMigrations
       end
     end
 
-    def safe_change_column_null(add_args, validate_args, change_args, remove_args, default)
+    def safe_change_column_null(add_args, validate_args, change_args, remove_args, default, constraints)
       @migration.reversible do |dir|
         dir.up do
           unless default.nil?
@@ -86,7 +86,10 @@ module StrongMigrations
           validate_options = validate_args.extract_options!
           remove_options = remove_args.extract_options!
 
-          @migration.add_check_constraint(*add_args, **add_options)
+          # only skip invalid constraints
+          unless constraints.any? { |c| c["name"] == validate_options[:name] && !c["validated"] }
+            @migration.add_check_constraint(*add_args, **add_options)
+          end
           disable_transaction
 
           @migration.connection.begin_db_transaction

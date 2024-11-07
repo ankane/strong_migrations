@@ -175,6 +175,23 @@ class SafeByDefaultTest < Minitest::Test
     User.delete_all
   end
 
+  def test_change_column_null_invalid
+    skip unless postgresql?
+
+    user = User.create!
+
+    error = assert_raises(ActiveRecord::StatementInvalid) do
+      migrate ChangeColumnNull
+    end
+    assert_kind_of PG::CheckViolation, error.cause
+
+    user.update!(name: "Test")
+
+    assert_safe ChangeColumnNull
+  ensure
+    User.delete_all
+  end
+
   def with_lock_timeout(lock_timeout)
     StrongMigrations.lock_timeout = lock_timeout
     yield
