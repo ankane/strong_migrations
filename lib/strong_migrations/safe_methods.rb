@@ -85,6 +85,7 @@ module StrongMigrations
 
           @migration.add_check_constraint(*add_args, **add_options)
           disable_transaction
+
           @migration.connection.begin_db_transaction
           @migration.validate_check_constraint(*validate_args, **validate_options)
           @migration.change_column_null(*change_args)
