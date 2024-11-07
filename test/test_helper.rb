@@ -197,7 +197,7 @@ class Minitest::Test
       end
     else
       begin
-        connection.execute("LOCK TABLE users WRITE")
+        connection.execute("LOCK TABLE #{connection.quote_table_name(table)} WRITE")
         yield
       ensure
         connection.execute("UNLOCK TABLES")
