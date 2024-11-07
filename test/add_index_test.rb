@@ -91,4 +91,22 @@ class AddIndexTest < Minitest::Test
       end
     end
   end
+
+  def test_lock_timeout
+    skip unless postgresql?
+
+    with_locked_table("users") do
+      with_lock_timeout(0.1) do
+        assert_raises(ActiveRecord::LockWaitTimeout) do
+          migrate AddIndexConcurrently
+        end
+      end
+    end
+
+    assert_raises(ActiveRecord::StatementInvalid) do
+      migrate AddIndexConcurrently
+    end
+
+    migrate AddIndexConcurrently, direction: :down
+  end
 end

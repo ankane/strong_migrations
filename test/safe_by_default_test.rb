@@ -221,12 +221,4 @@ class SafeByDefaultTest < Minitest::Test
   ensure
     User.delete_all
   end
-
-  def with_lock_timeout(lock_timeout)
-    StrongMigrations.lock_timeout = lock_timeout
-    yield
-  ensure
-    StrongMigrations.lock_timeout = nil
-    ActiveRecord::Base.connection.execute("RESET lock_timeout")
-  end
 end

@@ -186,6 +186,14 @@ class Minitest::Test
     end
   end
 
+  def with_lock_timeout(lock_timeout)
+    StrongMigrations.lock_timeout = lock_timeout
+    yield
+  ensure
+    StrongMigrations.lock_timeout = nil
+    ActiveRecord::Base.connection.execute("RESET lock_timeout")
+  end
+
   def with_locked_table(table)
     pool = ActiveRecord::Base.connection_pool
     connection = pool.checkout
