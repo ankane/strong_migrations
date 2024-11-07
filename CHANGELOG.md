@@ -3,6 +3,7 @@
 - Added `skip_databases` option
 - Added warning for unsupported adapters
 - Improved output for `db:forward`, `db:rollback`, `db:migrate:up`, and `db:migrate:down`
+- Improved handling of invalid indexes with `add_index`, `safe_by_default`, and Active Record 7.1+
 
 ## 2.0.2 (2024-10-30)
 

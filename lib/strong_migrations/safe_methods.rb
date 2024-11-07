@@ -4,9 +4,16 @@ module StrongMigrations
       StrongMigrations.safe_by_default && [:add_index, :add_belongs_to, :add_reference, :remove_index, :add_foreign_key, :add_check_constraint, :change_column_null].include?(method)
     end
 
-    # TODO check if invalid index with expected name exists and remove if needed
     def safe_add_index(*args, **options)
       disable_transaction
+      if ActiveRecord::VERSION::STRING.to_f >= 7.1
+        table, columns = args
+        index_name = options.fetch(:name, @migration.connection.index_name(table, columns))
+        if @migration.connection.indexes(table).any? { |i| i.name == index_name && !i.valid }
+          # TODO pass index schema for extra safety?
+          safe_remove_index(table, name: index_name)
+        end
+      end
       @migration.add_index(*args, **options.merge(algorithm: :concurrently))
     end
 

@@ -13,6 +13,27 @@ class SafeByDefaultTest < Minitest::Test
     assert_safe AddIndex
   end
 
+  def test_add_index_invalid
+    skip unless postgresql? && ActiveRecord::VERSION::STRING.to_f >= 7.1
+
+    pool = ActiveRecord::Base.connection_pool
+    connection = pool.checkout
+
+    connection.transaction do
+      connection.execute("LOCK TABLE users IN ROW EXCLUSIVE MODE")
+
+      assert_raises(ActiveRecord::LockWaitTimeout) do
+        with_lock_timeout(0.1) do
+          migrate AddIndex
+        end
+      end
+    end
+
+    assert_safe AddIndex
+  ensure
+    pool.checkin(connection) if connection
+  end
+
   def test_add_index_extra_arguments
     assert_argument_error AddIndexExtraArguments
   end
@@ -129,5 +150,13 @@ class SafeByDefaultTest < Minitest::Test
     assert_match "default value not supported yet with safe_by_default", error.message
   ensure
     User.delete_all
+  end
+
+  def with_lock_timeout(lock_timeout)
+    StrongMigrations.lock_timeout = lock_timeout
+    yield
+  ensure
+    StrongMigrations.lock_timeout = nil
+    ActiveRecord::Base.connection.execute("RESET lock_timeout")
   end
 end
