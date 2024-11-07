@@ -185,6 +185,27 @@ class Minitest::Test
       yield
     end
   end
+
+  def with_locked_table(table)
+    pool = ActiveRecord::Base.connection_pool
+    connection = pool.checkout
+
+    if postgresql?
+      connection.transaction do
+        connection.execute("LOCK TABLE #{connection.quote_table_name(table)} IN ROW EXCLUSIVE MODE")
+        yield
+      end
+    else
+      begin
+        connection.execute("LOCK TABLE users WRITE")
+        yield
+      ensure
+        connection.execute("UNLOCK TABLES")
+      end
+    end
+  ensure
+    pool.checkin(connection) if connection
+  end
 end
 
 StrongMigrations.add_check do |method, args|

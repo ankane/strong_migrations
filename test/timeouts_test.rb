@@ -179,20 +179,9 @@ class TimeoutsTest < Minitest::Test
     $migrate_attempts = 0
     $transaction_attempts = 0
 
-    connection = ActiveRecord::Base.connection_pool.checkout
     if lock
-      if postgresql?
-        connection.transaction do
-          connection.execute("LOCK TABLE users IN ACCESS EXCLUSIVE MODE")
-          yield
-        end
-      else
-        begin
-          connection.execute("LOCK TABLE users WRITE")
-          yield
-        ensure
-          connection.execute("UNLOCK TABLES")
-        end
+      with_locked_table("users") do
+        yield
       end
     else
       yield
@@ -200,7 +189,6 @@ class TimeoutsTest < Minitest::Test
   ensure
     StrongMigrations.lock_timeout_retries = 0
     StrongMigrations.lock_timeout_retry_delay = 5
-    ActiveRecord::Base.connection_pool.checkin(connection) if connection
   end
 
   def assert_retries(migration, retries: 1, **options)

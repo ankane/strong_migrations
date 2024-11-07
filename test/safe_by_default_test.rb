@@ -17,8 +17,10 @@ class SafeByDefaultTest < Minitest::Test
     skip unless postgresql?
 
     with_locked_table("users") do
-      assert_raises(ActiveRecord::LockWaitTimeout) do
-        migrate AddIndex
+      with_lock_timeout(0.1) do
+        assert_raises(ActiveRecord::LockWaitTimeout) do
+          migrate AddIndex
+        end
       end
     end
 
@@ -147,21 +149,6 @@ class SafeByDefaultTest < Minitest::Test
     assert_match "default value not supported yet with safe_by_default", error.message
   ensure
     User.delete_all
-  end
-
-  def with_locked_table(table)
-    pool = ActiveRecord::Base.connection_pool
-    connection = pool.checkout
-
-    connection.transaction do
-      connection.execute("LOCK TABLE #{connection.quote_table_name(table)} IN ROW EXCLUSIVE MODE")
-
-      with_lock_timeout(0.1) do
-        yield
-      end
-    end
-  ensure
-    pool.checkin(connection) if connection
   end
 
   def with_lock_timeout(lock_timeout)
