@@ -81,13 +81,17 @@ module StrongMigrations
 
           @migration.safety_assured do
             @migration.execute(add_code)
-            disable_transaction
+          end
+          disable_transaction
+          @migration.connection.begin_db_transaction
+          @migration.safety_assured do
             @migration.execute(validate_code)
           end
           @migration.change_column_null(*change_args)
           @migration.safety_assured do
             @migration.execute(remove_code)
           end
+          @migration.connection.commit_db_transaction
         end
         dir.down do
           down_args = change_args.dup
