@@ -49,8 +49,7 @@ module StrongMigrations
         dir.up do
           @migration.add_foreign_key(from_table, to_table, *args, **options.merge(validate: false))
           disable_transaction
-          validate_options = options.slice(:column, :name)
-          @migration.validate_foreign_key(from_table, to_table, **validate_options)
+          @migration.validate_foreign_key(from_table, to_table, **options.slice(:column, :name))
         end
         dir.down do
           remove_options = options.slice(:column, :name)
