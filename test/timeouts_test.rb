@@ -157,6 +157,19 @@ class TimeoutsTest < Minitest::Test
     assert_equal 1, $migrate_attempts
   end
 
+  def test_lock_timeout_retries_add_index
+    skip unless postgresql?
+
+    error = assert_raises(ActiveRecord::StatementInvalid) do
+      with_lock_timeout_retries do
+        migrate AddIndexConcurrently
+      end
+    end
+    assert_kind_of PG::DuplicateTable, error.cause
+
+    migrate AddIndexConcurrently, direction: :down
+  end
+
   def reset_timeouts
     StrongMigrations.lock_timeout = nil
     StrongMigrations.statement_timeout = nil
