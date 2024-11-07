@@ -228,7 +228,7 @@ module StrongMigrations
       table, column, null, default = args
       if !null
         if postgresql?
-          safe = adapter.constraints(table).any? { |c| c["def"] == "CHECK ((#{column} IS NOT NULL))" || c["def"] == "CHECK ((#{connection.quote_column_name(column)} IS NOT NULL))" }
+          safe = adapter.constraints(table).any? { |c| c["validated"] && (c["def"] == "CHECK ((#{column} IS NOT NULL))" || c["def"] == "CHECK ((#{connection.quote_column_name(column)} IS NOT NULL))") }
 
           unless safe
             # match https://github.com/nullobject/rein

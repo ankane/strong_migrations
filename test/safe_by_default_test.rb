@@ -132,6 +132,30 @@ class SafeByDefaultTest < Minitest::Test
     assert_argument_error AddCheckConstraintExtraArguments
   end
 
+  def test_add_check_constraint_invalid
+    skip unless postgresql?
+
+    user = User.create!(credit_score: -1)
+
+    error = assert_raises(ActiveRecord::StatementInvalid) do
+      migrate AddCheckConstraint
+    end
+    assert_kind_of PG::CheckViolation, error.cause
+
+    user.update!(credit_score: 1)
+
+    migrate AddCheckConstraint
+
+    # fail if trying to add the same constraint in a future migration
+    assert_raises(ActiveRecord::StatementInvalid) do
+      migrate AddCheckConstraint
+    end
+
+    migrate AddCheckConstraint, direction: :down
+  ensure
+    User.delete_all
+  end
+
   def test_change_column_null
     skip unless postgresql?
 

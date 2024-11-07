@@ -62,7 +62,10 @@ module StrongMigrations
     def safe_add_check_constraint(table, expression, *args, add_options, validate_options)
       @migration.reversible do |dir|
         dir.up do
-          @migration.add_check_constraint(table, expression, *args, **add_options)
+          # only skip invalid constraints
+          unless adapter.constraints(table).any? { |c| c["name"] == validate_options[:name] && !c["validated"] }
+            @migration.add_check_constraint(table, expression, *args, **add_options)
+          end
           disable_transaction
           @migration.validate_check_constraint(table, **validate_options)
         end
