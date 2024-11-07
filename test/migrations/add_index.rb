@@ -53,7 +53,7 @@ end
 
 class AddIndexColumns < TestMigration
   def change
-    add_index :users, [:name, :city, :state, :zip_code]
+    add_index :users, [:name, :city, :country, :deleted_at]
   end
 end
 
@@ -61,7 +61,7 @@ class AddIndexColumnsUnique < TestMigration
   disable_ddl_transaction!
 
   def change
-    add_index :users, :name, unique: true, algorithm: :concurrently
+    add_index :users, [:name, :city, :country, :deleted_at], unique: true, algorithm: :concurrently
   end
 end
 
