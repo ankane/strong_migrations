@@ -24,6 +24,11 @@ class SafeByDefaultTest < Minitest::Test
       end
     end
 
+    # fail if same name but different options
+    assert_raises(ActiveRecord::StatementInvalid) do
+      migrate AddIndexUnique
+    end
+
     migrate AddIndex
 
     # fail if trying to add the same index in a future migration

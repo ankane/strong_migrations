@@ -5,6 +5,12 @@ class AddIndex < TestMigration
   end
 end
 
+class AddIndexUnique < TestMigration
+  def change
+    add_index :users, :name, unique: true
+  end
+end
+
 class AddIndexUp < TestMigration
   def self.up
     add_index :users, :name
