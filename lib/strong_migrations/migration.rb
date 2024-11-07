@@ -18,7 +18,8 @@ module StrongMigrations
         end
       end
     end
-    ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
+    # same as ActiveRecord::Migration
+    ruby2_keywords(:method_missing)
 
     def revert(*)
       if strong_migrations_checker.version_safe?
