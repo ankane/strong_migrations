@@ -56,8 +56,7 @@ module StrongMigrations
           @migration.validate_foreign_key(from_table, to_table, **options.slice(:column, :name))
         end
         dir.down do
-          remove_options = options.slice(:column, :name)
-          @migration.remove_foreign_key(from_table, to_table, **remove_options)
+          @migration.remove_foreign_key(from_table, to_table, **options.slice(:column, :name))
         end
       end
     end
