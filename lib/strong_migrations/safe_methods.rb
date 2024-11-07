@@ -6,8 +6,14 @@ module StrongMigrations
 
     def safe_add_index(*args, **options)
       disable_transaction
-      remove_invalid_index_if_needed(*args, **options.merge(algorithm: :concurrently))
-      @migration.add_index(*args, **options.merge(algorithm: :concurrently))
+      if direction == :up && (index_name = invalid_index_name(*args, **options))
+        @migration.safety_assured do
+          # TODO pass index schema for extra safety?
+          @migration.execute("REINDEX INDEX CONCURRENTLY #{connection.quote_table_name(index_name)}")
+        end
+      else
+        @migration.add_index(*args, **options.merge(algorithm: :concurrently))
+      end
     end
 
     def safe_remove_index(*args, **options)
@@ -118,6 +124,18 @@ module StrongMigrations
 
     def in_transaction?
       connection.open_transactions > 0
+    end
+
+    def invalid_index_name(*args, **options)
+      return nil unless connection.index_exists?(*args, **options.merge(valid: false))
+
+      table, columns = args
+      index_name = options.fetch(:name, connection.index_name(table, columns))
+
+      # valid option is ignored for Active Record < 7.1, so need to check name as well
+      return nil unless ar_version >= 7.1 || adapter.index_invalid?(table, index_name)
+
+      index_name
     end
   end
 end

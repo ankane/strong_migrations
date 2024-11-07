@@ -24,13 +24,14 @@ class SafeByDefaultTest < Minitest::Test
       end
     end
 
+    migrate AddIndex
+
+    # fail if trying to add the same index in a future migration
     assert_raises(ActiveRecord::StatementInvalid) do
       migrate AddIndex
     end
 
-    StrongMigrations.stub(:remove_invalid_indexes, true) do
-      assert_safe AddIndex
-    end
+    migrate AddIndex, direction: :down
   end
 
   def test_add_index_extra_arguments

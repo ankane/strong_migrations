@@ -127,7 +127,7 @@ module StrongMigrations
         safe
       end
 
-      # TODO use indexes method when Active Record < 7.1 is no longer supported
+      # TODO remove when Active Record < 7.1 is no longer supported
       def index_invalid?(table_name, index_name)
         query = <<~SQL
           SELECT
