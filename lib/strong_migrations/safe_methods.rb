@@ -6,7 +6,7 @@ module StrongMigrations
 
     def safe_add_index(*args, **options)
       disable_transaction
-      remove_index_if_needed(*args, **options.merge(algorithm: :concurrently))
+      remove_invalid_index_if_needed(*args, **options.merge(algorithm: :concurrently))
       @migration.add_index(*args, **options.merge(algorithm: :concurrently))
     end
 
@@ -121,7 +121,7 @@ module StrongMigrations
     end
 
     # REINDEX INDEX CONCURRENTLY leaves a new invalid index if it fails, so use remove_index instead
-    def remove_index_if_needed(*args, **options)
+    def remove_invalid_index_if_needed(*args, **options)
       if direction == :up && (index_name = invalid_index_name(*args, **options))
         @migration.say("Attempting to remove invalid index")
         # TODO pass index schema for extra safety?
