@@ -14,7 +14,7 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_index_invalid
-    skip unless postgresql? && ActiveRecord::VERSION::STRING.to_f >= 7.1
+    skip unless postgresql?
 
     with_locked_table("users") do
       assert_raises(ActiveRecord::LockWaitTimeout) do
