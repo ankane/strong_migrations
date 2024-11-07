@@ -6,20 +6,8 @@ module StrongMigrations
 
     def safe_add_index(*args, **options)
       disable_transaction
-      remove_invalid_index(*args, **options)
+      remove_invalid_index(*args, **options.merge(algorithm: :concurrently))
       @migration.add_index(*args, **options.merge(algorithm: :concurrently))
-    end
-
-    def remove_invalid_index(*args, **options)
-      return if direction != :up
-
-      table, columns = args
-      index_name = options.fetch(:name, @migration.connection.index_name(table, columns))
-      if adapter.index_invalid?(table, index_name)
-        @migration.say("Removing invalid index")
-        # TODO pass index schema for extra safety?
-        safe_remove_index(table, name: index_name)
-      end
     end
 
     def safe_remove_index(*args, **options)

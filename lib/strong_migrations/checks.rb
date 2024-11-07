@@ -460,5 +460,17 @@ module StrongMigrations
     def model_name(table)
       table.to_s.classify
     end
+
+    def remove_invalid_index(*args, **options)
+      return unless StrongMigrations.remove_invalid_indexes && postgresql? && direction == :up
+
+      table, columns = args
+      index_name = options.fetch(:name, connection.index_name(table, columns))
+      if adapter.index_invalid?(table, index_name)
+        @migration.say("Removing invalid index")
+        # TODO pass index schema for extra safety?
+        @migration.remove_index(table, **{name: index_name}.merge(options.slice(:algorithm)))
+      end
+    end
   end
 end

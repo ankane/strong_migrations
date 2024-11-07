@@ -1,9 +1,9 @@
 ## 2.1.0 (unreleased)
 
 - Added `skip_databases` option
+- Added experimental `remove_invalid_indexes` option
 - Added warning for unsupported adapters
 - Improved output for `db:forward`, `db:rollback`, `db:migrate:up`, and `db:migrate:down`
-- Improved handling of invalid indexes with `add_index` and `safe_by_default`
 
 ## 2.0.2 (2024-10-30)
 
