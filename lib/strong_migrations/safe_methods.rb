@@ -47,7 +47,7 @@ module StrongMigrations
     def safe_add_foreign_key(from_table, to_table, *args, **options)
       @migration.reversible do |dir|
         dir.up do
-          if ar_version < 7.1 || !@migration.connection.foreign_key_exists?(from_table, to_table, **options.merge(validate: false))
+          if ar_version < 7.1 || !connection.foreign_key_exists?(from_table, to_table, **options.merge(validate: false))
             @migration.add_foreign_key(from_table, to_table, *args, **options.merge(validate: false))
           end
           disable_transaction
@@ -93,11 +93,11 @@ module StrongMigrations
           end
           disable_transaction
 
-          @migration.connection.begin_db_transaction
+          connection.begin_db_transaction
           @migration.validate_check_constraint(*validate_args, **validate_options)
           @migration.change_column_null(*change_args)
           @migration.remove_check_constraint(*remove_args, **remove_options)
-          @migration.connection.commit_db_transaction
+          connection.commit_db_transaction
         end
         dir.down do
           down_args = change_args.dup
@@ -111,13 +111,13 @@ module StrongMigrations
     # so just commit at start
     def disable_transaction
       if in_transaction? && !transaction_disabled
-        @migration.connection.commit_db_transaction
+        connection.commit_db_transaction
         self.transaction_disabled = true
       end
     end
 
     def in_transaction?
-      @migration.connection.open_transactions > 0
+      connection.open_transactions > 0
     end
   end
 end
