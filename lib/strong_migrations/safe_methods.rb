@@ -47,9 +47,9 @@ module StrongMigrations
     def safe_add_foreign_key(from_table, to_table, *args, **options)
       @migration.reversible do |dir|
         dir.up do
-          # validate option is ignored for Active Record < 7.1
+          # validate option is unintentionally ignored for Active Record < 7.1
           # https://github.com/rails/rails/pull/45896
-          if ar_version < 7.1 || !connection.foreign_key_exists?(from_table, to_table, **options.merge(validate: false))
+          if !connection.foreign_key_exists?(from_table, to_table, **options.merge(validate: false))
             @migration.add_foreign_key(from_table, to_table, *args, **options.merge(validate: false))
           end
           disable_transaction

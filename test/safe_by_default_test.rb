@@ -146,16 +146,14 @@ class SafeByDefaultTest < Minitest::Test
 
     user.update!(order_id: nil)
 
+    migrate AddForeignKey
+
     if ActiveRecord::VERSION::STRING.to_f >= 7.1
-      migrate AddForeignKey
-    else
+      # fail if trying to add the same foreign key in a future migration
       assert_raises(ActiveRecord::StatementInvalid) do
         migrate AddForeignKey
       end
-    end
-
-    # fail if trying to add the same foreign key in a future migration
-    assert_raises(ActiveRecord::StatementInvalid) do
+    else
       migrate AddForeignKey
     end
 
