@@ -135,7 +135,7 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_foreign_key_invalid
-    skip unless postgresql? && ActiveRecord::VERSION::STRING.to_f >= 7.1
+    skip unless postgresql?
 
     user = User.create!(order_id: 1)
 
@@ -146,7 +146,13 @@ class SafeByDefaultTest < Minitest::Test
 
     user.update!(order_id: nil)
 
-    migrate AddForeignKey
+    if ActiveRecord::VERSION::STRING.to_f >= 7.1
+      migrate AddForeignKey
+    else
+      assert_raises(ActiveRecord::StatementInvalid) do
+        migrate AddForeignKey
+      end
+    end
 
     # fail if trying to add the same foreign key in a future migration
     assert_raises(ActiveRecord::StatementInvalid) do
