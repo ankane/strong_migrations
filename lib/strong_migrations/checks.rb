@@ -234,21 +234,21 @@ module StrongMigrations
             # match https://github.com/nullobject/rein
             constraint_name = "#{table}_#{column}_null"
 
-            add_code = constraint_str("ALTER TABLE %s ADD CONSTRAINT %s CHECK (%s IS NOT NULL) NOT VALID", [table, constraint_name, column])
-            validate_code = constraint_str("ALTER TABLE %s VALIDATE CONSTRAINT %s", [table, constraint_name])
+            add_args = [table, "#{quote_column_if_needed(column)} IS NOT NULL", {name: constraint_name, validate: false}]
+            validate_args = [table, {name: constraint_name}]
             change_args = [table, column, null]
-            remove_code = constraint_str("ALTER TABLE %s DROP CONSTRAINT %s", [table, constraint_name])
+            remove_args = [table, {name: constraint_name}]
 
             if StrongMigrations.safe_by_default
-              safe_change_column_null(add_code, validate_code, change_args, remove_code, default)
+              safe_change_column_null(add_args, validate_args, change_args, remove_args, default)
               throw :safe
             end
 
-            add_constraint_code = command_str(:add_check_constraint, [table, "#{quote_column_if_needed(column)} IS NOT NULL", {name: constraint_name, validate: false}])
+            add_constraint_code = command_str(:add_check_constraint, add_args)
 
-            up_code = String.new(command_str(:validate_check_constraint, [table, {name: constraint_name}]))
+            up_code = String.new(command_str(:validate_check_constraint, validate_args))
             up_code << "\n    #{command_str(:change_column_null, change_args)}"
-            up_code << "\n    #{command_str(:remove_check_constraint, [table, {name: constraint_name}])}"
+            up_code << "\n    #{command_str(:remove_check_constraint, remove_args)}"
             down_code = "#{add_constraint_code}\n    #{command_str(:change_column_null, [table, column, true])}"
             validate_constraint_code = "def up\n    #{up_code}\n  end\n\n  def down\n    #{down_code}\n  end"
 

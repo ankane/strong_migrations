@@ -72,25 +72,23 @@ module StrongMigrations
       end
     end
 
-    def safe_change_column_null(add_code, validate_code, change_args, remove_code, default)
+    def safe_change_column_null(add_args, validate_args, change_args, remove_args, default)
       @migration.reversible do |dir|
         dir.up do
           unless default.nil?
             raise Error, "default value not supported yet with safe_by_default"
           end
 
-          @migration.safety_assured do
-            @migration.execute(add_code)
-          end
+          add_options = add_args.extract_options!
+          validate_options = validate_args.extract_options!
+          remove_options = remove_args.extract_options!
+
+          @migration.add_check_constraint(*add_args, **add_options)
           disable_transaction
           @migration.connection.begin_db_transaction
-          @migration.safety_assured do
-            @migration.execute(validate_code)
-          end
+          @migration.validate_check_constraint(*validate_args, **validate_options)
           @migration.change_column_null(*change_args)
-          @migration.safety_assured do
-            @migration.execute(remove_code)
-          end
+          @migration.remove_check_constraint(*remove_args, **remove_options)
           @migration.connection.commit_db_transaction
         end
         dir.down do
