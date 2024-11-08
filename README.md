@@ -385,6 +385,8 @@ class BackfillSomeColumn < ActiveRecord::Migration[7.2]
 end
 ```
 
+Note: If backfilling with a method other than `update_all`, use `User.reset_column_information` to ensure the model has up-to-date column information.
+
 ### Adding an index non-concurrently
 
 :turtle: Safe by default available
