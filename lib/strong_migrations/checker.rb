@@ -244,5 +244,30 @@ module StrongMigrations
         !defined?(@skip_retries)
       )
     end
+
+    # REINDEX INDEX CONCURRENTLY leaves a new invalid index if it fails, so use remove_index instead
+    def remove_invalid_index_if_needed(*args, **options)
+      if direction == :up && (index_name = invalid_index_name(*args, **options))
+        @migration.say("Attempting to remove invalid index")
+        # TODO pass index schema for extra safety?
+        @migration.remove_index(args[0], **{name: index_name}.merge(options.slice(:algorithm)))
+      end
+    end
+
+    def invalid_index_name(*args, **options)
+      # avoid errors with index_exists?
+      return nil if args.size != 2
+
+      # ensures has same options as existing index
+      return nil unless connection.index_exists?(*args, **options.merge(valid: false))
+
+      table, columns = args
+      index_name = options.fetch(:name, connection.index_name(table, columns))
+
+      # valid option is ignored for Active Record < 7.1, so check name as well
+      return nil unless ar_version >= 7.1 || adapter.index_invalid?(table, index_name)
+
+      index_name
+    end
   end
 end
