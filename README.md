@@ -795,7 +795,7 @@ Skip checks and other functionality for specific databases with: [unreleased]
 StrongMigrations.skip_databases += [:catalog]
 ```
 
-Note: This does not affect `alphabetize_schema`
+Note: This does not affect `alphabetize_schema`.
 
 ## Custom Messages
 
