@@ -92,7 +92,7 @@ class AddIndexTest < Minitest::Test
     end
   end
 
-  def test_lock_timeout
+  def test_remove_invalid_indexes
     skip unless postgresql?
 
     with_locked_table("users") do
@@ -109,6 +109,12 @@ class AddIndexTest < Minitest::Test
 
     StrongMigrations.stub(:remove_invalid_indexes, true) do
       migrate AddIndexConcurrently
+
+      # fail if trying to add the same index in a future migration
+      error = assert_raises(ActiveRecord::StatementInvalid) do
+        migrate AddIndexConcurrently
+      end
+      assert_kind_of PG::DuplicateTable, error.cause
     end
 
     migrate AddIndexConcurrently, direction: :down
