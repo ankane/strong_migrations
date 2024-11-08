@@ -192,6 +192,8 @@ class TimeoutsTest < Minitest::Test
     StrongMigrations.stub(:remove_invalid_indexes, true) do
       assert_retries AddIndexConcurrently
     end
+
+    migrate AddIndexConcurrently, direction: :down
   end
 
   def reset_timeouts
