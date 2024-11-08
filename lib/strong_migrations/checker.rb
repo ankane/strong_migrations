@@ -118,7 +118,7 @@ module StrongMigrations
     end
 
     def perform_method(method, *args)
-      if StrongMigrations.remove_invalid_indexes && direction == :up && method == :add_index
+      if StrongMigrations.remove_invalid_indexes && direction == :up && method == :add_index && postgresql?
         @skip_retries = true
         options = args.extract_options!
         remove_invalid_index_if_needed(*args, **options)
