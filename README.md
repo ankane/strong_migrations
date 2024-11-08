@@ -872,6 +872,18 @@ production:
 
 For HTTP connections, Redis, and other services, check out [this guide](https://github.com/ankane/the-ultimate-guide-to-ruby-timeouts).
 
+## Invalid Indexes
+
+In Postgres, adding an index non-concurrently can leave behind an invalid index if the lock timeout is reached. Running the migration again can result in an error.
+
+To automatically remove the invalid index when the migration runs again, use:
+
+```ruby
+StrongMigrations.remove_invalid_indexes = true
+```
+
+Note: This feature is experimental.
+
 ## Lock Timeout Retries
 
 Note: This feature is experimental.
