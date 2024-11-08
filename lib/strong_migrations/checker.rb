@@ -32,7 +32,7 @@ module StrongMigrations
       end
     end
 
-    def perform(method, *args)
+    def perform(method, *args, &block)
       return yield if skip?
 
       check_adapter
@@ -104,9 +104,9 @@ module StrongMigrations
           # TODO figure out how to handle methods that generate multiple statements
           # like add_reference(table, ref, index: {algorithm: :concurrently})
           # lock timeout after first statement will cause retry to fail
-          retry_lock_timeouts { yield }
+          retry_lock_timeouts { perform_method(method, *args, &block) }
         else
-          yield
+          perform_method(method, *args, &block)
         end
 
       # outdated statistics + a new index can hurt performance of existing queries
@@ -115,6 +115,16 @@ module StrongMigrations
       end
 
       result
+    end
+
+    def perform_method(method, *args)
+      if StrongMigrations.remove_invalid_indexes && direction == :up && method == :add_index
+        @skip_retries = true
+        options = args.extract_options!
+        remove_invalid_index_if_needed(*args, **options)
+        remove_instance_variable(:@skip_retries)
+      end
+      yield
     end
 
     def retry_lock_timeouts(check_committed: false)
@@ -230,7 +240,8 @@ module StrongMigrations
       (
         StrongMigrations.lock_timeout_retries > 0 &&
         !in_transaction? &&
-        method != :transaction
+        method != :transaction &&
+        !defined?(@skip_retries)
       )
     end
   end

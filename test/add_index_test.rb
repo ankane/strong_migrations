@@ -107,6 +107,10 @@ class AddIndexTest < Minitest::Test
       migrate AddIndexConcurrently
     end
 
+    StrongMigrations.stub(:remove_invalid_indexes, true) do
+      migrate AddIndexConcurrently
+    end
+
     migrate AddIndexConcurrently, direction: :down
   end
 end

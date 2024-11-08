@@ -186,6 +186,12 @@ class TimeoutsTest < Minitest::Test
     StrongMigrations.safe_by_default = false
   end
 
+  def test_lock_timeout_retries_add_index_remove_invalid_indexes
+    StrongMigrations.stub(:remove_invalid_indexes, true) do
+      assert_retries AddIndexConcurrently
+    end
+  end
+
   def reset_timeouts
     StrongMigrations.lock_timeout = nil
     StrongMigrations.statement_timeout = nil
