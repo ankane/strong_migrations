@@ -247,11 +247,12 @@ module StrongMigrations
 
     # REINDEX INDEX CONCURRENTLY leaves a new invalid index if it fails, so use remove_index instead
     def remove_invalid_index_if_needed(*args, **options)
-      if direction == :up && (index_name = invalid_index_name(*args, **options))
-        @migration.say("Attempting to remove invalid index")
-        # TODO pass index schema for extra safety?
-        @migration.remove_index(args[0], **{name: index_name}.merge(options.slice(:algorithm)))
-      end
+      index_name = invalid_index_name(*args, **options)
+      return if index_name.nil?
+
+      @migration.say("Attempting to remove invalid index")
+      # TODO pass index schema for extra safety?
+      @migration.remove_index(args[0], **{name: index_name}.merge(options.slice(:algorithm)))
     end
 
     def invalid_index_name(*args, **options)
