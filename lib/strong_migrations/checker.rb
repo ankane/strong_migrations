@@ -259,7 +259,7 @@ module StrongMigrations
 
       @migration.say("Attempting to remove invalid index")
       # TODO pass index schema for extra safety?
-      @migration.remove_index(args[0], **{name: index_name}.merge(options.slice(:algorithm)))
+      @migration.remove_index(table, **{name: index_name}.merge(options.slice(:algorithm)))
     end
   end
 end
