@@ -41,7 +41,7 @@ module StrongMigrations
   self.check_down = false
   self.alphabetize_schema = false
   self.skip_databases = []
-  self.remove_invalid_indexes = false # does not affect safe_by_default
+  self.remove_invalid_indexes = false
 
   # private
   def self.developer_env?

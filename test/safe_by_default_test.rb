@@ -25,25 +25,21 @@ class SafeByDefaultTest < Minitest::Test
       end
     end
 
-    # fail if same name but different options
-    error = assert_raises(ActiveRecord::StatementInvalid) do
-      migrate AddIndexUnique
-    end
-    assert_kind_of PG::DuplicateTable, error.cause
+    StrongMigrations.stub(:remove_invalid_indexes, true) do
+      # fail if same name but different options
+      error = assert_raises(ActiveRecord::StatementInvalid) do
+        migrate AddIndexUnique
+      end
+      assert_kind_of PG::DuplicateTable, error.cause
 
-    # TODO do not fail if already safe
-    error = assert_raises(ActiveRecord::StatementInvalid) do
-      migrate AddIndexConcurrently
-    end
-    assert_kind_of PG::DuplicateTable, error.cause
-
-    migrate AddIndexes
-
-    # fail if trying to add the same index in a future migration
-    error = assert_raises(ActiveRecord::StatementInvalid) do
       migrate AddIndexes
+
+      # fail if trying to add the same index in a future migration
+      error = assert_raises(ActiveRecord::StatementInvalid) do
+        migrate AddIndexes
+      end
+      assert_kind_of PG::DuplicateTable, error.cause
     end
-    assert_kind_of PG::DuplicateTable, error.cause
 
     migrate AddIndexes, direction: :down
   end

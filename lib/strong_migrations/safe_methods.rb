@@ -6,7 +6,6 @@ module StrongMigrations
 
     def safe_add_index(*args, **options)
       disable_transaction
-      remove_invalid_index_if_needed(*args, **options.merge(algorithm: :concurrently))
       @migration.add_index(*args, **options.merge(algorithm: :concurrently))
     end
 
