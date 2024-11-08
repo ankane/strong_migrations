@@ -732,7 +732,7 @@ Certain methods like `execute` and `change_table` cannot be inspected and are pr
 
 ## Safe by Default
 
-Make operations safe by default. For these select migrations, this allows you to write the code under the "Bad" section, but the migration will be performed as if you had written the "Good" version.
+Make certain operations safe by default. This allows you to write the code under the "Bad" section, but the migration will be performed as if you had written the "Good" version.
 
 - adding and removing an index
 - adding a foreign key
