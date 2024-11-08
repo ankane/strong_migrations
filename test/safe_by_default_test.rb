@@ -3,6 +3,7 @@ require_relative "test_helper"
 class SafeByDefaultTest < Minitest::Test
   def setup
     StrongMigrations.safe_by_default = true
+    super
   end
 
   def teardown
