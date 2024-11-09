@@ -41,13 +41,6 @@ class CheckDownTest < Minitest::Test
     end
   end
 
-  def with_check_down
-    StrongMigrations.check_down = true
-    yield
-  ensure
-    StrongMigrations.check_down = false
-  end
-
   def test_add_column
     migrate AddColumnDefault
     with_check_down do
@@ -63,5 +56,12 @@ class CheckDownTest < Minitest::Test
     with_check_down do
       assert_safe AddIndexConcurrently, direction: :down
     end
+  end
+
+  def with_check_down
+    StrongMigrations.check_down = true
+    yield
+  ensure
+    StrongMigrations.check_down = false
   end
 end
