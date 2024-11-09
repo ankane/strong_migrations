@@ -786,7 +786,7 @@ Check the [source code](https://github.com/ankane/strong_migrations/blob/master/
 Skip checks and other functionality for specific databases with: [unreleased]
 
 ```ruby
-StrongMigrations.skip_databases += [:catalog]
+StrongMigrations.skip_database(:catalog)
 ```
 
 Note: This does not affect `alphabetize_schema`.

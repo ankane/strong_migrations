@@ -148,7 +148,7 @@ module StrongMigrations
     end
 
     def skip?
-      StrongMigrations.skip_databases.map(&:to_s).include?(db_config_name)
+      StrongMigrations.skipped_databases.map(&:to_s).include?(db_config_name)
     end
 
     private
@@ -157,7 +157,7 @@ module StrongMigrations
       return if defined?(@adapter_checked)
 
       if adapter.instance_of?(Adapters::AbstractAdapter)
-        warn "[strong_migrations] Unsupported adapter: #{connection.adapter_name}. Use StrongMigrations.skip_databases += #{[db_config_name.to_sym].inspect} to silence this warning."
+        warn "[strong_migrations] Unsupported adapter: #{connection.adapter_name}. Use StrongMigrations.skip_database(#{db_config_name.to_sym.inspect}) to silence this warning."
       end
 
       @adapter_checked = true
