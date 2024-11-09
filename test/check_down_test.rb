@@ -47,4 +47,21 @@ class CheckDownTest < Minitest::Test
   ensure
     StrongMigrations.check_down = false
   end
+
+  def test_add_column
+    migrate AddColumnDefault
+    with_check_down do
+      assert_unsafe AddColumnDefault, direction: :down
+    end
+    assert_safe AddColumnDefault, direction: :down
+  end
+
+  def test_add_index
+    skip unless postgresql?
+
+    migrate AddIndexConcurrently
+    with_check_down do
+      assert_safe AddIndexConcurrently, direction: :down
+    end
+  end
 end
