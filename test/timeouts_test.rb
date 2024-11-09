@@ -216,13 +216,16 @@ class TimeoutsTest < Minitest::Test
 
   def assert_retries(migration, retries: 2, **options)
     retry_count = 0
-    count = proc do |message, *|
+    original_say = nil
+    count = proc do |message, *args, **options|
+      original_say.call(message, *args, **options)
       retry_count += 1 if message.include?("Lock timeout")
     end
 
     assert_raises(ActiveRecord::LockWaitTimeout) do
       with_lock_timeout_retries(**options) do
         migration = migration.new
+        original_say = migration.method(:say)
         migration.stub(:say, count) do
           migrate migration
         end
