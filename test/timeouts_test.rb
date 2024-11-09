@@ -112,7 +112,7 @@ class TimeoutsTest < Minitest::Test
     assert_retries CheckLockTimeoutRetries
 
     # MySQL and MariaDB do not support DDL transactions
-    assert_equal (postgresql? ? 2 : 1), $migrate_attempts
+    assert_equal (postgresql? ? 3 : 1), $migrate_attempts
   end
 
   def test_lock_timeout_retries_no_retries
@@ -137,8 +137,8 @@ class TimeoutsTest < Minitest::Test
     assert_retries CheckLockTimeoutRetriesTransactionDdlTransaction
 
     # retries entire migration, not transaction block alone
-    assert_equal 2, $migrate_attempts
-    assert_equal 2, $transaction_attempts
+    assert_equal 3, $migrate_attempts
+    assert_equal 3, $transaction_attempts
   end
 
   def test_lock_timeout_retries_no_ddl_transaction
@@ -197,7 +197,7 @@ class TimeoutsTest < Minitest::Test
 
   def with_lock_timeout_retries(lock: true)
     StrongMigrations.lock_timeout = postgresql? ? 0.1 : 1
-    StrongMigrations.lock_timeout_retries = 1
+    StrongMigrations.lock_timeout_retries = 2
     StrongMigrations.lock_timeout_retry_delay = 0
     $migrate_attempts = 0
     $transaction_attempts = 0
@@ -214,7 +214,7 @@ class TimeoutsTest < Minitest::Test
     StrongMigrations.lock_timeout_retry_delay = 5
   end
 
-  def assert_retries(migration, retries: 1, **options)
+  def assert_retries(migration, retries: 2, **options)
     retry_count = 0
     count = proc do |message, *|
       retry_count += 1 if message.include?("Lock timeout")
