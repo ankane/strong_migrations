@@ -1,15 +1,12 @@
 require_relative "test_helper"
 
 class CheckDownTest < Minitest::Test
-  def test_check_down
-    migrate CheckDown
-    assert_safe CheckDown, direction: :down
-
+  def test_basic
     migrate CheckDown
     with_check_down do
       assert_unsafe CheckDown, direction: :down
     end
-    migrate CheckDown, direction: :down
+    assert_safe CheckDown, direction: :down
   end
 
   def test_safe
