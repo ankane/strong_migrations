@@ -82,7 +82,7 @@ class MiscTest < Minitest::Test
     previous_db_config = ActiveRecord::Base.connection_db_config.configuration_hash
     ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
     schema_migration.create_table
-    assert_output nil, /Unsupported adapter/ do
+    assert_output nil, "[strong_migrations] Unsupported adapter: SQLite. Use StrongMigrations.skip_database(:primary) to silence this warning.\n" do
       assert_unsafe CreateTableForce
     end
   ensure
