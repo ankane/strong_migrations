@@ -120,12 +120,7 @@ module StrongMigrations
 
     def perform_method(method, *args)
       if StrongMigrations.remove_invalid_indexes && direction == :up && method == :add_index && postgresql?
-        @skip_retries = true
-        begin
-          remove_invalid_index_if_needed(*args)
-        ensure
-          @skip_retries = false
-        end
+        remove_invalid_index_if_needed(*args)
       end
       yield
     end
@@ -248,6 +243,16 @@ module StrongMigrations
       )
     end
 
+    def without_retries
+      previous_value = @skip_retries
+      begin
+        @skip_retries = true
+        yield
+      ensure
+        @skip_retries = previous_value
+      end
+    end
+
     # REINDEX INDEX CONCURRENTLY leaves a new invalid index if it fails, so use remove_index instead
     def remove_invalid_index_if_needed(*args)
       options = args.extract_options!
@@ -263,8 +268,10 @@ module StrongMigrations
       return if ar_version < 7.1 && !adapter.index_invalid?(table, index_name)
 
       @migration.say("Attempting to remove invalid index")
-      # TODO pass index schema for extra safety?
-      @migration.remove_index(table, **{name: index_name}.merge(options.slice(:algorithm)))
+      without_retries do
+        # TODO pass index schema for extra safety?
+        @migration.remove_index(table, **{name: index_name}.merge(options.slice(:algorithm)))
+      end
     end
   end
 end
