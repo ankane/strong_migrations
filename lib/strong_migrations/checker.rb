@@ -20,6 +20,7 @@ module StrongMigrations
       @timeouts_set = false
       @committed = false
       @transaction_disabled = false
+      @skip_retries = false
     end
 
     def self.safety_assured
@@ -123,7 +124,7 @@ module StrongMigrations
         begin
           remove_invalid_index_if_needed(*args)
         ensure
-          remove_instance_variable(:@skip_retries)
+          @skip_retries = false
         end
       end
       yield
@@ -243,7 +244,7 @@ module StrongMigrations
         StrongMigrations.lock_timeout_retries > 0 &&
         !in_transaction? &&
         method != :transaction &&
-        !defined?(@skip_retries)
+        !@skip_retries
       )
     end
 
