@@ -1,4 +1,4 @@
-## 2.1.0 (unreleased)
+## 2.1.0 (2024-11-08)
 
 - Added `skip_database` method
 - Added experimental `remove_invalid_indexes` option

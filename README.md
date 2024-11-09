@@ -783,7 +783,7 @@ Check the [source code](https://github.com/ankane/strong_migrations/blob/master/
 
 ## Skip Databases
 
-Skip checks and other functionality for specific databases with: [unreleased]
+Skip checks and other functionality for specific databases with:
 
 ```ruby
 StrongMigrations.skip_database(:catalog)
@@ -876,7 +876,7 @@ For HTTP connections, Redis, and other services, check out [this guide](https://
 
 In Postgres, adding an index non-concurrently can leave behind an invalid index if the lock timeout is reached. Running the migration again can result in an error.
 
-To automatically remove the invalid index when the migration runs again, use: [unreleased]
+To automatically remove the invalid index when the migration runs again, use:
 
 ```ruby
 StrongMigrations.remove_invalid_indexes = true
