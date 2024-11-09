@@ -120,9 +120,11 @@ module StrongMigrations
     def perform_method(method, *args)
       if StrongMigrations.remove_invalid_indexes && direction == :up && method == :add_index && postgresql?
         @skip_retries = true
-        options = args.extract_options!
-        remove_invalid_index_if_needed(*args, **options)
-        remove_instance_variable(:@skip_retries)
+        begin
+          remove_invalid_index_if_needed(*args)
+        ensure
+          remove_instance_variable(:@skip_retries)
+        end
       end
       yield
     end
@@ -246,7 +248,9 @@ module StrongMigrations
     end
 
     # REINDEX INDEX CONCURRENTLY leaves a new invalid index if it fails, so use remove_index instead
-    def remove_invalid_index_if_needed(*args, **options)
+    def remove_invalid_index_if_needed(*args)
+      options = args.extract_options!
+
       # ensures has same options as existing index
       # check args to avoid errors with index_exists?
       return unless args.size == 2 && connection.index_exists?(*args, **options.merge(valid: false))
