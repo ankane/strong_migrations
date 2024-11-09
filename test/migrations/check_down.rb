@@ -37,3 +37,11 @@ class CheckDownChangeSafe < TestMigration
     remove_index :users, column: :name, algorithm: :concurrently
   end
 end
+
+class CheckDownSafetyAssured < TestMigration
+  def change
+    safety_assured do
+      add_column :users, :age, :integer
+    end
+  end
+end

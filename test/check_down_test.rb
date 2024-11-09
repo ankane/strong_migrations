@@ -35,6 +35,14 @@ class CheckDownTest < Minitest::Test
     end
   end
 
+  def test_safety_assured
+    migrate CheckDownSafetyAssured
+    with_check_down do
+      assert_unsafe CheckDownSafetyAssured, direction: :down
+    end
+    assert_safe CheckDownSafetyAssured, direction: :down
+  end
+
   def test_add_column
     migrate AddColumnDefault
     with_check_down do
