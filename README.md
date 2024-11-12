@@ -910,7 +910,7 @@ StrongMigrations.lock_timeout_retry_delay = 10.seconds
 To mark migrations as safe that were created before installing this gem, create an initializer with:
 
 ```ruby
-StrongMigrations.start_after = 20230101000000
+StrongMigrations.start_after = 20250101000000
 ```
 
 Use the version from your latest migration.
