@@ -1,4 +1,4 @@
-Copyright (c) 2013 Bob Remeika and David Waller, 2015-2024 Andrew Kane
+Copyright (c) 2013 Bob Remeika and David Waller, 2015-2025 Andrew Kane
 
 MIT License
 
