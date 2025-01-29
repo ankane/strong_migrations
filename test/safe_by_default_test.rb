@@ -235,4 +235,10 @@ class SafeByDefaultTest < Minitest::Test
   ensure
     User.delete_all
   end
+
+  def test_change_column_null_long_name
+    skip unless postgresql?
+
+    assert_safe ChangeColumnNullLongName
+  end
 end

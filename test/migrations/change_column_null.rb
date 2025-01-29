@@ -83,3 +83,11 @@ class ChangeColumnNullQuoted < TestMigration
     change_column_null :users, :interval, true
   end
 end
+
+class ChangeColumnNullLongName < TestMigration
+  def change
+    column = "a"*60
+    add_column :users, column, :string
+    change_column_null :users, column, false
+  end
+end

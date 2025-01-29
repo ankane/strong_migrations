@@ -1,3 +1,7 @@
+## 2.1.1 (unreleased)
+
+- Fixed constraint name for long table and column names with `change_column_null`
+
 ## 2.1.0 (2024-11-08)
 
 - Added `skip_database` method

@@ -232,10 +232,21 @@ module StrongMigrations
           safe = constraints.any? { |c| c.options[:validate] && (c.expression == "#{column} IS NOT NULL" || c.expression == "#{connection.quote_column_name(column)} IS NOT NULL") }
 
           unless safe
+            expression = "#{quote_column_if_needed(column)} IS NOT NULL"
+
             # match https://github.com/nullobject/rein
             constraint_name = "#{table}_#{column}_null"
+            # 63 characters is max length for Postgres, 64 characters for MySQL and MariaDB
+            if constraint_name.bytesize > 63
+              constraint_name = connection.check_constraint_options(table, expression, {})[:name]
 
-            add_args = [table, "#{quote_column_if_needed(column)} IS NOT NULL", {name: constraint_name, validate: false}]
+              # avoid collision with Active Record naming for safe_by_default
+              if StrongMigrations.safe_by_default
+                constraint_name = constraint_name.sub("rails", "strong")
+              end
+            end
+
+            add_args = [table, expression, {name: constraint_name, validate: false}]
             validate_args = [table, {name: constraint_name}]
             change_args = [table, column, null]
             remove_args = [table, {name: constraint_name}]
