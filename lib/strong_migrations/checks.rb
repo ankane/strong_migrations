@@ -242,7 +242,7 @@ module StrongMigrations
 
               # avoid collision with Active Record naming for safe_by_default
               if StrongMigrations.safe_by_default
-                constraint_name = constraint_name.sub("rails", "strong")
+                constraint_name = constraint_name.sub("rails", "strong_migrations")
               end
             end
 
