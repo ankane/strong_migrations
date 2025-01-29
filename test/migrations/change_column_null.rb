@@ -86,7 +86,7 @@ end
 
 class ChangeColumnNullLongName < TestMigration
   def change
-    column = "a"*60
+    column = "a"*53
     add_column :users, column, :string
     change_column_null :users, column, false
   end
