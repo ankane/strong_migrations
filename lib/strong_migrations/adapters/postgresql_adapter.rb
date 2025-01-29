@@ -173,6 +173,10 @@ module StrongMigrations
         ["primary_key", "serial", "bigserial"]
       end
 
+      def max_constraint_name_length
+        63
+      end
+
       private
 
       def set_timeout(setting, timeout)

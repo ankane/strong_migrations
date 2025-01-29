@@ -92,6 +92,10 @@ module StrongMigrations
         "writes"
       end
 
+      def max_constraint_name_length
+        64
+      end
+
       private
 
       # do not memoize

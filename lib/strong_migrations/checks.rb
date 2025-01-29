@@ -236,8 +236,7 @@ module StrongMigrations
 
             # match https://github.com/nullobject/rein
             constraint_name = "#{table}_#{column}_null"
-            # 63 characters is max length for Postgres, 64 characters for MySQL and MariaDB
-            if constraint_name.bytesize > 63
+            if adapter.max_constraint_name_length && constraint_name.bytesize > adapter.max_constraint_name_length
               constraint_name = connection.check_constraint_options(table, expression, {})[:name]
 
               # avoid collision with Active Record naming for safe_by_default
