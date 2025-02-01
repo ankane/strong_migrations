@@ -30,10 +30,6 @@ class ChangeColumnDefaultTest < Minitest::Test
   end
 
   def with_partial_inserts(value, &block)
-    if ActiveRecord::VERSION::MAJOR >= 7
-      ActiveRecord::Base.stub(:partial_inserts, value, &block)
-    else
-      ActiveRecord::Base.stub(:partial_writes, value, &block)
-    end
+    ActiveRecord::Base.stub(:partial_inserts, value, &block)
   end
 end

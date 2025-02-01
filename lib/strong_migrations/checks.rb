@@ -216,11 +216,11 @@ module StrongMigrations
       table, column, _default_or_changes = args
 
       # just check ActiveRecord::Base, even though can override on model
-      partial_inserts = ar_version >= 7 ? ActiveRecord::Base.partial_inserts : ActiveRecord::Base.partial_writes
+      partial_inserts = ActiveRecord::Base.partial_inserts
 
       if partial_inserts && !new_column?(table, column)
         raise_error :change_column_default,
-          config: ar_version >= 7 ? "partial_inserts" : "partial_writes"
+          config: "partial_inserts"
       end
     end
 

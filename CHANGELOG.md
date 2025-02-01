@@ -1,6 +1,7 @@
-## 2.1.1 (unreleased)
+## 2.2.0 (unreleased)
 
 - Fixed constraint name for long table and column names with `change_column_null`
+- Dropped support for Active Record < 7
 
 ## 2.1.0 (2024-11-08)
 

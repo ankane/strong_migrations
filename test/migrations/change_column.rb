@@ -284,12 +284,7 @@ end
 
 class ChangeColumnTimestamptzIncreaseLimit < TestMigration
   def up
-    if ActiveRecord::VERSION::MAJOR >= 7
-      add_column :users, :joined_at, :timestamptz, limit: 0
-    else
-      # limit ignored with add_column and timestamptz in Rails < 7
-      safety_assured { execute 'ALTER TABLE "users" ADD "joined_at" timestamptz(0)' }
-    end
+    add_column :users, :joined_at, :timestamptz, limit: 0
     change_column :users, :joined_at, :timestamptz, limit: 3
     change_column :users, :joined_at, :timestamptz, limit: 6
     change_column :users, :joined_at, :timestamptz
