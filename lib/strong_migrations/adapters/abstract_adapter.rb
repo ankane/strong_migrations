@@ -40,9 +40,6 @@ module StrongMigrations
         ["primary_key"]
       end
 
-      def max_constraint_name_length
-      end
-
       private
 
       def connection

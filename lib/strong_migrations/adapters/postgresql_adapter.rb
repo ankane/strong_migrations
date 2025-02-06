@@ -173,10 +173,6 @@ module StrongMigrations
         ["primary_key", "serial", "bigserial"]
       end
 
-      def max_constraint_name_length
-        63
-      end
-
       private
 
       def set_timeout(setting, timeout)
@@ -214,9 +210,15 @@ module StrongMigrations
       end
 
       def datetime_type
-        # https://github.com/rails/rails/pull/41084
-        # no need to support custom datetime_types
-        key = connection.class.datetime_type
+        key =
+          if ActiveRecord::VERSION::MAJOR >= 7
+            # https://github.com/rails/rails/pull/41084
+            # no need to support custom datetime_types
+            connection.class.datetime_type
+          else
+            # https://github.com/rails/rails/issues/21126#issuecomment-327895275
+            :datetime
+          end
 
         # could be timestamp, timestamp without time zone, timestamp with time zone, etc
         connection.class.const_get(:NATIVE_DATABASE_TYPES).fetch(key).fetch(:name)

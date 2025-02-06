@@ -216,11 +216,11 @@ module StrongMigrations
       table, column, _default_or_changes = args
 
       # just check ActiveRecord::Base, even though can override on model
-      partial_inserts = ActiveRecord::Base.partial_inserts
+      partial_inserts = ar_version >= 7 ? ActiveRecord::Base.partial_inserts : ActiveRecord::Base.partial_writes
 
       if partial_inserts && !new_column?(table, column)
         raise_error :change_column_default,
-          config: "partial_inserts"
+          config: ar_version >= 7 ? "partial_inserts" : "partial_writes"
       end
     end
 
@@ -232,20 +232,10 @@ module StrongMigrations
           safe = constraints.any? { |c| c.options[:validate] && (c.expression == "#{column} IS NOT NULL" || c.expression == "#{connection.quote_column_name(column)} IS NOT NULL") }
 
           unless safe
-            expression = "#{quote_column_if_needed(column)} IS NOT NULL"
-
             # match https://github.com/nullobject/rein
             constraint_name = "#{table}_#{column}_null"
-            if adapter.max_constraint_name_length && constraint_name.bytesize > adapter.max_constraint_name_length
-              constraint_name = connection.check_constraint_options(table, expression, {})[:name]
 
-              # avoid collision with Active Record naming for safe_by_default
-              if StrongMigrations.safe_by_default
-                constraint_name = constraint_name.sub("rails", "strong_migrations")
-              end
-            end
-
-            add_args = [table, expression, {name: constraint_name, validate: false}]
+            add_args = [table, "#{quote_column_if_needed(column)} IS NOT NULL", {name: constraint_name, validate: false}]
             validate_args = [table, {name: constraint_name}]
             change_args = [table, column, null]
             remove_args = [table, {name: constraint_name}]
