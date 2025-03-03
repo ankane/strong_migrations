@@ -219,6 +219,14 @@ class SafeByDefaultTest < Minitest::Test
     User.delete_all
   end
 
+  def test_change_column_null_default_with_start_after
+    skip unless postgresql?
+
+    StrongMigrations.stub(:start_after, 20170101000000) do
+      assert_safe ChangeColumnNullDefault
+    end
+  end
+
   def test_change_column_null_invalid
     skip unless postgresql?
 

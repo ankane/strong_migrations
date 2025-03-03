@@ -1,7 +1,9 @@
 module StrongMigrations
   module SafeMethods
-    def safe_by_default_method?(method)
-      StrongMigrations.safe_by_default && [:add_index, :add_belongs_to, :add_reference, :remove_index, :add_foreign_key, :add_check_constraint, :change_column_null].include?(method)
+    def safe_by_default_method?(method, version: nil)
+      StrongMigrations.safe_by_default &&
+        StrongMigrations.check_enabled?(method, version: version) &&
+        [:add_index, :add_belongs_to, :add_reference, :remove_index, :add_foreign_key, :add_check_constraint, :change_column_null].include?(method)
     end
 
     def safe_add_index(*args, **options)
