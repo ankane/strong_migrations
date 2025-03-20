@@ -1,6 +1,7 @@
 ## 2.2.1 (unreleased)
 
 - Improved backfill instructions
+- Improved error for `change_column_null` with default value with `safe_by_default` option
 - Fixed `safe_by_default` applying to migrations before `start_after`
 
 ## 2.2.0 (2025-02-01)

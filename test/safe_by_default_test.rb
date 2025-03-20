@@ -211,10 +211,7 @@ class SafeByDefaultTest < Minitest::Test
 
     # TODO add
     # User.create!
-    error = assert_raises(StrongMigrations::Error) do
-      migrate ChangeColumnNullDefault
-    end
-    assert_match "default value not supported yet with safe_by_default", error.message
+    assert_unsafe ChangeColumnNullDefault
   ensure
     User.delete_all
   end
