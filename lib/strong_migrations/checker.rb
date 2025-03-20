@@ -41,7 +41,7 @@ module StrongMigrations
       set_timeouts
       check_lock_timeout
 
-      if !safe? || (safe_by_default_method?(method) && !version_safe?)
+      if !safe? || safe_by_default_method?(method)
         # TODO better pattern
         # see checks.rb for methods
         case method
