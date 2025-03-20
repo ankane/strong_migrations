@@ -1,3 +1,7 @@
+## 2.2.1 (unreleased)
+
+- Fixed `safe_by_default` applying to migrations before `start_after`
+
 ## 2.2.0 (2025-02-01)
 
 - Fixed constraint name for long table and column names with `change_column_null`
