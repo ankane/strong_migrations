@@ -168,6 +168,12 @@ class Minitest::Test
     end
   end
 
+  def with_start_after(start_after)
+    StrongMigrations.stub(:start_after, start_after) do
+      yield
+    end
+  end
+
   def with_target_version(version)
     StrongMigrations.target_version = version
     yield

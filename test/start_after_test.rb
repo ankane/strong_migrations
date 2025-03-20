@@ -27,10 +27,4 @@ class StartAfterTest < Minitest::Test
       assert_unsafe RevertAddReference, version: 20170101000001
     end
   end
-
-  def with_start_after(start_after)
-    StrongMigrations.stub(:start_after, start_after) do
-      yield
-    end
-  end
 end
