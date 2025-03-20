@@ -446,7 +446,7 @@ module StrongMigrations
         update_expr = "#{quote_column_if_needed(column)} = #{default}"
         "#{model}.unscoped.in_batches do |relation| \n      relation.where(#{column}: nil).update_all(#{update_expr.inspect})\n      sleep(0.01)\n    end"
       else
-        "#{model}.unscoped.in_batches do |relation| \n      relation.update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
+        "#{model}.unscoped.in_batches do |relation| \n      relation.where(#{column}: nil).update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
       end
     end
 

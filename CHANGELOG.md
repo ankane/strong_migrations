@@ -1,5 +1,6 @@
 ## 2.2.1 (unreleased)
 
+- Improved backfill instructions
 - Fixed `safe_by_default` applying to migrations before `start_after`
 
 ## 2.2.0 (2025-02-01)
