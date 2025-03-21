@@ -210,7 +210,7 @@ class SafeByDefaultTest < Minitest::Test
     skip unless postgresql?
 
     User.create!(name: "Existing")
-    User.insert_all!(1000.times.map { {city: "Test"} })
+    User.insert_all!(10000.times.map { {city: "Test"} })
 
     assert_safe ChangeColumnNullDefault
 
