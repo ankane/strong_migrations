@@ -220,6 +220,25 @@ class SafeByDefaultTest < Minitest::Test
     User.delete_all
   end
 
+  def test_change_column_null_default_callable
+    skip unless postgresql?
+
+    User.create!
+    assert_safe ChangeColumnNullDefaultCallable
+    refute_nil User.last.deleted_at
+  ensure
+    User.delete_all
+  end
+
+  def test_change_column_null_default_uuid
+    skip unless postgresql?
+
+    User.create!
+    assert_safe ChangeColumnNullDefaultUUID
+  ensure
+    User.delete_all
+  end
+
   def test_change_column_null_default_version_safe
     skip unless postgresql?
 

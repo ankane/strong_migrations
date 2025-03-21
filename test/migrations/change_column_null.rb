@@ -69,6 +69,19 @@ class ChangeColumnNullDefault < TestMigration
   end
 end
 
+class ChangeColumnNullDefaultCallable < TestMigration
+  def change
+    change_column_null :users, :deleted_at, false, -> { "clock_timestamp()" }
+  end
+end
+
+class ChangeColumnNullDefaultUUID < TestMigration
+  def change
+    add_column :users, :nice, :uuid
+    change_column_null :users, :nice, false, "gen_random_uuid()"
+  end
+end
+
 class ChangeColumnNullQuoted < TestMigration
   def up
     safety_assured do
