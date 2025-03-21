@@ -251,11 +251,7 @@ module StrongMigrations
             remove_args = [table, {name: constraint_name}]
 
             if StrongMigrations.safe_by_default
-              if !default.nil?
-                raise_error :change_column_null,
-                  code: backfill_code(table, column, default)
-              end
-              safe_change_column_null(add_args, validate_args, change_args, remove_args, default, constraints)
+              safe_change_column_null(add_args, validate_args, change_args, remove_args, table, column, default, constraints)
               throw :safe
             end
 

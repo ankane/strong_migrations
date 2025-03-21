@@ -209,9 +209,13 @@ class SafeByDefaultTest < Minitest::Test
   def test_change_column_null_default
     skip unless postgresql?
 
-    # TODO add
-    # User.create!
-    assert_unsafe ChangeColumnNullDefault
+    User.create!(name: "Existing")
+    User.insert_all!(1000.times.map { {city: "Test"} })
+
+    assert_safe ChangeColumnNullDefault
+
+    assert_equal "Existing", User.first.name
+    assert_equal "Andy", User.last.name
   ensure
     User.delete_all
   end

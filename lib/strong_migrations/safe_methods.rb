@@ -76,11 +76,30 @@ module StrongMigrations
       end
     end
 
-    def safe_change_column_null(add_args, validate_args, change_args, remove_args, default, constraints)
+    def safe_change_column_null(add_args, validate_args, change_args, remove_args, table, column, default, constraints)
       @migration.reversible do |dir|
         dir.up do
           unless default.nil?
-            raise Error, "default value not supported yet with safe_by_default"
+            # TODO search for parent model if needed
+            if connection.pool != ActiveRecord::Base.connection_pool
+              raise_error :change_column_null,
+                code: backfill_code(table, column, default)
+            end
+
+            model =
+              Class.new(ActiveRecord::Base) do
+                self.table_name = table
+
+                def self.to_s
+                  "Backfill"
+                end
+              end
+
+            @migration.say("Backfilling default")
+            model.unscoped.in_batches do |relation|
+              relation.where(column => nil).update_all({column => default})
+              sleep(0.01)
+            end
           end
 
           add_options = add_args.extract_options!
