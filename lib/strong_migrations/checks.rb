@@ -444,9 +444,9 @@ module StrongMigrations
       if function
         # update_all(column: Arel.sql(default)) also works in newer versions of Active Record
         update_expr = "#{quote_column_if_needed(column)} = #{default}"
-        "#{model}.unscoped.in_batches do |relation| \n      relation.where(#{column}: nil).update_all(#{update_expr.inspect})\n      sleep(0.01)\n    end"
+        "#{model}.unscoped.in_batches(of: 10000) do |relation| \n      relation.where(#{column}: nil).update_all(#{update_expr.inspect})\n      sleep(0.01)\n    end"
       else
-        "#{model}.unscoped.in_batches do |relation| \n      relation.where(#{column}: nil).update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
+        "#{model}.unscoped.in_batches(of: 10000) do |relation| \n      relation.where(#{column}: nil).update_all #{column}: #{default.inspect}\n      sleep(0.01)\n    end"
       end
     end
 
