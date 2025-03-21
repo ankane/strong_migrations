@@ -95,13 +95,17 @@ module StrongMigrations
                 end
               end
 
+            update_sql =
+              model.connection_pool.with_connection do |c|
+                quoted_column = c.quote_column_name(column)
+                quoted_default = c.quote_default_expression(default, c.send(:column_for, table, column))
+                "#{quoted_column} = #{quoted_default}"
+              end
+
             @migration.say("Backfilling default")
             disable_transaction
             model.unscoped.in_batches(of: 10000) do |relation|
-              c = relation.connection
-              quoted_column = c.quote_column_name(column)
-              quoted_default = c.quote_default_expression(default, c.send(:column_for, table, column))
-              relation.where(column => nil).update_all("#{quoted_column} = #{quoted_default}")
+              relation.where(column => nil).update_all(update_sql)
               sleep(0.01)
             end
           end
