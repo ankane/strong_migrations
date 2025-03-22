@@ -1,4 +1,4 @@
-## 2.2.1 (unreleased)
+## 2.2.1 (2025-03-21)
 
 - Added support for `change_column_null` with default value with `safe_by_default` option
 - Improved backfill instructions
