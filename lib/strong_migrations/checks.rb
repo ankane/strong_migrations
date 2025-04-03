@@ -210,6 +210,17 @@ module StrongMigrations
       end
 
       raise_error :change_column, rewrite_blocks: adapter.rewrite_blocks unless safe
+
+      # constraints must be rechecked
+      # Postgres recommends dropping constraints before and adding them back
+      # https://www.postgresql.org/docs/current/ddl-alter.html#DDL-ALTER-COLUMN-TYPE
+      if postgresql?
+        constraints = adapter.constraints(table, column)
+        if constraints.any?
+          commands = constraints.map { |c| command_str(:remove_check_constraint, [table, c.expression, {name: c.name}]) }
+          raise_error :change_column_constraint, code: commands.join("\n    ")
+        end
+      end
     end
 
     def check_change_column_default(*args)

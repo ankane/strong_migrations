@@ -195,6 +195,11 @@ class ChangeColumnTest < Minitest::Test
     assert_unsafe ChangeColumnInetToCidr
   end
 
+  def test_constraint
+    skip unless postgresql?
+    assert_unsafe ChangeColumnConstraint
+  end
+
   def test_with_not_null
     assert_unsafe ChangeColumnWithNotNull
   end

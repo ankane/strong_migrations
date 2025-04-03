@@ -1,3 +1,7 @@
+## 2.3.0 (unreleased)
+
+- Added check for `change_column` for columns with check constraints with Postgres
+
 ## 2.2.1 (2025-03-21)
 
 - Added support for `change_column_null` with default value with `safe_by_default` option

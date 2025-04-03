@@ -394,3 +394,12 @@ class ChangeColumnMissingTable < TestMigration
     change_column :missing, :properties, :string
   end
 end
+
+class ChangeColumnConstraint < TestMigration
+  def change
+    safety_assured do
+      add_check_constraint :users, "name IS NOT NULL"
+    end
+    change_column :users, :name, :text
+  end
+end

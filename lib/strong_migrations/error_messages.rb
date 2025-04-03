@@ -60,6 +60,16 @@ while the entire table is rewritten. A safer approach is to:
     change_column_with_not_null:
 "Changing the type is safe, but setting NOT NULL is not.",
 
+    change_column_constraint: "Changing the type of a column that has check constraints blocks reads and writes
+while every row is checked. Drop the check constraints on the column before
+changing the type and add them back afterwards.
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{code}
+  end
+end",
+
     remove_column: "Active Record caches attributes, which causes problems
 when removing columns. Be sure to ignore the column%{column_suffix}:
 

@@ -177,6 +177,11 @@ module StrongMigrations
         63
       end
 
+      def constraints(table, column)
+        # TODO improve column check
+        connection.check_constraints(table).select { |c| /\b#{Regexp.escape(column.to_s)}\b/.match?(c.expression) }
+      end
+
       private
 
       def set_timeout(setting, timeout)
