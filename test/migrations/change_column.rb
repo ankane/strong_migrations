@@ -399,6 +399,8 @@ class ChangeColumnConstraint < TestMigration
   def change
     safety_assured do
       add_check_constraint :users, "name IS NOT NULL"
+      add_check_constraint :users, "name = lower(name)"
+      add_check_constraint :users, "credit_score > 0"
     end
     change_column :users, :name, :text
   end
