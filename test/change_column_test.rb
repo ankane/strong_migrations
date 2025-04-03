@@ -200,6 +200,11 @@ class ChangeColumnTest < Minitest::Test
     assert_unsafe ChangeColumnConstraint
   end
 
+  def test_other_constraints
+    skip unless postgresql?
+    assert_safe ChangeColumnOtherConstraints
+  end
+
   def test_with_not_null
     assert_unsafe ChangeColumnWithNotNull
   end

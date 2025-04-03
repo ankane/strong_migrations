@@ -405,3 +405,17 @@ class ChangeColumnConstraint < TestMigration
     change_column :users, :name, :text
   end
 end
+
+class ChangeColumnOtherConstraints < TestMigration
+  def change
+    add_column :users, :new_name, :string
+    safety_assured do
+      add_check_constraint :users, "new_name IS NOT NULL"
+      add_check_constraint :users, "credit_score > 0"
+    end
+    reversible do |direction|
+      direction.up { change_column :users, :name, :text }
+      direction.down { change_column :users, :name, :string }
+    end
+  end
+end
