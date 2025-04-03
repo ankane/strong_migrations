@@ -66,7 +66,13 @@ changing the type and add them back afterwards.
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
-    %{code}
+    %{change_column_code}
+  end
+end
+
+class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{validate_constraint_code}
   end
 end",
 

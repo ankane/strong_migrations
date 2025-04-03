@@ -217,8 +217,23 @@ module StrongMigrations
       if postgresql?
         constraints = adapter.constraints(table, column)
         if constraints.any?
-          commands = constraints.map { |c| command_str(:remove_check_constraint, [table, c.expression, {name: c.name}]) }
-          raise_error :change_column_constraint, code: commands.join("\n    ")
+          change_commands = []
+          constraints.each do |c|
+            change_commands << command_str(:remove_check_constraint, [table, c.expression, {name: c.name}])
+          end
+          change_commands << command_str(:change_column, args + [options])
+          constraints.each do |c|
+            change_commands << command_str(:add_check_constraint, [table, c.expression, {name: c.name, validate: false}])
+          end
+
+          validate_commands = []
+          constraints.each do |c|
+            validate_commands << command_str(:validate_check_constraint, [table, {name: c.name}])
+          end
+
+          raise_error :change_column_constraint,
+            change_column_code: change_commands.join("\n    "),
+            validate_constraint_code: validate_commands.join("\n    ")
         end
       end
     end
