@@ -127,21 +127,6 @@ module StrongMigrations
         safe
       end
 
-      # TODO remove when Active Record < 7.1 is no longer supported
-      def index_invalid?(table_name, index_name)
-        query = <<~SQL
-          SELECT
-            indisvalid
-          FROM
-            pg_index
-          WHERE
-            indrelid = to_regclass(#{connection.quote(connection.quote_table_name(table_name))}) AND
-            indexrelid = to_regclass(#{connection.quote(connection.quote_table_name(index_name))}) AND
-            indisvalid = false
-        SQL
-        select_all(query.squish).any?
-      end
-
       def writes_blocked?
         query = <<~SQL
           SELECT

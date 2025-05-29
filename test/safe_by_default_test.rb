@@ -150,12 +150,8 @@ class SafeByDefaultTest < Minitest::Test
 
     migrate AddForeignKey
 
-    if ActiveRecord::VERSION::STRING.to_f >= 7.1
-      # fail if trying to add the same foreign key in a future migration
-      assert_raises(ActiveRecord::StatementInvalid) do
-        migrate AddForeignKey
-      end
-    else
+    # fail if trying to add the same foreign key in a future migration
+    assert_raises(ActiveRecord::StatementInvalid) do
       migrate AddForeignKey
     end
 

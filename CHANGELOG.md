@@ -1,3 +1,7 @@
+## 2.4.0 (unreleased)
+
+- Dropped support for Ruby < 3.2 and Active Record < 7.1
+
 ## 2.3.0 (2025-04-03)
 
 - Added check for `change_column` for columns with check constraints with Postgres

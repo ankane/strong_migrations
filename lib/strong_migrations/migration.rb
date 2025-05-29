@@ -7,10 +7,7 @@ module StrongMigrations
     end
 
     def method_missing(method, *args)
-      return super if is_a?(ActiveRecord::Schema)
-
-      # Active Record 7.0.2+ versioned schema
-      return super if defined?(ActiveRecord::Schema::Definition) && is_a?(ActiveRecord::Schema::Definition)
+      return super if is_a?(ActiveRecord::Schema) || is_a?(ActiveRecord::Schema::Definition)
 
       catch(:safe) do
         strong_migrations_checker.perform(method, *args) do

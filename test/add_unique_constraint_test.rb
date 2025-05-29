@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 class AddUniqueConstraintTest < Minitest::Test
   def setup
-    skip unless unique_constraints?
+    skip unless postgresql?
     super
   end
 
@@ -16,9 +16,5 @@ class AddUniqueConstraintTest < Minitest::Test
 
   def test_new_table
     assert_safe AddUniqueConstraintNewTable
-  end
-
-  def unique_constraints?
-    postgresql? && ActiveRecord::VERSION::STRING.to_f >= 7.1
   end
 end

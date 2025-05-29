@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 class AddExclusionConstraintTest < Minitest::Test
   def setup
-    skip unless exclusion_constraints?
+    skip unless postgresql?
     super
   end
 
@@ -12,9 +12,5 @@ class AddExclusionConstraintTest < Minitest::Test
 
   def test_new_table
     assert_safe AddExclusionConstraintNewTable
-  end
-
-  def exclusion_constraints?
-    postgresql? && ActiveRecord::VERSION::STRING.to_f >= 7.1
   end
 end

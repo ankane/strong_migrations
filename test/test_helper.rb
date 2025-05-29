@@ -1,5 +1,4 @@
 require "bundler/setup"
-require "logger" # for Active Support < 7.1
 Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
@@ -19,14 +18,10 @@ connection_options = {
 }
 if $adapter == "mysql2"
   connection_options[:encoding] = "utf8mb4"
-  if ActiveRecord::VERSION::STRING.to_f >= 7.1 && ActiveRecord::VERSION::MAJOR < 8
+  if ActiveRecord::VERSION::MAJOR < 8
     connection_options[:prepared_statements] = true
   end
 elsif $adapter == "trilogy"
-  if ActiveRecord::VERSION::STRING.to_f < 7.1
-    require "trilogy_adapter/connection"
-    ActiveRecord::Base.public_send :extend, TrilogyAdapter::Connection
-  end
   connection_options[:host] = "127.0.0.1"
 end
 ActiveRecord::Base.establish_connection(**connection_options)
@@ -45,11 +40,7 @@ TestMigration = ActiveRecord::Migration[migration_version]
 TestSchema = ActiveRecord::Schema
 
 def schema_migration
-  if ActiveRecord::VERSION::STRING.to_f >= 7.1
-    connection_class.schema_migration
-  else
-    ActiveRecord::SchemaMigration
-  end
+  connection_class.schema_migration
 end
 
 def connection_class
@@ -118,26 +109,13 @@ class Minitest::Test
   include Helpers
 
   def migrate(migration, direction: :up, version: 123)
-    if ActiveRecord::VERSION::STRING.to_f >= 7.1
-      schema_migration.delete_all_versions
-    else
-      schema_migration.delete_all
-    end
+    schema_migration.delete_all_versions
     migration = migration.new unless migration.is_a?(TestMigration)
     migration.version ||= version
     if direction == :down
-      if ActiveRecord::VERSION::STRING.to_f >= 7.1
-        schema_migration.create_version(migration.version)
-      else
-        schema_migration.create!(version: migration.version)
-      end
+      schema_migration.create_version(migration.version)
     end
-    args =
-      if ActiveRecord::VERSION::STRING.to_f >= 7.1
-        [schema_migration, connection_class.internal_metadata]
-      else
-        [schema_migration]
-      end
+    args = [schema_migration, connection_class.internal_metadata]
     ActiveRecord::Migrator.new(direction, [migration], *args).migrate
     true
   rescue => e

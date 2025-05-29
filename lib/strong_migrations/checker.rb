@@ -264,9 +264,6 @@ module StrongMigrations
       table, columns = args
       index_name = options.fetch(:name, connection.index_name(table, columns))
 
-      # valid option is ignored for Active Record < 7.1, so check name as well
-      return if ar_version < 7.1 && !adapter.index_invalid?(table, index_name)
-
       @migration.say("Attempting to remove invalid index")
       without_retries do
         # TODO pass index schema for extra safety?
