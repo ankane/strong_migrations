@@ -119,11 +119,6 @@ class Minitest::Test
     ActiveRecord::Migrator.new(direction, [migration], *args).migrate
     true
   rescue => e
-    # https://github.com/oracle/truffleruby/issues/3831
-    if e.cause && RUBY_ENGINE == "truffleruby"
-      cause = e.cause.cause
-      e.cause.define_singleton_method(:cause) { cause }
-    end
     raise e.cause || e
   end
 
