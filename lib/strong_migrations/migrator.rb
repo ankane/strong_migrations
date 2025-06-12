@@ -4,7 +4,7 @@ module StrongMigrations
       return super unless StrongMigrations.lock_timeout_retries > 0 && use_transaction?(migration)
 
       # handle MigrationProxy class
-      migration = migration.send(:migration) if migration.respond_to?(:migration, true)
+      migration = migration.send(:migration) if !migration.is_a?(ActiveRecord::Migration) && migration.respond_to?(:migration, true)
 
       checker = migration.send(:strong_migrations_checker)
       return super if checker.skip?

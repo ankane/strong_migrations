@@ -4,10 +4,17 @@ class AlphabetizeSchemaTest < Minitest::Test
   def test_default
     schema = dump_schema
 
-    expected_columns = <<-EOS
+    if ActiveRecord::VERSION::STRING.to_f >= 8.1
+      expected_columns = <<-EOS
+    t.string "name"
+    t.bigint "order_id"
+      EOS
+    else
+      expected_columns = <<-EOS
     t.string "name"
     t.string "city"
-    EOS
+      EOS
+    end
     assert_match expected_columns, schema
   end
 
