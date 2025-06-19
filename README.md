@@ -882,8 +882,6 @@ To automatically remove the invalid index when the migration runs again, use:
 StrongMigrations.remove_invalid_indexes = true
 ```
 
-Note: This feature is experimental.
-
 ## Lock Timeout Retries
 
 Note: This feature is experimental.
