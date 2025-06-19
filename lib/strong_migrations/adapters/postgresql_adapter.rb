@@ -27,6 +27,10 @@ module StrongMigrations
         set_timeout("lock_timeout", timeout)
       end
 
+      def set_transaction_timeout(timeout)
+        set_timeout("transaction_timeout", timeout)
+      end
+
       def check_lock_timeout(limit)
         lock_timeout = connection.select_all("SHOW lock_timeout").first["lock_timeout"]
         lock_timeout_sec = timeout_to_sec(lock_timeout)
