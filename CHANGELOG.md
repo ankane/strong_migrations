@@ -1,5 +1,6 @@
 ## 2.4.0 (unreleased)
 
+- Added `remove_invalid_indexes` option to install generator
 - Dropped support for Ruby < 3.2 and Active Record < 7.1
 
 ## 2.3.0 (2025-04-03)

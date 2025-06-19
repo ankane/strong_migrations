@@ -20,6 +20,9 @@ StrongMigrations.auto_analyze = true
 #   end
 # end<% if postgresql? %>
 
+# Remove invalid indexes when rerunning migrations
+# StrongMigrations.remove_invalid_indexes = true
+
 # Make some operations safe by default
 # See https://github.com/ankane/strong_migrations#safe-by-default
 # StrongMigrations.safe_by_default = true<% end %>
