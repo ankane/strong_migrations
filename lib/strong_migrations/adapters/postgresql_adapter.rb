@@ -27,6 +27,10 @@ module StrongMigrations
         set_timeout("lock_timeout", timeout)
       end
 
+      def supports_transaction_timeout?
+        server_version > Gem::Version.new("17.0")
+      end
+
       def set_transaction_timeout(timeout)
         set_timeout("transaction_timeout", timeout)
       end

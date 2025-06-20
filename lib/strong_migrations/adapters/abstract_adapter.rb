@@ -47,6 +47,10 @@ module StrongMigrations
       def max_constraint_name_length
       end
 
+      def supports_transaction_timeout?
+        false
+      end
+
       private
 
       def connection

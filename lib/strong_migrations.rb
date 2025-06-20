@@ -27,10 +27,9 @@ module StrongMigrations
   class << self
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
       :target_postgresql_version, :target_mysql_version, :target_mariadb_version,
-      :enabled_checks, :lock_timeout, :statement_timeout, :transaction_timeout, :check_down,
-      :target_version, :safe_by_default, :target_sql_mode, :lock_timeout_retries,
-      :lock_timeout_retry_delay, :alphabetize_schema, :skipped_databases,
-      :remove_invalid_indexes
+      :enabled_checks, :lock_timeout, :statement_timeout, :check_down, :target_version,
+      :safe_by_default, :target_sql_mode, :lock_timeout_retries, :lock_timeout_retry_delay,
+      :alphabetize_schema, :skipped_databases, :remove_invalid_indexes, :transaction_timeout
     attr_writer :lock_timeout_limit
   end
   self.auto_analyze = false

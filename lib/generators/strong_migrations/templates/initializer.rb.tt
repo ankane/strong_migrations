@@ -4,7 +4,6 @@ StrongMigrations.start_after = <%= start_after %>
 # Set timeouts for migrations<%= pgbouncer_message %>
 StrongMigrations.lock_timeout = 10.seconds
 StrongMigrations.statement_timeout = 1.hour
-StrongMigrations.transaction_timeout = 1.hour
 
 # Analyze tables after indexes are added
 # Outdated statistics can sometimes hurt performance
