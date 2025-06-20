@@ -9,12 +9,14 @@ class TimeoutsTest < Minitest::Test
     skip unless postgresql? || mysql? || mariadb?
 
     StrongMigrations.statement_timeout = 1.hour
+    StrongMigrations.transaction_timeout = 1.hour
     StrongMigrations.lock_timeout = 10.seconds
 
     migrate CheckTimeouts
 
     if postgresql?
       assert_equal "1h", $statement_timeout
+      assert_equal "1h", $transaction_timeout if transaction_timeout?
       assert_equal "10s", $lock_timeout
     else
       assert_equal 3600, $statement_timeout
@@ -50,6 +52,28 @@ class TimeoutsTest < Minitest::Test
     else
       assert_equal 1.001, $statement_timeout
     end
+  end
+
+  def test_transaction_timeout_float
+    skip unless transaction_timeout?
+
+    StrongMigrations.transaction_timeout = 0.5.seconds
+
+    migrate CheckTimeouts
+
+    assert_equal "500ms", $transaction_timeout
+  end
+
+  # designed for 0 case to prevent no timeout
+  # but can't test without transaction timeout error
+  def test_transaction_timeout_float_ceil
+    skip unless transaction_timeout?
+
+    StrongMigrations.transaction_timeout = 1.000001.seconds
+
+    migrate CheckTimeouts
+
+    assert_equal "1001ms", $transaction_timeout
   end
 
   def test_lock_timeout_float

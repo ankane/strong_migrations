@@ -13,6 +13,11 @@ class CheckTimeouts < TestMigration
         connection.select_all("SHOW VARIABLES LIKE 'max_statement_time'").first["Value"].to_f
       end
 
+    $transaction_timeout =
+      if postgresql? && transaction_timeout?
+        connection.select_all("SHOW transaction_timeout").first["transaction_timeout"]
+      end
+
     $lock_timeout =
       if postgresql?
         connection.select_all("SHOW lock_timeout").first["lock_timeout"]

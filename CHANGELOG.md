@@ -1,5 +1,6 @@
 ## 2.4.0 (unreleased)
 
+- Added `transaction_timeout` option
 - Added `remove_invalid_indexes` option to install generator
 - Dropped support for Ruby < 3.2 and Active Record < 7.1
 

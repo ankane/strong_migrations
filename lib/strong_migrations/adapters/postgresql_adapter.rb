@@ -23,14 +23,12 @@ module StrongMigrations
         set_timeout("statement_timeout", timeout)
       end
 
-      def set_lock_timeout(timeout)
-        set_timeout("lock_timeout", timeout)
+      def set_transaction_timeout(timeout)
+        set_timeout("transaction_timeout", timeout) if server_version >= Gem::Version.new("17")
       end
 
-      def set_transaction_timeout(timeout)
-        return unless server_version >= Gem::Version.new("17.0")
-
-        set_timeout("transaction_timeout", timeout)
+      def set_lock_timeout(timeout)
+        set_timeout("lock_timeout", timeout)
       end
 
       def check_lock_timeout(limit)

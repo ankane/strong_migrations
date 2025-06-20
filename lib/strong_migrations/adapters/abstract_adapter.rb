@@ -16,15 +16,15 @@ module StrongMigrations
         # do nothing
       end
 
+      def set_transaction_timeout(timeout)
+        # do nothing
+      end
+
       def set_lock_timeout(timeout)
         # do nothing
       end
 
       def check_lock_timeout(limit)
-        # do nothing
-      end
-
-      def set_transaction_timeout(timeout)
         # do nothing
       end
 
