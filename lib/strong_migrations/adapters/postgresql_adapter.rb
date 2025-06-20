@@ -24,6 +24,7 @@ module StrongMigrations
       end
 
       def set_transaction_timeout(timeout)
+        # TODO make sure true version supports it as well?
         set_timeout("transaction_timeout", timeout) if server_version >= Gem::Version.new("17")
       end
 
