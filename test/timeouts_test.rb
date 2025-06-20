@@ -9,14 +9,14 @@ class TimeoutsTest < Minitest::Test
     skip unless postgresql? || mysql? || mariadb?
 
     StrongMigrations.statement_timeout = 1.hour
-    StrongMigrations.transaction_timeout = 1.hour
+    StrongMigrations.transaction_timeout = 2.hours
     StrongMigrations.lock_timeout = 10.seconds
 
     migrate CheckTimeouts
 
     if postgresql?
       assert_equal "1h", $statement_timeout
-      assert_equal "1h", $transaction_timeout if transaction_timeout?
+      assert_equal "2h", $transaction_timeout if transaction_timeout?
       assert_equal "10s", $lock_timeout
     else
       assert_equal 3600, $statement_timeout
@@ -90,11 +90,13 @@ class TimeoutsTest < Minitest::Test
     skip unless postgresql?
 
     StrongMigrations.statement_timeout = "1h"
+    StrongMigrations.transaction_timeout = "2h"
     StrongMigrations.lock_timeout = "1d"
 
     migrate CheckTimeouts
 
     assert_equal "1h", $statement_timeout
+    assert_equal "2h", $transaction_timeout if transaction_timeout?
     assert_equal "1d", $lock_timeout
   end
 
@@ -206,9 +208,11 @@ class TimeoutsTest < Minitest::Test
 
   def reset_timeouts
     StrongMigrations.lock_timeout = nil
+    StrongMigrations.transaction_timeout = nil
     StrongMigrations.statement_timeout = nil
     if postgresql?
       ActiveRecord::Base.connection.execute("RESET lock_timeout")
+      ActiveRecord::Base.connection.execute("RESET transaction_timeout")
       ActiveRecord::Base.connection.execute("RESET statement_timeout")
     elsif mysql?
       ActiveRecord::Base.connection.execute("SET max_execution_time = DEFAULT")
