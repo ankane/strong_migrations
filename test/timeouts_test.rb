@@ -212,7 +212,7 @@ class TimeoutsTest < Minitest::Test
     StrongMigrations.statement_timeout = nil
     if postgresql?
       ActiveRecord::Base.connection.execute("RESET lock_timeout")
-      ActiveRecord::Base.connection.execute("RESET transaction_timeout")
+      ActiveRecord::Base.connection.execute("RESET transaction_timeout") if transaction_timeout?
       ActiveRecord::Base.connection.execute("RESET statement_timeout")
     elsif mysql?
       ActiveRecord::Base.connection.execute("SET max_execution_time = DEFAULT")
