@@ -24,6 +24,10 @@ module StrongMigrations
         # do nothing
       end
 
+      def set_transaction_timeout(timeout)
+        # do nothing
+      end
+
       def add_column_default_safe?
         false
       end

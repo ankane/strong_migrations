@@ -184,6 +184,9 @@ module StrongMigrations
       if StrongMigrations.lock_timeout
         adapter.set_lock_timeout(StrongMigrations.lock_timeout)
       end
+      if StrongMigrations.transaction_timeout
+        adapter.set_transaction_timeout(StrongMigrations.transaction_timeout)
+      end
 
       @timeouts_set = true
     end
