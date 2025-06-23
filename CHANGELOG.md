@@ -1,4 +1,4 @@
-## 2.4.0 (unreleased)
+## 2.4.0 (2025-06-23)
 
 - Added `remove_invalid_indexes` option to install generator
 - Added experimental `transaction_timeout` option
