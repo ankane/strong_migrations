@@ -57,4 +57,20 @@ class AddReferenceTest < Minitest::Test
       assert_argument_error AddReferenceExtraArguments
     end
   end
+
+  def test_auto_analyze_with_index
+    StrongMigrations.auto_analyze = true
+    logs = capture_logs { assert_safe AddReferenceConcurrently }
+    assert_includes logs, "ANALYZE"
+  ensure
+    StrongMigrations.auto_analyze = false
+  end
+
+  def test_auto_analyze_skips_analyze_without_index
+    StrongMigrations.auto_analyze = true
+    logs = capture_logs { assert_safe AddReferenceNoIndex }
+    refute logs.include?("ANALYZE")
+  ensure
+    StrongMigrations.auto_analyze = false
+  end
 end

@@ -206,6 +206,16 @@ class Minitest::Test
   ensure
     pool.checkin(connection) if connection
   end
+
+  def capture_logs
+    original_logger = ActiveRecord::Base.logger
+    buffer = StringIO.new
+    ActiveRecord::Base.logger = ActiveSupport::Logger.new(buffer)
+    yield
+    buffer.tap(&:rewind).read
+  ensure
+    ActiveRecord::Base.logger = original_logger
+  end
 end
 
 StrongMigrations.add_check do |method, args|
