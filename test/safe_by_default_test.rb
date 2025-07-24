@@ -49,6 +49,12 @@ class SafeByDefaultTest < Minitest::Test
     migrate AddIndexes, direction: :down
   end
 
+  def test_add_index_auto_analyze
+    with_auto_analyze do
+      assert_analyzed AddIndexes
+    end
+  end
+
   def test_add_index_extra_arguments
     assert_argument_error AddIndexExtraArguments
   end
@@ -98,6 +104,12 @@ class SafeByDefaultTest < Minitest::Test
 
   def test_add_reference_foreign_key_on_delete
     assert_safe AddReferenceForeignKeyOnDelete
+  end
+
+  def test_add_reference_auto_analyze
+    with_auto_analyze do
+      assert_analyzed AddReference
+    end
   end
 
   def test_add_reference_extra_arguments
