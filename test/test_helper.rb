@@ -166,6 +166,13 @@ class Minitest::Test
     StrongMigrations.target_version = nil
   end
 
+  def with_auto_analyze
+    StrongMigrations.auto_analyze = true
+    yield
+  ensure
+    StrongMigrations.auto_analyze = false
+  end
+
   def with_safety_assured
     StrongMigrations::Checker.stub(:safe, true) do
       yield

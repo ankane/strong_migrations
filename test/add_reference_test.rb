@@ -51,10 +51,9 @@ class AddReferenceTest < Minitest::Test
   end
 
   def test_auto_analyze
-    StrongMigrations.auto_analyze = true
-    assert_analyzed postgresql? ? AddReferenceConcurrently : AddReference
-  ensure
-    StrongMigrations.auto_analyze = false
+    with_auto_analyze do
+      assert_analyzed postgresql? ? AddReferenceConcurrently : AddReference
+    end
   end
 
   def test_auto_analyze_false
@@ -62,28 +61,25 @@ class AddReferenceTest < Minitest::Test
   end
 
   def test_auto_analyze_no_index
-    StrongMigrations.auto_analyze = true
-    refute_analyzed AddReferenceNoIndex
-  ensure
-    StrongMigrations.auto_analyze = false
+    with_auto_analyze do
+      refute_analyzed AddReferenceNoIndex
+    end
   end
 
   def test_auto_analyze_default
-    StrongMigrations.auto_analyze = true
-    with_safety_assured do
-      assert_analyzed AddReferenceDefault
+    with_auto_analyze do
+      with_safety_assured do
+        assert_analyzed AddReferenceDefault
+      end
     end
-  ensure
-    StrongMigrations.auto_analyze = false
   end
 
   def test_auto_analyze_add_belongs_to
-    StrongMigrations.auto_analyze = true
-    with_safety_assured do
-      assert_analyzed AddBelongsTo
+    with_auto_analyze do
+      with_safety_assured do
+        assert_analyzed AddBelongsTo
+      end
     end
-  ensure
-    StrongMigrations.auto_analyze = false
   end
 
   def test_extra_arguments
