@@ -104,7 +104,14 @@ in your application. A safer approach is to:
 
     rename_schema:
 "Renaming a schema that's in use will cause errors
-in your application.",
+in your application. A safer approach is to:
+
+1. Create a new schema
+2. Write to both schemas
+3. Backfill data from the old schema to the new schema
+4. Move reads from the old schema to the new schema
+5. Stop writing to the old schema
+6. Drop the old schema",
 
     rename_table:
 "Renaming a table that's in use will cause errors

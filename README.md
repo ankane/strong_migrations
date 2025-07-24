@@ -80,6 +80,7 @@ Postgres-specific checks:
 - [adding a json column](#adding-a-json-column)
 - [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
 - [adding a column with a volatile default value](#adding-a-column-with-a-volatile-default-value)
+- [renaming a schema](#renaming-a-schema) [unreleased]
 
 Config-specific checks:
 
@@ -657,6 +658,31 @@ end
 ```
 
 Then [backfill the data](#backfilling-data).
+
+### Renaming a schema
+
+#### Bad
+
+Renaming a schema that’s in use will cause errors in your application.
+
+```ruby
+class RenameUsersToCustomers < ActiveRecord::Migration[8.1]
+  def change
+    rename_schema :users, :customers
+  end
+end
+```
+
+#### Good
+
+A safer approach is to:
+
+1. Create a new schema
+2. Write to both schemas
+3. Backfill data from the old schema to the new schema
+4. Move reads from the old schema to the new schema
+5. Stop writing to the old schema
+6. Drop the old schema
 
 ### Changing the default value of a column
 
