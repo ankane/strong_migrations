@@ -13,6 +13,10 @@ class MiscTest < Minitest::Test
     assert_unsafe RenameTable
   end
 
+  def test_rename_schema
+    assert_unsafe RenameSchema
+  end
+
   def test_create_table_force
     assert_unsafe CreateTableForce
   end

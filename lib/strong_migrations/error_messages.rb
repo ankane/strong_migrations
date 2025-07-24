@@ -102,6 +102,10 @@ in your application. A safer approach is to:
 5. Stop writing to the old column
 6. Drop the old column",
 
+    rename_schema:
+"Renaming a schema that's in use will cause errors
+in your application.",
+
     rename_table:
 "Renaming a table that's in use will cause errors
 in your application. A safer approach is to:

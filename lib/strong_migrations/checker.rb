@@ -79,6 +79,8 @@ module StrongMigrations
           check_remove_index(*args)
         when :rename_column
           check_rename_column
+        when :rename_schema
+          check_rename_schema
         when :rename_table
           check_rename_table
         when :validate_check_constraint

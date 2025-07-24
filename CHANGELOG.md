@@ -1,5 +1,6 @@
 ## 2.5.0 (unreleased)
 
+- Added check for `rename_schema`
 - Made `auto_analyze` apply to `add_reference`
 
 ## 2.4.0 (2025-06-23)

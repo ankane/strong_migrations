@@ -384,6 +384,10 @@ module StrongMigrations
       raise_error :rename_column
     end
 
+    def check_rename_schema
+      raise_error :rename_schema
+    end
+
     def check_rename_table
       raise_error :rename_table
     end

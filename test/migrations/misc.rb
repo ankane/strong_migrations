@@ -16,6 +16,12 @@ class RenameTable < TestMigration
   end
 end
 
+class RenameSchema < TestMigration
+  def change
+    rename_schema :public, :bad_name
+  end
+end
+
 class CreateTableForce < TestMigration
   def change
     create_table :admins, force: :cascade do |t|

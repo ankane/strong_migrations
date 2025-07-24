@@ -8,6 +8,8 @@ jobs:
       matrix:
         include:
           - ruby: 3.4
+            gemfile: gemfiles/activerecord81.gemfile
+          - ruby: 3.4
             gemfile: Gemfile
           - ruby: 3.3
             gemfile: gemfiles/activerecord72.gemfile
