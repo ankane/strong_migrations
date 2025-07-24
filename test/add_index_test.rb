@@ -63,9 +63,13 @@ class AddIndexTest < Minitest::Test
 
   def test_auto_analyze
     StrongMigrations.auto_analyze = true
-    assert_safe AddIndexSafetyAssured
+    assert_analyzed AddIndexSafetyAssured
   ensure
     StrongMigrations.auto_analyze = false
+  end
+
+  def test_auto_analyze_false
+    refute_analyzed AddIndexSafetyAssured
   end
 
   def test_extra_arguments

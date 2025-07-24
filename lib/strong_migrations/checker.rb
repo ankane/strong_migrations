@@ -111,7 +111,7 @@ module StrongMigrations
         end
 
       # outdated statistics + a new index can hurt performance of existing queries
-      if StrongMigrations.auto_analyze && direction == :up && method == :add_index
+      if StrongMigrations.auto_analyze && direction == :up && adds_index?(method, *args)
         adapter.analyze_table(args[0])
       end
 
@@ -253,6 +253,18 @@ module StrongMigrations
         yield
       ensure
         @skip_retries = previous_value
+      end
+    end
+
+    def adds_index?(method, *args)
+      case method
+      when :add_index
+        true
+      when :add_reference, :add_belongs_to
+        options = args.extract_options!
+        !!options.fetch(:index, true)
+      else
+        false
       end
     end
 

@@ -1,3 +1,7 @@
+## 2.5.0 (unreleased)
+
+- Made `auto_analyze` apply to `add_reference`
+
 ## 2.4.0 (2025-06-23)
 
 - Added `remove_invalid_indexes` option to install generator

@@ -206,6 +206,33 @@ class Minitest::Test
   ensure
     pool.checkin(connection) if connection
   end
+
+  def assert_analyzed(migration)
+    assert analyzed?(migration)
+  end
+
+  def refute_analyzed(migration)
+    refute analyzed?(migration)
+  end
+
+  def analyzed?(migration)
+    statements = capture_statements do
+      migrate migration, direction: :up
+    end
+    migrate migration, direction: :down
+    statements.any? { |s| s.start_with?("ANALYZE") }
+  end
+
+  def capture_statements
+    statements = []
+    callback = lambda do |_, _, _, _, payload|
+      statements << payload[:sql] if payload[:name] != "SCHEMA"
+    end
+    ActiveSupport::Notifications.subscribed(callback, "sql.active_record") do
+      yield
+    end
+    statements
+  end
 end
 
 StrongMigrations.add_check do |method, args|
