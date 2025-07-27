@@ -80,7 +80,7 @@ Postgres-specific checks:
 - [adding a json column](#adding-a-json-column)
 - [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
 - [adding a column with a volatile default value](#adding-a-column-with-a-volatile-default-value)
-- [renaming a schema](#renaming-a-schema) [unreleased]
+- [renaming a schema](#renaming-a-schema)
 
 Config-specific checks:
 
