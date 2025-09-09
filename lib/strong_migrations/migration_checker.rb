@@ -1,6 +1,5 @@
 module StrongMigrations
   class MigrationChecker
-    PRIMARY_DATABASE = "primary"
     TEST_DATABASE = "test"
 
     def initialize
@@ -16,8 +15,38 @@ module StrongMigrations
     private
 
     def target_databases
-      return [PRIMARY_DATABASE] unless rails_application?
+      return [primary_database_name] unless rails_application?
       configured_databases.reject { |database| skip_database?(database) }
+    end
+
+    def primary_database_name
+      return detect_primary_database if rails_application?
+      "default"
+    end
+
+    def detect_primary_database
+      databases = configured_databases
+      
+      # Strategy 1: Rails 6+ multi-database primary
+      return "primary" if databases.include?("primary")
+      
+      # Strategy 2: Current Rails environment
+      return Rails.env if databases.include?(Rails.env)
+      
+      # Strategy 3: Common defaults
+      ["default", "development"].each do |name|
+        return name if databases.include?(name)
+      end
+      
+      # Strategy 4: First non-test database (fallback)
+      fallback_database
+    end
+
+    def fallback_database
+      databases = configured_databases
+      non_test = databases.reject { |db| db == TEST_DATABASE }
+      non_skipped = non_test.reject { |db| StrongMigrations.skipped_databases.include?(db) }
+      non_skipped.first || non_test.first || "default"
     end
 
     def configured_databases
@@ -43,17 +72,35 @@ module StrongMigrations
     end
 
     def connection_pool_for(database)
-      if database == PRIMARY_DATABASE
-        ActiveRecord::Base.connection_pool
-      else
-        ActiveRecord::Base.connection_handler.retrieve_connection_pool(database)
-      end
+      return default_connection_pool unless rails_application?
+      
+      ActiveRecord::Base.connection_handler.retrieve_connection_pool(database) ||
+      default_connection_pool
+    end
+
+    def default_connection_pool
+      ActiveRecord::Base.connection_pool
     end
 
     def find_pending_migrations(connection_pool)
       migration_context = connection_pool.migration_context
-      applied_versions = migration_context.get_all_versions
+      
+      if migration_context.respond_to?(:pending_migration_versions)
+        find_pending_with_rails_method(migration_context)
+      else
+        find_pending_manually(migration_context)
+      end
+    end
 
+    def find_pending_with_rails_method(migration_context)
+      pending_versions = migration_context.pending_migration_versions
+      migration_context.migrations.select do |migration|
+        pending_versions.include?(migration.version)
+      end
+    end
+
+    def find_pending_manually(migration_context)
+      applied_versions = migration_context.get_all_versions
       migration_context.migrations.reject do |migration|
         applied_versions.include?(migration.version)
       end

@@ -5,19 +5,41 @@ class MigrationCheckerTest < Minitest::Test
     @checker = StrongMigrations::MigrationChecker.new
   end
 
-  def test_database_filtering_logic
-    rails_app = create_rails_app(["development", "test", "production"])
-    
-    Rails.stub(:respond_to?, ->(method) { method == :application }) do
-      Rails.stub(:application, rails_app) do
-        StrongMigrations.stub(:skipped_databases, ["production"]) do
-          databases = @checker.send(:target_databases)
-          
-          assert_equal ["development"], databases
-          refute_includes databases, "test"
-          refute_includes databases, "production"
-        end
+  def test_target_databases_filters_test_and_skipped
+    with_rails_app(["development", "test", "production"]) do
+      StrongMigrations.stub(:skipped_databases, ["production"]) do
+        databases = @checker.send(:target_databases)
+        
+        assert_equal ["development"], databases
+        refute_includes databases, "test"
+        refute_includes databases, "production"
       end
+    end
+  end
+
+  def test_primary_database_name_prefers_primary
+    with_rails_app(["primary", "secondary"]) do
+      assert_equal "primary", @checker.send(:primary_database_name)
+    end
+  end
+
+  def test_primary_database_name_uses_rails_env
+    with_rails_app(["development", "staging"]) do
+      Rails.stub(:env, "development") do
+        assert_equal "development", @checker.send(:primary_database_name)
+      end
+    end
+  end
+
+  def test_primary_database_name_falls_back_to_default
+    with_rails_app(["default", "backup"]) do
+      assert_equal "default", @checker.send(:primary_database_name)
+    end
+  end
+
+  def test_primary_database_name_without_rails
+    Rails.stub(:respond_to?, false) do
+      assert_equal "default", @checker.send(:primary_database_name)
     end
   end
 
@@ -56,7 +78,10 @@ class MigrationCheckerTest < Minitest::Test
   end
 
   def create_rails_app(databases)
-    config = create_mock_object(database_configuration: databases.to_h { |db| [db, {}] })
+    # Ensure keys are returned in the order we specify
+    database_config = {}
+    databases.each { |db| database_config[db] = {} }
+    config = create_mock_object(database_configuration: database_config)
     create_mock_object(config: config)
   end
 
@@ -72,6 +97,15 @@ class MigrationCheckerTest < Minitest::Test
     mock = Object.new
     methods.each { |method, value| mock.define_singleton_method(method) { value } }
     mock
+  end
+
+  def with_rails_app(databases)
+    rails_app = create_rails_app(databases)
+    Rails.stub(:respond_to?, ->(method) { method == :application }) do
+      Rails.stub(:application, rails_app) do
+        yield
+      end
+    end
   end
 
 end
