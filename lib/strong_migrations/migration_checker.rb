@@ -8,74 +8,35 @@ module StrongMigrations
     end
 
     def run
-      target_databases.each { |database| check_database(database) }
+      target_databases.each { |connection_pool| check_database(connection_pool) }
       report_results
     end
 
     private
 
     def target_databases
-      return [primary_database_name] unless rails_application?
-      configured_databases.reject { |database| skip_database?(database) }
-    end
-
-    def primary_database_name
-      return detect_primary_database if rails_application?
-      "default"
-    end
-
-    def detect_primary_database
-      databases = configured_databases
+      return [default_connection_pool] unless rails_application?
       
-      # Strategy 1: Rails 6+ multi-database primary
-      return "primary" if databases.include?("primary")
-      
-      # Strategy 2: Current Rails environment
-      return Rails.env if databases.include?(Rails.env)
-      
-      # Strategy 3: Common defaults
-      ["default", "development"].each do |name|
-        return name if databases.include?(name)
+      ActiveRecord::Base.connection_handler.connection_pool_list.reject do |pool|
+        skip_database?(pool.db_config.name)
       end
-      
-      # Strategy 4: First non-test database (fallback)
-      fallback_database
-    end
-
-    def fallback_database
-      databases = configured_databases
-      non_test = databases.reject { |db| db == TEST_DATABASE }
-      non_skipped = non_test.reject { |db| StrongMigrations.skipped_databases.include?(db) }
-      non_skipped.first || non_test.first || "default"
-    end
-
-    def configured_databases
-      Rails.application.config.database_configuration.keys
     end
 
     def skip_database?(database)
-      database == TEST_DATABASE || StrongMigrations.skipped_databases.include?(database)
+      database == TEST_DATABASE || StrongMigrations.skipped_databases.map(&:to_s).include?(database)
     end
 
     def rails_application?
       defined?(Rails) && Rails.respond_to?(:application) && Rails.application
     end
 
-    def check_database(database)
-      connection_pool = connection_pool_for(database)
+    def check_database(connection_pool)
       return unless connection_pool
 
       pending_migrations = find_pending_migrations(connection_pool)
       return if pending_migrations.empty?
 
       process_migrations(pending_migrations, connection_pool)
-    end
-
-    def connection_pool_for(database)
-      return default_connection_pool unless rails_application?
-      
-      ActiveRecord::Base.connection_handler.retrieve_connection_pool(database) ||
-      default_connection_pool
     end
 
     def default_connection_pool

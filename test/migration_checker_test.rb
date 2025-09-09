@@ -6,40 +6,40 @@ class MigrationCheckerTest < Minitest::Test
   end
 
   def test_target_databases_filters_test_and_skipped
-    with_rails_app(["development", "test", "production"]) do
-      StrongMigrations.stub(:skipped_databases, ["production"]) do
-        databases = @checker.send(:target_databases)
-        
-        assert_equal ["development"], databases
-        refute_includes databases, "test"
-        refute_includes databases, "production"
+    dev_pool = create_connection_pool_with_name("development")
+    test_pool = create_connection_pool_with_name("test")
+    prod_pool = create_connection_pool_with_name("production")
+    
+    Rails.stub(:respond_to?, ->(method) { method == :application }) do
+      Rails.stub(:application, Object.new) do
+        ActiveRecord::Base.connection_handler.stub(:connection_pool_list, [dev_pool, test_pool, prod_pool]) do
+          StrongMigrations.stub(:skipped_databases, ["production"]) do
+            pools = @checker.send(:target_databases)
+            
+            assert_equal 1, pools.size
+            assert_equal "development", pools.first.db_config.name
+          end
+        end
       end
     end
   end
 
-  def test_primary_database_name_prefers_primary
-    with_rails_app(["primary", "secondary"]) do
-      assert_equal "primary", @checker.send(:primary_database_name)
-    end
-  end
 
-  def test_primary_database_name_uses_rails_env
-    with_rails_app(["development", "staging"]) do
-      Rails.stub(:env, "development") do
-        assert_equal "development", @checker.send(:primary_database_name)
-      end
-    end
-  end
-
-  def test_primary_database_name_falls_back_to_default
-    with_rails_app(["default", "backup"]) do
-      assert_equal "default", @checker.send(:primary_database_name)
-    end
-  end
-
-  def test_primary_database_name_without_rails
+  def test_target_databases_returns_default_when_not_rails_app
     Rails.stub(:respond_to?, false) do
-      assert_equal "default", @checker.send(:primary_database_name)
+      pools = @checker.send(:target_databases)
+      
+      assert_equal 1, pools.size
+      assert_equal ActiveRecord::Base.connection_pool, pools.first
+    end
+  end
+
+  def test_skip_database_filters_test_and_configured_skipped
+    assert @checker.send(:skip_database?, "test")
+    
+    with_skip_database("production") do
+      assert @checker.send(:skip_database?, "production")
+      refute @checker.send(:skip_database?, "development")
     end
   end
 
@@ -77,12 +77,9 @@ class MigrationCheckerTest < Minitest::Test
     )
   end
 
-  def create_rails_app(databases)
-    # Ensure keys are returned in the order we specify
-    database_config = {}
-    databases.each { |db| database_config[db] = {} }
-    config = create_mock_object(database_configuration: database_config)
-    create_mock_object(config: config)
+  def create_connection_pool_with_name(db_name)
+    db_config = create_mock_object(name: db_name)
+    create_mock_object(db_config: db_config)
   end
 
   def create_connection_pool(migrations, applied_versions)
@@ -99,12 +96,9 @@ class MigrationCheckerTest < Minitest::Test
     mock
   end
 
-  def with_rails_app(databases)
-    rails_app = create_rails_app(databases)
-    Rails.stub(:respond_to?, ->(method) { method == :application }) do
-      Rails.stub(:application, rails_app) do
-        yield
-      end
+  def with_skip_database(database)
+    StrongMigrations.stub(:skipped_databases, [database]) do
+      yield
     end
   end
 
