@@ -981,6 +981,48 @@ Columns can flip order in `db/schema.rb` when you have multiple developers. One 
 StrongMigrations.alphabetize_schema = true
 ```
 
+## Check Pending Migrations
+
+Check all pending migrations for unsafe operations without running them:
+
+```sh
+rake strong_migrations:check
+```
+
+This will validate pending migrations and:
+
+- Exit with code 0 if all migrations are safe
+- Exit with code 1 if any migrations have unsafe operations
+- List all problematic migrations with specific error messages
+- Work across multiple database configurations
+
+Example output for unsafe migrations:
+
+```txt
+Checking 2 pending migrations for primary database...
+
+1 of 2 pending migrations failed strong_migrations checks:
+================================================================================
+
+1. Migration: AddIndex (version: 20230101000001)
+   File: db/migrate/20230101000001_add_index.rb
+   Error:
+     Adding an index non-concurrently blocks writes. Instead, use:
+     
+     class AddIndex < ActiveRecord::Migration[8.0]
+       disable_ddl_transaction!
+       
+       def change
+         add_index :users, :name, algorithm: :concurrently
+       end
+     end
+
+================================================================================
+Summary: 1 migrations failed, 1 passed
+```
+
+Use this to validate migrations in CI or before deploying to production.
+
 ## Permissions
 
 We recommend using a [separate database user](https://ankane.org/postgres-users) for migrations when possible so you don’t need to grant your app user permission to alter tables.

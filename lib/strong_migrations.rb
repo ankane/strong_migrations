@@ -13,6 +13,7 @@ require_relative "strong_migrations/safe_methods"
 require_relative "strong_migrations/checker"
 require_relative "strong_migrations/migration"
 require_relative "strong_migrations/migration_context"
+require_relative "strong_migrations/migration_checker"
 require_relative "strong_migrations/migrator"
 require_relative "strong_migrations/version"
 
@@ -88,6 +89,10 @@ module StrongMigrations
 
   def self.skip_database(database)
     self.skipped_databases << database
+  end
+
+  def self.check_pending_migrations
+    MigrationChecker.new.run
   end
 end
 
