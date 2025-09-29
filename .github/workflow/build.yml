@@ -1,0 +1,46 @@
+name: build
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ruby: 3.4
+            gemfile: gemfiles/activerecord81.gemfile
+          - ruby: 3.4
+            gemfile: Gemfile
+          - ruby: 3.3
+            gemfile: gemfiles/activerecord72.gemfile
+          - ruby: 3.3
+            gemfile: gemfiles/activerecord52.gemfile
+          - ruby: 3.3
+            gemfile: gemfiles/activerecord42.gemfile
+          - ruby: 3.2
+            gemfile: gemfiles/activerecord71.gemfile
+    env:
+      BUNDLE_GEMFILE: ${{ matrix.gemfile }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+
+      - uses: ankane/setup-postgres@v1
+        with:
+          database: strong_migrations_test
+      - run: bundle exec rake test
+
+      - uses: ankane/setup-mysql@v1
+        with:
+          database: strong_migrations_test
+      - run: ADAPTER=mysql2 bundle exec rake test
+      - run: ADAPTER=trilogy bundle exec rake test
+
+      - uses: ankane/setup-mariadb@v1
+        with:
+          database: strong_migrations_test
+      - run: ADAPTER=mysql2 bundle exec rake test
+      - run: ADAPTER=trilogy bundle exec rake test
