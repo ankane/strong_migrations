@@ -2,7 +2,11 @@
 # when making changes, be sure to see how it affects it
 module StrongMigrations
   module Adapters
-    class MySQLAdapter < AbstractAdapter
+    class MysqlAdapter < AbstractAdapter
+      def mysql?
+        true
+      end
+
       def name
         "MySQL"
       end
@@ -13,22 +17,30 @@ module StrongMigrations
 
       def server_version
         @server_version ||= begin
-          target_version(StrongMigrations.target_mysql_version) do
-            select_all("SELECT VERSION()").first["VERSION()"].split("-").first
-          end
+          target_version(StrongMigrations.target_mysql_version) ||
+            target_version(StrongMigrations.target_version) ||
+            begin
+              select_all("SELECT VERSION()").first["VERSION()"].split("-").first
+            rescue
+              connection.select_all("SELECT version()").first["version()"]
+            end
+        rescue
+          nil
         end
       end
 
       def set_statement_timeout(timeout)
-        # use ceil to prevent no timeout for values under 1 ms
-        select_all("SET max_execution_time = #{connection.quote((timeout.to_f * 1000).ceil)}")
+        # MySQL 5.7.8+ and MariaDB 10.1.1+
+        if min_version?("5.7.8")
+          connection.execute("SET max_execution_time = #{timeout_value(timeout)}")
+        end
       end
 
       def set_lock_timeout(timeout)
         # fix deprecation warning with Active Record 7.1
         timeout = timeout.value if timeout.is_a?(ActiveSupport::Duration)
 
-        select_all("SET lock_wait_timeout = #{connection.quote(timeout)}")
+        connection.execute("SET lock_wait_timeout = #{timeout_value(timeout, "s")}")
       end
 
       def check_lock_timeout(limit)
@@ -39,8 +51,24 @@ module StrongMigrations
         end
       end
 
+      def default_lock_timeout
+        "10"
+      end
+
+      def default_statement_timeout
+        "1h"
+      end
+
       def analyze_table(table)
-        connection.execute "ANALYZE TABLE #{connection.quote_table_name(table.to_s)}"
+        connection.execute "ANALYZE TABLE #{connection.quote_table_name(table)}"
+      end
+
+      def add_index_concurrently_supported?
+        false
+      end
+
+      def remove_index_concurrently_supported?
+        false
       end
 
       def add_column_default_safe?
@@ -97,6 +125,14 @@ module StrongMigrations
       end
 
       private
+
+      def timeout_value(timeout, suffix = nil)
+        if timeout.is_a?(String)
+          timeout.to_i
+        else
+          timeout.to_i / (suffix == "s" ? 1000 : 1)
+        end
+      end
 
       # do not memoize
       # want latest value

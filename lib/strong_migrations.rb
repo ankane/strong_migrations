@@ -2,27 +2,25 @@
 require "active_support"
 
 # adapters
-require_relative "strong_migrations/adapters/abstract_adapter"
-require_relative "strong_migrations/adapters/mysql_adapter"
-require_relative "strong_migrations/adapters/mariadb_adapter"
-require_relative "strong_migrations/adapters/postgresql_adapter"
+require "strong_migrations/adapters/abstract_adapter"
+require "strong_migrations/adapters/mysql_adapter"
+require "strong_migrations/adapters/mariadb_adapter"
+require "strong_migrations/adapters/postgresql_adapter"
 
 # modules
-require_relative "strong_migrations/checks"
-require_relative "strong_migrations/safe_methods"
-require_relative "strong_migrations/checker"
-require_relative "strong_migrations/migration"
-require_relative "strong_migrations/migration_context"
-require_relative "strong_migrations/migrator"
-require_relative "strong_migrations/version"
-
-# integrations
-require_relative "strong_migrations/railtie" if defined?(Rails)
+require "strong_migrations/safe_methods"
+require "strong_migrations/checker"
+require "strong_migrations/schema_dumper"
+require "strong_migrations/migrator"
+require "strong_migrations/migration_context"
+require "strong_migrations/database_tasks"
+require "strong_migrations/migration"
+require "strong_migrations/railtie" if defined?(Rails)
+require "strong_migrations/unsafe_migration"
+require "strong_migrations/version"
 
 module StrongMigrations
   class Error < StandardError; end
-  class UnsafeMigration < Error; end
-  class UnsupportedVersion < Error; end
 
   class << self
     attr_accessor :auto_analyze, :start_after, :checks, :error_messages,
@@ -42,6 +40,7 @@ module StrongMigrations
   self.alphabetize_schema = false
   self.skipped_databases = []
   self.remove_invalid_indexes = false
+  self.enabled_checks = {}
 
   # private
   def self.developer_env?
@@ -96,9 +95,15 @@ require_relative "strong_migrations/error_messages"
 
 ActiveSupport.on_load(:active_record) do
   ActiveRecord::Migration.prepend(StrongMigrations::Migration)
-  ActiveRecord::MigrationContext.prepend(StrongMigrations::MigrationContext)
-  ActiveRecord::Migrator.prepend(StrongMigrations::Migrator)
+  if defined?(ActiveRecord::MigrationContext)
+    ActiveRecord::MigrationContext.prepend(StrongMigrations::MigrationContext)
+  end
+  if defined?(ActiveRecord::Migrator) && ActiveRecord::VERSION::MAJOR >= 5
+    ActiveRecord::Migrator.prepend(StrongMigrations::Migrator)
+  end
 
   require_relative "strong_migrations/schema_dumper"
-  ActiveRecord::SchemaDumper.prepend(StrongMigrations::SchemaDumper)
+  if defined?(ActiveRecord::SchemaDumper)
+    ActiveRecord::SchemaDumper.prepend(StrongMigrations::SchemaDumper)
+  end
 end

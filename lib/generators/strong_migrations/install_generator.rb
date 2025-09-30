@@ -31,7 +31,11 @@ module StrongMigrations
       end
 
       def adapter
-        ActiveRecord::Base.connection_db_config.adapter.to_s
+        if ActiveRecord::Base.respond_to?(:connection_db_config)
+          ActiveRecord::Base.connection_db_config.adapter.to_s
+        else
+          ActiveRecord::Base.connection.adapter_name.downcase
+        end
       end
 
       def postgresql?

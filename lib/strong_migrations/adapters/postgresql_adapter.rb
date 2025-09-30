@@ -1,6 +1,10 @@
 module StrongMigrations
   module Adapters
-    class PostgreSQLAdapter < AbstractAdapter
+    class PostgresqlAdapter < AbstractAdapter
+      def postgresql?
+        true
+      end
+
       def name
         "PostgreSQL"
       end
@@ -10,26 +14,34 @@ module StrongMigrations
       end
 
       def server_version
-        @version ||= begin
-          target_version(StrongMigrations.target_postgresql_version) do
-            version = select_all("SHOW server_version_num").first["server_version_num"].to_i
-            # major and minor version
-            "#{version / 10000}.#{(version % 10000)}"
-          end
+        @server_version ||= begin
+          target_version(StrongMigrations.target_postgresql_version) ||
+            target_version(StrongMigrations.target_version) ||
+            begin
+              version = select_all("SHOW server_version_num").first["server_version_num"].to_i
+              # major and minor version
+              "#{version / 10000}.#{(version % 10000)}"
+            rescue
+              connection.select_all("SHOW server_version").first["server_version"]
+            end
+        rescue
+          nil
         end
       end
 
       def set_statement_timeout(timeout)
-        set_timeout("statement_timeout", timeout)
-      end
-
-      def set_transaction_timeout(timeout)
-        # TODO make sure true version supports it as well?
-        set_timeout("transaction_timeout", timeout) if server_version >= Gem::Version.new("17")
+        connection.execute("SET statement_timeout = #{connection.quote(timeout_value(timeout))}")
       end
 
       def set_lock_timeout(timeout)
-        set_timeout("lock_timeout", timeout)
+        connection.execute("SET lock_timeout = #{connection.quote(timeout_value(timeout))}")
+      end
+
+      def set_transaction_timeout(timeout)
+        # transaction_timeout introduced in PG 17
+        if min_version?("17")
+          connection.execute("SET transaction_timeout = #{connection.quote(timeout_value(timeout))}")
+        end
       end
 
       def check_lock_timeout(limit)
@@ -42,8 +54,24 @@ module StrongMigrations
         end
       end
 
+      def default_lock_timeout
+        "10s"
+      end
+
+      def default_statement_timeout
+        "1h"
+      end
+
       def analyze_table(table)
-        connection.execute "ANALYZE #{connection.quote_table_name(table.to_s)}"
+        connection.execute "ANALYZE #{connection.quote_table_name(table)}"
+      end
+
+      def add_index_concurrently_supported?
+        true
+      end
+
+      def remove_index_concurrently_supported?
+        min_version?("9.2")
       end
 
       def add_column_default_safe?
@@ -172,13 +200,18 @@ module StrongMigrations
         connection.check_constraints(table).select { |c| /\b#{Regexp.escape(column.to_s)}\b/.match?(c.expression) }
       end
 
+      def rewrite_blocks
+        "reads and writes"
+      end
+
       private
 
-      def set_timeout(setting, timeout)
-        # use ceil to prevent no timeout for values under 1 ms
-        timeout = (timeout.to_f * 1000).ceil unless timeout.is_a?(String)
-
-        select_all("SET #{setting} TO #{connection.quote(timeout)}")
+      def timeout_value(timeout)
+        if timeout.is_a?(String)
+          timeout
+        else
+          "#{timeout.to_i}ms"
+        end
       end
 
       # units: https://www.postgresql.org/docs/current/config-setting.html

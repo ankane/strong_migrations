@@ -1,18 +1,18 @@
 module StrongMigrations
   module MigrationContext
-    def up(...)
+    def up(*args)
       super
     rescue => e
       strong_migrations_process_exception(e)
     end
 
-    def down(...)
+    def down(*args)
       super
     rescue => e
       strong_migrations_process_exception(e)
     end
 
-    def run(...)
+    def run(*args)
       super
     rescue => e
       strong_migrations_process_exception(e)
@@ -43,4 +43,9 @@ module StrongMigrations
       raise e
     end
   end
+end
+
+# Hook into migration context for Rails 5.2+
+if defined?(ActiveRecord::MigrationContext)
+  ActiveRecord::MigrationContext.prepend(StrongMigrations::MigrationContext)
 end

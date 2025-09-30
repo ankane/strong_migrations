@@ -5,8 +5,24 @@ module StrongMigrations
         @checker = checker
       end
 
+      def connection
+        @checker.connection
+      end
+
+      def postgresql?
+        false
+      end
+
+      def mysql?
+        false
+      end
+
+      def mariadb?
+        false
+      end
+
       def name
-        "Unknown"
+        connection.adapter_name
       end
 
       def min_version
@@ -47,14 +63,42 @@ module StrongMigrations
       def max_constraint_name_length
       end
 
-      private
-
-      def connection
-        @checker.send(:connection)
+      def server_version
+        @server_version ||= begin
+          target_version(StrongMigrations.target_version) ||
+            connection.select_all("SELECT version()").first["version"]
+        rescue
+          nil
+        end
       end
+
+      def min_version?(version)
+        return false unless server_version
+
+        if version.is_a?(String)
+          Gem::Version.new(server_version_num) >= Gem::Version.new(version)
+        else
+          server_version_num >= version
+        end
+      end
+
+      private
 
       def select_all(statement)
         connection.select_all(statement)
+      end
+
+      def server_version_num
+        @server_version_num ||= begin
+          version = server_version
+          if postgresql?
+            version.split(" ").first
+          elsif mysql? || mariadb?
+            version.split("-").first
+          else
+            version
+          end
+        end
       end
 
       def target_version(target_version)
@@ -62,18 +106,31 @@ module StrongMigrations
         version =
           if target_version && StrongMigrations.developer_env?
             if target_version.is_a?(Hash)
-              db_config_name = connection.pool.db_config.name
-              target_version.stringify_keys.fetch(db_config_name) do
+              # Rails 4.2 compatible database name access
+              db_name = if connection.respond_to?(:database_name)
+                          connection.database_name
+                        else
+                          connection.current_database
+                        end
+              target_version.stringify_keys.fetch(db_name) do
                 # error class is not shown in db:migrate output so ensure message is descriptive
-                raise StrongMigrations::Error, "StrongMigrations.target_version is not configured for :#{db_config_name} database"
+                raise StrongMigrations::Error, "StrongMigrations.target_version is not configured for :#{db_name} database"
               end.to_s
             else
               target_version.to_s
             end
           else
-            yield
+            yield if block_given?
           end
-        Gem::Version.new(version)
+        version ? Gem::Version.new(version) : nil
+      end
+
+      def database_name
+        if connection.respond_to?(:database_name)
+          connection.database_name
+        else
+          connection.current_database
+        end
       end
     end
   end

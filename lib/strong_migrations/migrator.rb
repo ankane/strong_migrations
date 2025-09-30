@@ -1,6 +1,6 @@
 module StrongMigrations
   module Migrator
-    def ddl_transaction(migration, ...)
+    def ddl_transaction(migration, *args)
       return super unless StrongMigrations.lock_timeout_retries > 0 && use_transaction?(migration)
 
       # handle MigrationProxy class
@@ -14,8 +14,13 @@ module StrongMigrations
         # failed transaction reverts timeout, so need to re-apply
         checker.reset
 
-        super(migration, ...)
+        super(migration, *args)
       end
     end
   end
+end
+
+# Hook into migrator for Rails 5+
+if defined?(ActiveRecord::Migrator) && ActiveRecord::VERSION::MAJOR >= 5
+  ActiveRecord::Migrator.prepend(StrongMigrations::Migrator)
 end
