@@ -27,6 +27,17 @@ class CheckTimeouts < TestMigration
   end
 end
 
+class CheckTransactionTimeoutWithoutStatement < TestMigration
+  include Helpers
+
+  def change
+    $transaction_timeout =
+      if postgresql? && transaction_timeout?
+        connection.select_all("SHOW transaction_timeout").first["transaction_timeout"]
+      end
+  end
+end
+
 class CheckLockTimeout < TestMigration
   def change
     safety_assured { execute "SELECT 1" }
