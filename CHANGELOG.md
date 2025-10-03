@@ -1,3 +1,7 @@
+## 2.5.1 (unreleased)
+
+- Fixed `transaction_timeout` option with DDL transaction
+
 ## 2.5.0 (2025-07-27)
 
 - Added check for `rename_schema`
