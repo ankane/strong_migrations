@@ -151,6 +151,16 @@ module StrongMigrations
       StrongMigrations.skipped_databases.map(&:to_s).include?(db_config_name)
     end
 
+    def set_transaction_timeout
+      return if defined?(@transaction_timeout_set)
+
+      if StrongMigrations.transaction_timeout
+        adapter.set_transaction_timeout(StrongMigrations.transaction_timeout)
+      end
+
+      @transaction_timeout_set = true
+    end
+
     private
 
     def check_adapter
@@ -182,9 +192,6 @@ module StrongMigrations
 
       if StrongMigrations.statement_timeout
         adapter.set_statement_timeout(StrongMigrations.statement_timeout)
-      end
-      if StrongMigrations.transaction_timeout
-        adapter.set_transaction_timeout(StrongMigrations.transaction_timeout)
       end
       if StrongMigrations.lock_timeout
         adapter.set_lock_timeout(StrongMigrations.lock_timeout)

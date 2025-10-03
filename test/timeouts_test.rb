@@ -76,6 +76,16 @@ class TimeoutsTest < Minitest::Test
     assert_equal "1001ms", $transaction_timeout
   end
 
+  def test_transaction_timeout_is_set_before_statements
+    skip unless transaction_timeout?
+
+    StrongMigrations.transaction_timeout = 1.seconds
+
+    migrate CheckTransactionTimeoutWithoutStatement
+
+    assert_equal "1s", $transaction_timeout
+  end
+
   def test_lock_timeout_float
     skip unless postgresql?
 
