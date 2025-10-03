@@ -6,6 +6,7 @@ module StrongMigrations
 
       # handle MigrationProxy class
       migration = migration.send(:migration) if !migration.is_a?(ActiveRecord::Migration) && migration.respond_to?(:migration, true)
+
       checker = migration.send(:strong_migrations_checker)
       return super if checker.skip?
 
