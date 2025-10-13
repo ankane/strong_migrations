@@ -1,4 +1,4 @@
-## 2.5.1 (unreleased)
+## 2.5.1 (2025-10-13)
 
 - Fixed `transaction_timeout` option with DDL transaction
 
