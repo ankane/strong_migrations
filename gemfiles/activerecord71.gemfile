@@ -3,7 +3,7 @@ source "https://rubygems.org"
 gemspec path: ".."
 
 gem "rake"
-gem "minitest", ">= 5"
+gem "minitest"
 gem "activerecord", "~> 7.1.0"
 gem "pg"
 gem "mysql2", "< 0.5.7"
