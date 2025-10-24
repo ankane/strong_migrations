@@ -82,10 +82,6 @@ Postgres-specific checks:
 - [adding a column with a volatile default value](#adding-a-column-with-a-volatile-default-value)
 - [renaming a schema](#renaming-a-schema)
 
-Config-specific checks:
-
-- [changing the default value of a column](#changing-the-default-value-of-a-column)
-
 Best practices:
 
 - [keeping non-unique indexes to three columns or less](#keeping-non-unique-indexes-to-three-columns-or-less)
@@ -683,36 +679,6 @@ A safer approach is to:
 4. Move reads from the old schema to the new schema
 5. Stop writing to the old schema
 6. Drop the old schema
-
-### Changing the default value of a column
-
-#### Bad
-
-Rails < 7 enables partial writes by default, which can cause incorrect values to be inserted when changing the default value of a column.
-
-```ruby
-class ChangeSomeColumnDefault < ActiveRecord::Migration[6.1]
-  def change
-    change_column_default :users, :some_column, from: "old", to: "new"
-  end
-end
-
-User.create!(some_column: "old") # can insert "new"
-```
-
-#### Good
-
-Disable partial writes in `config/application.rb`. For Rails < 7, use:
-
-```ruby
-config.active_record.partial_writes = false
-```
-
-For Rails 7+, use:
-
-```ruby
-config.active_record.partial_inserts = false
-```
 
 ### Keeping non-unique indexes to three columns or less
 
