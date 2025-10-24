@@ -43,7 +43,7 @@ end
 
 Deploy the code, then wrap this step in a safety_assured { ... } block.
 
-class RemoveColumn < ActiveRecord::Migration[8.0]
+class RemoveColumn < ActiveRecord::Migration[8.1]
   def change
     safety_assured { remove_column :users, :name }
   end
@@ -99,7 +99,7 @@ You can also add [custom checks](#custom-checks) or [disable specific checks](#d
 Active Record caches database columns at runtime, so if you drop a column, it can cause exceptions until your app reboots.
 
 ```ruby
-class RemoveSomeColumnFromUsers < ActiveRecord::Migration[8.0]
+class RemoveSomeColumnFromUsers < ActiveRecord::Migration[8.1]
   def change
     remove_column :users, :some_column
   end
@@ -120,7 +120,7 @@ end
 3. Write a migration to remove the column (wrap in `safety_assured` block)
 
   ```ruby
-  class RemoveSomeColumnFromUsers < ActiveRecord::Migration[8.0]
+  class RemoveSomeColumnFromUsers < ActiveRecord::Migration[8.1]
     def change
       safety_assured { remove_column :users, :some_column }
     end
@@ -137,7 +137,7 @@ end
 Changing the type of a column causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and writes are blocked in MySQL and MariaDB.
 
 ```ruby
-class ChangeSomeColumnType < ActiveRecord::Migration[8.0]
+class ChangeSomeColumnType < ActiveRecord::Migration[8.1]
   def change
     change_column :users, :some_column, :new_type
   end
@@ -183,7 +183,7 @@ A safer approach is to:
 Renaming a column that’s in use will cause errors in your application.
 
 ```ruby
-class RenameSomeColumn < ActiveRecord::Migration[8.0]
+class RenameSomeColumn < ActiveRecord::Migration[8.1]
   def change
     rename_column :users, :some_column, :new_name
   end
@@ -208,7 +208,7 @@ A safer approach is to:
 Renaming a table that’s in use will cause errors in your application.
 
 ```ruby
-class RenameUsersToCustomers < ActiveRecord::Migration[8.0]
+class RenameUsersToCustomers < ActiveRecord::Migration[8.1]
   def change
     rename_table :users, :customers
   end
@@ -233,7 +233,7 @@ A safer approach is to:
 The `force` option can drop an existing table.
 
 ```ruby
-class CreateUsers < ActiveRecord::Migration[8.0]
+class CreateUsers < ActiveRecord::Migration[8.1]
   def change
     create_table :users, force: true do |t|
       # ...
@@ -247,7 +247,7 @@ end
 Create tables without the `force` option.
 
 ```ruby
-class CreateUsers < ActiveRecord::Migration[8.0]
+class CreateUsers < ActiveRecord::Migration[8.1]
   def change
     create_table :users do |t|
       # ...
@@ -265,7 +265,7 @@ If you intend to drop an existing table, run `drop_table` first.
 Adding an auto-incrementing column (`serial`/`bigserial` in Postgres and `AUTO_INCREMENT` in MySQL and MariaDB) causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and writes are blocked in MySQL and MariaDB.
 
 ```ruby
-class AddIdToCitiesUsers < ActiveRecord::Migration[8.0]
+class AddIdToCitiesUsers < ActiveRecord::Migration[8.1]
   def change
     add_column :cities_users, :id, :primary_key
   end
@@ -285,7 +285,7 @@ Create a new table and migrate the data with the same steps as [renaming a table
 Adding a stored generated column causes the entire table to be rewritten. During this time, reads and writes are blocked in Postgres, and writes are blocked in MySQL and MariaDB.
 
 ```ruby
-class AddSomeColumnToUsers < ActiveRecord::Migration[8.0]
+class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
   def change
     add_column :users, :some_column, :virtual, type: :string, as: "...", stored: true
   end
@@ -305,7 +305,7 @@ Add a non-generated column and use callbacks or triggers instead (or a virtual g
 Adding a check constraint blocks reads and writes in Postgres and blocks writes in MySQL and MariaDB while every row is checked.
 
 ```ruby
-class AddCheckConstraint < ActiveRecord::Migration[8.0]
+class AddCheckConstraint < ActiveRecord::Migration[8.1]
   def change
     add_check_constraint :users, "price > 0", name: "price_check"
   end
@@ -317,7 +317,7 @@ end
 Add the check constraint without validating existing rows:
 
 ```ruby
-class AddCheckConstraint < ActiveRecord::Migration[8.0]
+class AddCheckConstraint < ActiveRecord::Migration[8.1]
   def change
     add_check_constraint :users, "price > 0", name: "price_check", validate: false
   end
@@ -327,7 +327,7 @@ end
 Then validate them in a separate migration.
 
 ```ruby
-class ValidateCheckConstraint < ActiveRecord::Migration[8.0]
+class ValidateCheckConstraint < ActiveRecord::Migration[8.1]
   def change
     validate_check_constraint :users, name: "price_check"
   end
@@ -343,7 +343,7 @@ end
 Strong Migrations can’t ensure safety for raw SQL statements. Make really sure that what you’re doing is safe, then use:
 
 ```ruby
-class ExecuteSQL < ActiveRecord::Migration[8.0]
+class ExecuteSQL < ActiveRecord::Migration[8.1]
   def change
     safety_assured { execute "..." }
   end
@@ -359,7 +359,7 @@ Note: Strong Migrations does not detect dangerous backfills.
 Active Record creates a transaction around each migration, and backfilling in the same transaction that alters a table keeps the table locked for the [duration of the backfill](https://wework.github.io/data/2015/11/05/add-columns-with-default-values-to-large-tables-in-rails-postgres/).
 
 ```ruby
-class AddSomeColumnToUsers < ActiveRecord::Migration[8.0]
+class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
   def change
     add_column :users, :some_column, :text
     User.update_all some_column: "default_value"
@@ -374,7 +374,7 @@ Also, running a single query to update data can cause issues for large tables.
 There are three keys to backfilling safely: batching, throttling, and running it outside a transaction. Use the Rails console or a separate migration with `disable_ddl_transaction!`.
 
 ```ruby
-class BackfillSomeColumn < ActiveRecord::Migration[8.0]
+class BackfillSomeColumn < ActiveRecord::Migration[8.1]
   disable_ddl_transaction!
 
   def up
@@ -397,7 +397,7 @@ Note: If backfilling with a method other than `update_all`, use `User.reset_colu
 In Postgres, adding an index non-concurrently blocks writes.
 
 ```ruby
-class AddSomeIndexToUsers < ActiveRecord::Migration[8.0]
+class AddSomeIndexToUsers < ActiveRecord::Migration[8.1]
   def change
     add_index :users, :some_column
   end
@@ -409,7 +409,7 @@ end
 Add indexes concurrently.
 
 ```ruby
-class AddSomeIndexToUsers < ActiveRecord::Migration[8.0]
+class AddSomeIndexToUsers < ActiveRecord::Migration[8.1]
   disable_ddl_transaction!
 
   def change
@@ -435,7 +435,7 @@ rails g index table column
 Rails adds an index non-concurrently to references by default, which blocks writes in Postgres.
 
 ```ruby
-class AddReferenceToUsers < ActiveRecord::Migration[8.0]
+class AddReferenceToUsers < ActiveRecord::Migration[8.1]
   def change
     add_reference :users, :city
   end
@@ -447,7 +447,7 @@ end
 Make sure the index is added concurrently.
 
 ```ruby
-class AddReferenceToUsers < ActiveRecord::Migration[8.0]
+class AddReferenceToUsers < ActiveRecord::Migration[8.1]
   disable_ddl_transaction!
 
   def change
@@ -465,7 +465,7 @@ end
 In Postgres, adding a foreign key blocks writes on both tables.
 
 ```ruby
-class AddForeignKeyOnUsers < ActiveRecord::Migration[8.0]
+class AddForeignKeyOnUsers < ActiveRecord::Migration[8.1]
   def change
     add_foreign_key :users, :orders
   end
@@ -475,7 +475,7 @@ end
 or
 
 ```ruby
-class AddReferenceToUsers < ActiveRecord::Migration[8.0]
+class AddReferenceToUsers < ActiveRecord::Migration[8.1]
   def change
     add_reference :users, :order, foreign_key: true
   end
@@ -487,7 +487,7 @@ end
 Add the foreign key without validating existing rows:
 
 ```ruby
-class AddForeignKeyOnUsers < ActiveRecord::Migration[8.0]
+class AddForeignKeyOnUsers < ActiveRecord::Migration[8.1]
   def change
     add_foreign_key :users, :orders, validate: false
   end
@@ -497,7 +497,7 @@ end
 Then validate them in a separate migration.
 
 ```ruby
-class ValidateForeignKeyOnUsers < ActiveRecord::Migration[8.0]
+class ValidateForeignKeyOnUsers < ActiveRecord::Migration[8.1]
   def change
     validate_foreign_key :users, :orders
   end
@@ -511,7 +511,7 @@ end
 In Postgres, adding a unique constraint creates a unique index, which blocks reads and writes.
 
 ```ruby
-class AddUniqueConstraint < ActiveRecord::Migration[8.0]
+class AddUniqueConstraint < ActiveRecord::Migration[8.1]
   def change
     add_unique_constraint :users, :some_column
   end
@@ -523,7 +523,7 @@ end
 Create a unique index concurrently, then use it for the constraint.
 
 ```ruby
-class AddUniqueConstraint < ActiveRecord::Migration[8.0]
+class AddUniqueConstraint < ActiveRecord::Migration[8.1]
   disable_ddl_transaction!
 
   def up
@@ -544,7 +544,7 @@ end
 In Postgres, adding an exclusion constraint blocks reads and writes while every row is checked.
 
 ```ruby
-class AddExclusionConstraint < ActiveRecord::Migration[8.0]
+class AddExclusionConstraint < ActiveRecord::Migration[8.1]
   def change
     add_exclusion_constraint :users, "number WITH =", using: :gist
   end
@@ -562,7 +562,7 @@ end
 In Postgres, there’s no equality operator for the `json` column type, which can cause errors for existing `SELECT DISTINCT` queries in your application.
 
 ```ruby
-class AddPropertiesToUsers < ActiveRecord::Migration[8.0]
+class AddPropertiesToUsers < ActiveRecord::Migration[8.1]
   def change
     add_column :users, :properties, :json
   end
@@ -574,7 +574,7 @@ end
 Use `jsonb` instead.
 
 ```ruby
-class AddPropertiesToUsers < ActiveRecord::Migration[8.0]
+class AddPropertiesToUsers < ActiveRecord::Migration[8.1]
   def change
     add_column :users, :properties, :jsonb
   end
@@ -590,7 +590,7 @@ end
 In Postgres, setting `NOT NULL` on an existing column blocks reads and writes while every row is checked.
 
 ```ruby
-class SetSomeColumnNotNull < ActiveRecord::Migration[8.0]
+class SetSomeColumnNotNull < ActiveRecord::Migration[8.1]
   def change
     change_column_null :users, :some_column, false
   end
@@ -602,7 +602,7 @@ end
 Instead, add a check constraint.
 
 ```ruby
-class SetSomeColumnNotNull < ActiveRecord::Migration[8.0]
+class SetSomeColumnNotNull < ActiveRecord::Migration[8.1]
   def change
     add_check_constraint :users, "some_column IS NOT NULL", name: "users_some_column_null", validate: false
   end
@@ -612,7 +612,7 @@ end
 Then validate it in a separate migration. Once the check constraint is validated, you can safely set `NOT NULL` on the column and drop the check constraint.
 
 ```ruby
-class ValidateSomeColumnNotNull < ActiveRecord::Migration[8.0]
+class ValidateSomeColumnNotNull < ActiveRecord::Migration[8.1]
   def up
     validate_check_constraint :users, name: "users_some_column_null"
     change_column_null :users, :some_column, false
@@ -633,7 +633,7 @@ end
 Adding a column with a volatile default value to an existing table causes the entire table to be rewritten. During this time, reads and writes are blocked.
 
 ```ruby
-class AddSomeColumnToUsers < ActiveRecord::Migration[8.0]
+class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
   def change
     add_column :users, :some_column, :uuid, default: "gen_random_uuid()"
   end
@@ -645,7 +645,7 @@ end
 Instead, add the column without a default value, then change the default.
 
 ```ruby
-class AddSomeColumnToUsers < ActiveRecord::Migration[8.0]
+class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
   def up
     add_column :users, :some_column, :uuid
     change_column_default :users, :some_column, from: nil, to: "gen_random_uuid()"
@@ -721,7 +721,7 @@ config.active_record.partial_inserts = false
 Adding a non-unique index with more than three columns rarely improves performance.
 
 ```ruby
-class AddSomeIndexToUsers < ActiveRecord::Migration[8.0]
+class AddSomeIndexToUsers < ActiveRecord::Migration[8.1]
   def change
     add_index :users, [:a, :b, :c, :d]
   end
@@ -733,7 +733,7 @@ end
 Instead, start an index with columns that narrow down the results the most.
 
 ```ruby
-class AddSomeIndexToUsers < ActiveRecord::Migration[8.0]
+class AddSomeIndexToUsers < ActiveRecord::Migration[8.1]
   def change
     add_index :users, [:d, :b]
   end
@@ -747,7 +747,7 @@ For Postgres, be sure to add them concurrently.
 To mark a step in the migration as safe, despite using a method that might otherwise be dangerous, wrap it in a `safety_assured` block.
 
 ```ruby
-class MySafeMigration < ActiveRecord::Migration[8.0]
+class MySafeMigration < ActiveRecord::Migration[8.1]
   def change
     safety_assured { remove_column :users, :some_column }
   end
