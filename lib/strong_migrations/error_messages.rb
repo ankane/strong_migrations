@@ -76,20 +76,33 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
-    remove_column: "Active Record caches attributes, which causes problems
-when removing columns. Be sure to ignore the column%{column_suffix}:
+    remove_column: 
+"Active Record caches attributes, which causes problems when removing columns. This is a TWO-STEP process.
+
+⚠️  IMPORTANT: You MUST complete Step 1 and verify the deploy succeeded
+before running Step 2. Running the migration before deploying can cause
+errors and downtime in your application.
+
+Step 1: Ignore the column%{column_suffix}
 
 class %{model} < %{base_model}
   %{code}
 end
 
-Deploy the code, then wrap this step in a safety_assured { ... } block.
+Deploy this code and make sure the deploy completes successfully.
+Verify your application is running with the ignored_columns in place.
+
+Step 2: Remove the column%{column_suffix} (only after Step 1 is deployed)
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
     safety_assured { %{command} }
   end
-end",
+end
+
+Why? If you run the migration before deploying Step 1, running application servers
+will still try to read the removed column%{column_suffix}, causing errors for every request
+that touches this model.",
 
     rename_column:
 "Renaming a column that's in use will cause errors
