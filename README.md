@@ -933,10 +933,15 @@ StrongMigrations.auto_analyze = true
 
 ## Faster Migrations
 
-Only dump the schema when adding a new migration. If you use Git, add to `config/environments/development.rb`:
+Only dump the schema when adding a new migration. If you use Git, add to the end of your `Rakefile`:
 
 ```rb
-config.active_record.dump_schema_after_migration = `git status db/migrate/ --porcelain`.present?
+task :faster_migrations do
+  ActiveRecord.dump_schema_after_migration = Rails.env.development? &&
+    `git status db/migrate/ --porcelain`.present?
+end
+
+task "db:migrate" => "faster_migrations"
 ```
 
 ## Schema Sanity
