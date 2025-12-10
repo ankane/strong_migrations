@@ -1,3 +1,7 @@
+## 2.5.2 (unreleased)
+
+- Fixed false positive for `add_reference` with `foreign_key: { validate: false }`
+
 ## 2.5.1 (2025-10-13)
 
 - Fixed `transaction_timeout` option with DDL transaction
