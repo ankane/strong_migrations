@@ -34,6 +34,12 @@ class AddReferenceForeignKeyValidateFalse < TestMigration
   end
 end
 
+class AddReferenceForeignKeyValidateFalseIndex < TestMigration
+  def change
+    add_reference :users, :device, foreign_key: {validate: false}
+  end
+end
+
 class AddReferenceForeignKeyToTable < TestMigration
   def change
     add_reference :users, :device, foreign_key: {to_table: :users}, index: false

@@ -98,6 +98,10 @@ class SafeByDefaultTest < Minitest::Test
     assert_safe AddReferenceForeignKey
   end
 
+  def test_add_reference_foreign_key_validate_false
+    assert_safe AddReferenceForeignKeyValidateFalseIndex
+  end
+
   def test_add_reference_foreign_key_to_table
     assert_safe AddReferenceForeignKeyToTable
   end
