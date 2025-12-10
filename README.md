@@ -195,7 +195,7 @@ A safer approach is to:
 3. Backfill data from the old column to the new column
 4. Move reads from the old column to the new column
 5. Stop writing to the old column
-6. Drop the old column
+6. [Drop the old column](#removing-a-column)
 
 ### Renaming a table
 
