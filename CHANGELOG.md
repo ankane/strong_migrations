@@ -1,4 +1,4 @@
-## 2.5.2 (2025-12-10)
+## 2.5.2 (unreleased)
 
 - Fixed false positive for `add_reference` with `foreign_key: { validate: false }`
 
