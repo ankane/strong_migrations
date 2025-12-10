@@ -42,6 +42,11 @@ class AddReferenceTest < Minitest::Test
     end
   end
 
+  def test_foreign_key_validate_false
+    skip unless postgresql?
+    assert_safe AddReferenceForeignKeyValidateFalse
+  end
+
   def test_add_belongs_to
     if postgresql?
       assert_unsafe AddBelongsTo

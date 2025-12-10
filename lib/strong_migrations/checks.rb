@@ -149,7 +149,11 @@ module StrongMigrations
         concurrently_set = index_value.is_a?(Hash) && index_value[:algorithm] == :concurrently
         bad_index = index_value && !concurrently_set
 
-        if bad_index || options[:foreign_key]
+        foreign_key_value = options[:foreign_key]
+        foreign_key_unsafe = foreign_key_value &&
+          !(foreign_key_value.is_a?(Hash) && foreign_key_value[:validate] == false)
+
+        if bad_index || foreign_key_unsafe
           if index_value.is_a?(Hash)
             options[:index] = options[:index].merge(algorithm: :concurrently)
           elsif index_value
@@ -161,7 +165,8 @@ module StrongMigrations
             throw :safe
           end
 
-          if options.delete(:foreign_key)
+          if foreign_key_unsafe
+            options.delete(:foreign_key)
             headline = "Adding a foreign key blocks writes on both tables."
             append = "\n\nThen add the foreign key in separate migrations."
           else
