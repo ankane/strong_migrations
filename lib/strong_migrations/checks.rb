@@ -147,13 +147,13 @@ module StrongMigrations
       if postgresql?
         index_value = options.fetch(:index, true)
         concurrently_set = index_value.is_a?(Hash) && index_value[:algorithm] == :concurrently
-        bad_index = index_value && !concurrently_set
+        index_unsafe = index_value && !concurrently_set
 
         foreign_key_value = options[:foreign_key]
-        foreign_key_unsafe = foreign_key_value &&
-          !(foreign_key_value.is_a?(Hash) && foreign_key_value[:validate] == false)
+        validate_false = foreign_key_value.is_a?(Hash) && foreign_key_value[:validate] == false
+        foreign_key_unsafe = foreign_key_value && !validate_false
 
-        if bad_index || foreign_key_unsafe
+        if index_unsafe || foreign_key_unsafe
           if index_value.is_a?(Hash)
             options[:index] = options[:index].merge(algorithm: :concurrently)
           elsif index_value

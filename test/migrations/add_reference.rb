@@ -28,6 +28,12 @@ class AddReferenceForeignKey < TestMigration
   end
 end
 
+class AddReferenceForeignKeyValidateFalse < TestMigration
+  def change
+    add_reference :users, :device, foreign_key: {validate: false}, index: false
+  end
+end
+
 class AddReferenceForeignKeyToTable < TestMigration
   def change
     add_reference :users, :device, foreign_key: {to_table: :users}, index: false
@@ -57,15 +63,5 @@ end
 class AddReferenceExtraArguments < TestMigration
   def change
     add_reference :users, :device, :extra, index: true
-  end
-end
-
-class AddReferenceForeignKeyValidateFalse < TestMigration
-  disable_ddl_transaction!
-
-  def change
-    add_reference :users, :country_order,
-                  foreign_key: {to_table: :orders, validate: false},
-                  index: {algorithm: :concurrently}
   end
 end
