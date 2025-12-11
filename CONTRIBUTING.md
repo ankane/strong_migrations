@@ -34,6 +34,8 @@ Fork the project and create a pull request. A few tips:
 
 - Keep changes to a minimum. If you have multiple features or fixes, submit multiple pull requests.
 - Follow the existing style. The code should read like it’s written by a single person.
+- Do not bump `lib/strong_migrations/version.rb`
+- Update `CHANGELOG.md` with the changes and specify (unreleased) as the release date: i.e `## x.x.x (unreleased)`
 - Add one or more tests if possible. Make sure existing tests pass with:
 
 ```sh
