@@ -45,43 +45,39 @@ class Minitest::Test
     end
   end
 
-  def with_start_after(start_after)
-    StrongMigrations.stub(:start_after, start_after) do
+  def with_option(name, value)
+    previous_value = StrongMigrations.send(name)
+    begin
+      StrongMigrations.send("#{name}=", value)
       yield
+    ensure
+      StrongMigrations.send("#{name}=", previous_value)
     end
   end
 
-  def with_target_version(version)
-    StrongMigrations.target_version = version
-    yield
+  def with_start_after(start_after, &block)
+    with_option(:start_after, start_after, &block)
+  end
+
+  def with_target_version(version, &block)
+    with_option(:target_version, version, &block)
+  end
+
+  def with_auto_analyze(&block)
+    with_option(:auto_analyze, true, &block)
+  end
+
+  def with_safety_assured(&block)
+    StrongMigrations::Checker.stub(:safe, true, &block)
+  end
+
+  def outside_developer_env(&block)
+    StrongMigrations.stub(:developer_env?, false, &block)
+  end
+
+  def with_lock_timeout(lock_timeout, &block)
+    with_option(:lock_timeout, lock_timeout, &block)
   ensure
-    StrongMigrations.target_version = nil
-  end
-
-  def with_auto_analyze
-    StrongMigrations.auto_analyze = true
-    yield
-  ensure
-    StrongMigrations.auto_analyze = false
-  end
-
-  def with_safety_assured
-    StrongMigrations::Checker.stub(:safe, true) do
-      yield
-    end
-  end
-
-  def outside_developer_env
-    StrongMigrations.stub(:developer_env?, false) do
-      yield
-    end
-  end
-
-  def with_lock_timeout(lock_timeout)
-    StrongMigrations.lock_timeout = lock_timeout
-    yield
-  ensure
-    StrongMigrations.lock_timeout = nil
     ActiveRecord::Base.connection.execute("RESET lock_timeout")
   end
 

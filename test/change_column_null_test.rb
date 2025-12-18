@@ -52,7 +52,7 @@ class ChangeColumnNullTest < Minitest::Test
   end
 
   def without_strict_mode
-    StrongMigrations.stub(:target_sql_mode, "") do
+    with_option(:target_sql_mode, "") do
       yield
     end
   end

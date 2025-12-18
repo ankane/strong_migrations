@@ -30,7 +30,7 @@ class SafeByDefaultTest < Minitest::Test
     end
     assert_kind_of PG::DuplicateTable, error.cause
 
-    StrongMigrations.stub(:remove_invalid_indexes, true) do
+    with_option(:remove_invalid_indexes, true) do
       # fail if same name but different options
       error = assert_raises(ActiveRecord::StatementInvalid) do
         migrate AddIndexUnique

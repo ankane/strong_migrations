@@ -209,7 +209,7 @@ class TimeoutsTest < Minitest::Test
   def test_lock_timeout_retries_add_index_remove_invalid_indexes
     skip unless postgresql?
 
-    StrongMigrations.stub(:remove_invalid_indexes, true) do
+    with_option(:remove_invalid_indexes, true) do
       assert_retries AddIndexConcurrently
     end
 

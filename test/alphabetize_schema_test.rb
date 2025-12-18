@@ -20,7 +20,7 @@ class AlphabetizeSchemaTest < Minitest::Test
 
   def test_enabled
     schema =
-      StrongMigrations.stub(:alphabetize_schema, true) do
+      with_option(:alphabetize_schema, true) do
         dump_schema
       end
 
@@ -36,7 +36,7 @@ class AlphabetizeSchemaTest < Minitest::Test
 
     migrate AddColumnGeneratedVirtual
     schema =
-      StrongMigrations.stub(:alphabetize_schema, true) do
+      with_option(:alphabetize_schema, true) do
         dump_schema
       end
     migrate AddColumnGeneratedVirtual, direction: :down
