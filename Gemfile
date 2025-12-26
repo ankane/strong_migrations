@@ -6,13 +6,7 @@ gem "rake"
 gem "minitest"
 gem "minitest-mock"
 gem "activerecord", "~> 8.1.0"
-
-platform :ruby, :windows do
-  gem "pg"
-end
-
-platform :ruby do
-  gem "mysql2"
-  gem "trilogy"
-  gem "sqlite3"
-end
+gem "pg", platform: [:ruby, :windows]
+gem "mysql2", platform: :ruby
+gem "trilogy", platform: :ruby
+gem "sqlite3", platform: :ruby
