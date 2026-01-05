@@ -80,7 +80,7 @@ class Minitest::Test
   def outside_developer_env(&block)
     previous_value = Rails.env
     begin
-      Rails.env = "production"
+      Rails.env = ActiveSupport::StringInquirer.new("production")
       yield
     ensure
       Rails.env = previous_value
