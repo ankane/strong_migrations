@@ -264,9 +264,8 @@ class TimeoutsTest < Minitest::Test
       with_lock_timeout_retries(**options) do
         migration = migration.new
         original_say = migration.method(:say)
-        migration.stub(:say, count) do
-          migrate migration
-        end
+        migration.define_singleton_method(:say, count)
+        migrate migration
       end
     end
     assert_equal retries, retry_count

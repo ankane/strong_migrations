@@ -30,6 +30,12 @@ class ChangeColumnDefaultTest < Minitest::Test
   end
 
   def with_partial_inserts(value, &block)
-    ActiveRecord::Base.stub(:partial_inserts, value, &block)
+    previous_value = ActiveRecord::Base.partial_inserts
+    begin
+      ActiveRecord::Base.partial_inserts = value
+      yield
+    ensure
+      ActiveRecord::Base.partial_inserts = previous_value
+    end
   end
 end

@@ -68,11 +68,23 @@ class Minitest::Test
   end
 
   def with_safety_assured(&block)
-    StrongMigrations::Checker.stub(:safe, true, &block)
+    previous_value = StrongMigrations::Checker.safe
+    begin
+      StrongMigrations::Checker.safe = true
+      yield
+    ensure
+      StrongMigrations::Checker.safe = previous_value
+    end
   end
 
   def outside_developer_env(&block)
-    StrongMigrations.stub(:developer_env?, false, &block)
+    previous_value = Rails.env
+    begin
+      Rails.env = "production"
+      yield
+    ensure
+      Rails.env = previous_value
+    end
   end
 
   def with_lock_timeout(lock_timeout, &block)

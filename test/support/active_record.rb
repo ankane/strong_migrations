@@ -2,9 +2,10 @@ require "active_record"
 
 # needed for target_version
 module Rails
-  def self.env
-    ActiveSupport::StringInquirer.new("test")
+  class << self
+    attr_accessor :env
   end
+  self.env = ActiveSupport::StringInquirer.new("test")
 end
 
 $adapter = ENV["ADAPTER"] || "postgresql"
