@@ -24,9 +24,9 @@ module StrongMigrations
         when /mysql|trilogy/
           # could try to connect to database and check for MariaDB
           # but this should be fine
-          "8.0"
+          "8.4"
         else
-          "10"
+          "18"
         end
       end
 
