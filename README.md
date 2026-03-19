@@ -910,7 +910,7 @@ Use the version from your latest migration.
 If your development database version is different from production, you can specify the production version so the right checks run in development.
 
 ```ruby
-StrongMigrations.target_version = 10 # or 8.0, 10.5, etc
+StrongMigrations.target_version = 16 # or 8.4, 11.8, etc
 ```
 
 The major version works well for Postgres, while the major and minor version is recommended for MySQL and MariaDB.
@@ -920,7 +920,7 @@ For safety, this option only affects development and test environments. In other
 If your app has multiple databases with different versions, you can use:
 
 ```ruby
-StrongMigrations.target_version = {primary: 13, catalog: 15}
+StrongMigrations.target_version = {primary: 16, catalog: 18}
 ```
 
 ## Analyze Tables
