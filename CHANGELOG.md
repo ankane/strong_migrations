@@ -1,3 +1,7 @@
+## 2.6.0 (unreleased)
+
+- Added check for `add_index` with `algorithm: :copy` with MySQL and MariaDB
+
 ## 2.5.2 (2025-12-20)
 
 - Fixed false positive for `add_reference` with `foreign_key: {validate: false}`

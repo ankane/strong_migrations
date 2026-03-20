@@ -82,6 +82,10 @@ Postgres-specific checks:
 - [adding a column with a volatile default value](#adding-a-column-with-a-volatile-default-value)
 - [renaming a schema](#renaming-a-schema)
 
+MySQL/MariaDB-specific checks:
+
+- [adding an index with copying](#adding-an-index-with-copying)
+
 Best practices:
 
 - [keeping non-unique indexes to three columns or less](#keeping-non-unique-indexes-to-three-columns-or-less)
@@ -679,6 +683,32 @@ A safer approach is to:
 4. Move reads from the old schema to the new schema
 5. Stop writing to the old schema
 6. Drop the old schema
+
+### Adding an index with copying
+
+#### Bad
+
+In MySQL and MariaDB, adding an index with copying blocks writes.
+
+```ruby
+class AddSomeIndexToUsers < ActiveRecord::Migration[8.1]
+  def change
+    add_index :users, :some_column, algorithm: :copy
+  end
+end
+```
+
+#### Good
+
+Add indexes with the default algorithm.
+
+```ruby
+class AddSomeIndexToUsers < ActiveRecord::Migration[8.1]
+  def change
+    add_index :users, :some_column
+  end
+end
+```
 
 ### Keeping non-unique indexes to three columns or less
 

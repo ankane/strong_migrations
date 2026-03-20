@@ -166,6 +166,15 @@ Instead, start an index with columns that narrow down the results the most.",
 Upgrade Postgres before adding new indexes, or wrap this step in a safety_assured { ... } block
 to accept the risk.",
 
+    add_index_copy:
+"Adding an index with copying blocks writes. Instead, use:
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{command}
+  end
+end",
+
     change_table:
 "Strong Migrations does not support inspecting what happens inside a
 change_table block, so cannot help you here. Please make really sure that what

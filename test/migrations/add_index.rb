@@ -35,6 +35,12 @@ class AddIndexConcurrently < TestMigration
   end
 end
 
+class AddIndexCopy < TestMigration
+  def change
+    add_index :users, :name, algorithm: :copy
+  end
+end
+
 class AddIndexSafetyAssured < TestMigration
   def change
     safety_assured { add_index :users, :name, name: "boom" }

@@ -138,6 +138,10 @@ module StrongMigrations
 
         raise_error :add_index, command: command_str("add_index", [table, columns, options.merge(algorithm: :concurrently)])
       end
+
+      if (mysql? || mariadb?) && options[:algorithm] == :copy && !new_table?(table)
+        raise_error :add_index_copy, command: command_str("add_index", [table, columns, options.except(:algorithm)])
+      end
     end
 
     def check_add_reference(method, *args)

@@ -52,6 +52,11 @@ class AddIndexTest < Minitest::Test
     assert_safe AddIndexConcurrently
   end
 
+  def test_copy
+    skip unless mysql? || mariadb?
+    assert_unsafe AddIndexCopy
+  end
+
   def test_columns
     assert_unsafe AddIndexColumns, "more than three columns"
   end
