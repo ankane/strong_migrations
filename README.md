@@ -84,7 +84,7 @@ Postgres-specific checks:
 
 MySQL/MariaDB-specific checks:
 
-- [adding an index with copying](#adding-an-index-with-copying)
+- [adding an index with copying](#adding-an-index-with-copying) [unreleased]
 
 Best practices:
 
