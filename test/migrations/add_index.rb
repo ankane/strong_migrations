@@ -41,6 +41,12 @@ class AddIndexCopy < TestMigration
   end
 end
 
+class AddIndexInplace < TestMigration
+  def change
+    add_index :users, :name, algorithm: :inplace
+  end
+end
+
 class AddIndexLockShared < TestMigration
   def change
     add_index :users, :name, lock: :shared

@@ -57,6 +57,11 @@ class AddIndexTest < Minitest::Test
     assert_unsafe AddIndexCopy
   end
 
+  def test_inplace
+    skip unless mysql? || mariadb?
+    assert_safe AddIndexInplace
+  end
+
   def test_lock_shared
     skip unless lock_option?
     assert_unsafe AddIndexLockShared
