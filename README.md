@@ -82,7 +82,7 @@ Postgres-specific checks:
 - [adding a column with a volatile default value](#adding-a-column-with-a-volatile-default-value)
 - [renaming a schema](#renaming-a-schema)
 
-MySQL/MariaDB-specific checks:
+MySQL and MariaDB-specific checks:
 
 - [using the COPY algorithm](#using-the-copy-algorithm) [unreleased]
 - [using shared or exclusive locking](#using-shared-or-exclusive-locking) [unreleased]
