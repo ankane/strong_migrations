@@ -26,7 +26,7 @@ class RemoveIndexTest < Minitest::Test
       migrate RemoveIndex
     else
       # algorithm option ignored for Active Record < 8.2
-      assert_safe RemoveIndexCopy
+      migrate RemoveIndexCopy
     end
   end
 
