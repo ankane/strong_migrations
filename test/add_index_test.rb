@@ -52,14 +52,14 @@ class AddIndexTest < Minitest::Test
     assert_safe AddIndexConcurrently
   end
 
-  def test_copy
+  def test_algorithm_copy
     skip unless mysql? || mariadb?
-    assert_unsafe AddIndexCopy
+    assert_unsafe AddIndexAlgorithmCopy
   end
 
-  def test_inplace
+  def test_algorithm_inplace
     skip unless mysql? || mariadb?
-    assert_safe AddIndexInplace
+    assert_safe AddIndexAlgorithmInplace
   end
 
   def test_lock_shared

@@ -17,17 +17,25 @@ class RemoveIndexTest < Minitest::Test
     end
   end
 
-  def test_copy
+  def test_algorithm_copy
     skip unless mysql? || mariadb?
 
     migrate AddIndex
     if ar_version >= 8.2
-      assert_unsafe RemoveIndexCopy
+      assert_unsafe RemoveIndexAlgorithmCopy
       migrate RemoveIndex
     else
       # algorithm option ignored for Active Record < 8.2
-      migrate RemoveIndexCopy
+      migrate RemoveIndexAlgorithmCopy
     end
+  end
+
+  def test_algorithm_inplace
+    skip unless mysql? || mariadb?
+
+    migrate AddIndex
+    # algorithm option ignored for Active Record < 8.2
+    migrate RemoveIndexAlgorithmInplace
   end
 
   def test_lock_shared
@@ -36,6 +44,13 @@ class RemoveIndexTest < Minitest::Test
     migrate AddIndex
     assert_unsafe RemoveIndexLockShared
     migrate RemoveIndex
+  end
+
+  def test_lock_none
+    skip unless lock_option?
+
+    migrate AddIndex
+    migrate RemoveIndexLockNone
   end
 
   def test_extra_arguments

@@ -35,13 +35,13 @@ class AddIndexConcurrently < TestMigration
   end
 end
 
-class AddIndexCopy < TestMigration
+class AddIndexAlgorithmCopy < TestMigration
   def change
     add_index :users, :name, algorithm: :copy
   end
 end
 
-class AddIndexInplace < TestMigration
+class AddIndexAlgorithmInplace < TestMigration
   def change
     add_index :users, :name, algorithm: :inplace
   end

@@ -30,15 +30,27 @@ class RemoveIndexConcurrently < TestMigration
   end
 end
 
-class RemoveIndexCopy < TestMigration
+class RemoveIndexAlgorithmCopy < TestMigration
   def change
     remove_index :users, column: :name, algorithm: :copy
+  end
+end
+
+class RemoveIndexAlgorithmInplace < TestMigration
+  def change
+    remove_index :users, column: :name, algorithm: :inplace
   end
 end
 
 class RemoveIndexLockShared < TestMigration
   def change
     remove_index :users, column: :name, lock: :shared
+  end
+end
+
+class RemoveIndexLockNone < TestMigration
+  def change
+    remove_index :users, column: :name, lock: :none
   end
 end
 
