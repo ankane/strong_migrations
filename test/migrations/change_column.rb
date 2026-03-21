@@ -419,3 +419,15 @@ class ChangeColumnOtherConstraints < TestMigration
     end
   end
 end
+
+class ChangeColumnAlgorithmCopy < TestMigration
+  def change
+    change_column :users, :country, :string, limit: 21, algorithm: :copy
+  end
+end
+
+class ChangeColumnLockShared < TestMigration
+  def change
+    change_column :users, :country, :string, limit: 21, lock: :shared
+  end
+end

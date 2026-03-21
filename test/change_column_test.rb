@@ -213,6 +213,16 @@ class ChangeColumnTest < Minitest::Test
     assert_unsafe ChangeColumnMissingTable
   end
 
+  def test_algorithm_copy
+    skip unless algorithm_option?
+    assert_unsafe ChangeColumnAlgorithmCopy
+  end
+
+  def test_lock_shared
+    skip unless lock_option?
+    assert_unsafe ChangeColumnLockShared
+  end
+
   def with_time_zone
     ActiveRecord::Base.connection.execute("SET timezone = 'America/Los_Angeles'")
     yield

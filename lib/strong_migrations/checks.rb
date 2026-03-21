@@ -247,6 +247,9 @@ module StrongMigrations
             validate_constraint_code: validate_commands.join("\n    ")
         end
       end
+
+      check_algorithm_option("change_column", *args, **options)
+      check_lock_option("change_column", *args, **options)
     end
 
     def check_change_column_default(*args)
@@ -343,6 +346,7 @@ module StrongMigrations
       raise_error :execute, header: "Possibly dangerous operation"
     end
 
+    # supports algorithm and lock options, but always raises
     def check_remove_column(method, *args)
       columns =
         case method
@@ -394,6 +398,7 @@ module StrongMigrations
       check_lock_option("remove_index", *args, **options)
     end
 
+    # supports algorithm and lock options, but always raises
     def check_rename_column
       raise_error :rename_column
     end
