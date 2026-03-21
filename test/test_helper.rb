@@ -140,6 +140,10 @@ class Minitest::Test
     end
     statements
   end
+
+  def ar_version
+    ActiveRecord::VERSION::STRING.to_f
+  end
 end
 
 StrongMigrations.add_check do |method, args|

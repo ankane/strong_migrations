@@ -21,7 +21,7 @@ class RemoveIndexTest < Minitest::Test
     skip unless mysql? || mariadb?
 
     migrate AddIndex
-    if ActiveRecord::VERSION::STRING.to_f >= 8.2
+    if ar_version >= 8.2
       assert_unsafe RemoveIndexCopy
       migrate RemoveIndex
     else

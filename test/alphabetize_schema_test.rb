@@ -4,7 +4,7 @@ class AlphabetizeSchemaTest < Minitest::Test
   def test_default
     schema = dump_schema
 
-    if ActiveRecord::VERSION::STRING.to_f >= 8.1
+    if ar_version >= 8.1
       expected_columns = <<-EOS
     t.string "name"
     t.bigint "order_id"

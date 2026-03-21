@@ -58,12 +58,12 @@ class AddIndexTest < Minitest::Test
   end
 
   def test_lock_shared
-    skip unless (mysql? || mariadb?) && ActiveRecord::VERSION::STRING.to_f >= 8.2
+    skip unless (mysql? || mariadb?) && ar_version >= 8.2
     assert_unsafe AddIndexLockShared
   end
 
   def test_lock_exclusive
-    skip unless (mysql? || mariadb?) && ActiveRecord::VERSION::STRING.to_f >= 8.2
+    skip unless (mysql? || mariadb?) && ar_version >= 8.2
     assert_unsafe AddIndexLockExclusive
   end
 
