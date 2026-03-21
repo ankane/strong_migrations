@@ -727,7 +727,7 @@ end
 
 #### Good
 
-Use the default locking.
+Use the default locking or no locking.
 
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration[8.2]

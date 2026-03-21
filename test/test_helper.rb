@@ -144,6 +144,10 @@ class Minitest::Test
   def ar_version
     ActiveRecord::VERSION::STRING.to_f
   end
+
+  def lock_option?
+    (mysql? || mariadb?) && ar_version >= 8.2
+  end
 end
 
 StrongMigrations.add_check do |method, args|

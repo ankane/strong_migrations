@@ -58,13 +58,23 @@ class AddIndexTest < Minitest::Test
   end
 
   def test_lock_shared
-    skip unless (mysql? || mariadb?) && ar_version >= 8.2
+    skip unless lock_option?
     assert_unsafe AddIndexLockShared
   end
 
   def test_lock_exclusive
-    skip unless (mysql? || mariadb?) && ar_version >= 8.2
+    skip unless lock_option?
     assert_unsafe AddIndexLockExclusive
+  end
+
+  def test_lock_none
+    skip unless lock_option?
+    assert_safe AddIndexLockNone
+  end
+
+  def test_lock_default
+    skip unless lock_option?
+    assert_safe AddIndexLockDefault
   end
 
   def test_columns

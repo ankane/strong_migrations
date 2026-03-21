@@ -53,6 +53,18 @@ class AddIndexLockExclusive < TestMigration
   end
 end
 
+class AddIndexLockNone < TestMigration
+  def change
+    add_index :users, :name, lock: :none
+  end
+end
+
+class AddIndexLockDefault < TestMigration
+  def change
+    add_index :users, :name, lock: :default
+  end
+end
+
 class AddIndexSafetyAssured < TestMigration
   def change
     safety_assured { add_index :users, :name, name: "boom" }
