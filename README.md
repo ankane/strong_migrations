@@ -84,7 +84,7 @@ Postgres-specific checks:
 
 MySQL/MariaDB-specific checks:
 
-- [adding an index with copying](#adding-an-index-with-copying) [unreleased]
+- [using the COPY algorithm](#using-the-copy-algorithm) [unreleased]
 
 Best practices:
 
@@ -684,11 +684,11 @@ A safer approach is to:
 5. Stop writing to the old schema
 6. Drop the old schema
 
-### Adding an index with copying
+### Using the COPY algorithm
 
 #### Bad
 
-In MySQL and MariaDB, adding an index with copying blocks writes.
+In MySQL and MariaDB, using the `COPY` algorithm blocks writes.
 
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration[8.1]
@@ -700,7 +700,7 @@ end
 
 #### Good
 
-Add indexes with the default algorithm.
+Use the default algorithm.
 
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration[8.1]

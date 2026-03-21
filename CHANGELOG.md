@@ -1,6 +1,6 @@
 ## 2.6.0 (unreleased)
 
-- Added check for `add_index` with `algorithm: :copy` with MySQL and MariaDB
+- Added check for `algorithm: :copy` with MySQL and MariaDB
 
 ## 2.5.2 (2025-12-20)
 

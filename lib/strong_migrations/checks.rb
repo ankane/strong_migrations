@@ -140,7 +140,7 @@ module StrongMigrations
       end
 
       if (mysql? || mariadb?) && options[:algorithm] == :copy && !new_table?(table)
-        raise_error :add_index_copy, command: command_str("add_index", [table, columns, options.except(:algorithm)])
+        raise_error :copy_algorithm, command: command_str("add_index", [table, columns, options.except(:algorithm)])
       end
     end
 
@@ -386,6 +386,11 @@ module StrongMigrations
         end
 
         raise_error :remove_index, command: command_str("remove_index", args + [options.merge(algorithm: :concurrently)])
+      end
+
+      # algorithm option ignored for Active Record < 8.2
+      if (mysql? || mariadb?) && options[:algorithm] == :copy && !new_table?(table) && ar_version >= 8.2
+        raise_error :copy_algorithm, command: command_str("remove_index", args + [options.except(:algorithm)])
       end
     end
 

@@ -30,6 +30,12 @@ class RemoveIndexConcurrently < TestMigration
   end
 end
 
+class RemoveIndexCopy < TestMigration
+  def change
+    remove_index :users, column: :name, algorithm: :copy
+  end
+end
+
 class RemoveIndexExtraArguments < TestMigration
   def change
     remove_index :users, :name, :extra

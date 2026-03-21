@@ -17,6 +17,19 @@ class RemoveIndexTest < Minitest::Test
     end
   end
 
+  def test_copy
+    skip unless mysql? || mariadb?
+
+    migrate AddIndex
+    if ActiveRecord::VERSION::STRING.to_f >= 8.2
+      assert_unsafe RemoveIndexCopy
+      migrate RemoveIndex
+    else
+      # algorithm option ignored for Active Record < 8.2
+      assert_safe RemoveIndexCopy
+    end
+  end
+
   def test_extra_arguments
     assert_argument_error RemoveIndexExtraArguments
   end
