@@ -77,3 +77,15 @@ class AddColumnBigserial < TestMigration
     add_column :users, :nice, :bigserial
   end
 end
+
+class AddColumnAlgorithmCopy < TestMigration
+  def change
+    add_column :users, :nice, :boolean, algorithm: :copy
+  end
+end
+
+class AddColumnLockShared < TestMigration
+  def change
+    add_column :users, :nice, :boolean, lock: :shared
+  end
+end

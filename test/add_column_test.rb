@@ -66,4 +66,14 @@ class AddColumnTest < Minitest::Test
     skip unless postgresql?
     assert_unsafe AddColumnBigserial
   end
+
+  def test_algorithm_copy
+    skip unless algorithm_option?
+    assert_unsafe AddColumnAlgorithmCopy
+  end
+
+  def test_lock_shared
+    skip unless lock_option?
+    assert_unsafe AddColumnLockShared
+  end
 end

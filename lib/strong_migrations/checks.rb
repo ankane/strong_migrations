@@ -76,6 +76,9 @@ module StrongMigrations
           rewrite_blocks: adapter.rewrite_blocks,
           append: append
       end
+
+      check_algorithm_option("add_column", *args, **options)
+      check_lock_option("add_column", *args, **options)
     end
 
     def check_add_exclusion_constraint(*args)

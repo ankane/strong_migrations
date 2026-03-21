@@ -145,6 +145,11 @@ class Minitest::Test
     ActiveRecord::VERSION::STRING.to_f
   end
 
+  # not used for add_index (which supported it before)
+  def algorithm_option?
+    (mysql? || mariadb?) && ar_version >= 8.2
+  end
+
   def lock_option?
     (mysql? || mariadb?) && ar_version >= 8.2
   end
