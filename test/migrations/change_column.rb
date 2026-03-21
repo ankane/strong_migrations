@@ -426,8 +426,28 @@ class ChangeColumnAlgorithmCopy < TestMigration
   end
 end
 
+class ChangeColumnAlgorithmInplace < TestMigration
+  def up
+    change_column :users, :country, :string, limit: 21, algorithm: :inplace
+  end
+
+  def down
+    change_column :users, :country, :string, limit: 20
+  end
+end
+
 class ChangeColumnLockShared < TestMigration
   def change
     change_column :users, :country, :string, limit: 21, lock: :shared
+  end
+end
+
+class ChangeColumnLockNone < TestMigration
+  def up
+    change_column :users, :country, :string, limit: 21, lock: :none
+  end
+
+  def down
+    change_column :users, :country, :string, limit: 20
   end
 end

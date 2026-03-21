@@ -72,8 +72,18 @@ class AddColumnTest < Minitest::Test
     assert_unsafe AddColumnAlgorithmCopy
   end
 
+  def test_algorithm_instant
+    skip unless algorithm_option?
+    assert_safe AddColumnAlgorithmInstant
+  end
+
   def test_lock_shared
     skip unless lock_option?
     assert_unsafe AddColumnLockShared
+  end
+
+  def test_lock_none
+    skip unless lock_option?
+    assert_safe AddColumnLockNone
   end
 end

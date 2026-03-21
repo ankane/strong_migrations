@@ -84,8 +84,20 @@ class AddColumnAlgorithmCopy < TestMigration
   end
 end
 
+class AddColumnAlgorithmInstant < TestMigration
+  def change
+    add_column :users, :nice, :boolean, algorithm: :instant
+  end
+end
+
 class AddColumnLockShared < TestMigration
   def change
     add_column :users, :nice, :boolean, lock: :shared
+  end
+end
+
+class AddColumnLockNone < TestMigration
+  def change
+    add_column :users, :nice, :boolean, lock: :none
   end
 end
