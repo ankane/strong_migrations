@@ -30,6 +30,14 @@ class RemoveIndexTest < Minitest::Test
     end
   end
 
+  def test_lock_shared
+    skip unless lock_option?
+
+    migrate AddIndex
+    assert_unsafe RemoveIndexLockShared
+    migrate RemoveIndex
+  end
+
   def test_extra_arguments
     assert_argument_error RemoveIndexExtraArguments
   end

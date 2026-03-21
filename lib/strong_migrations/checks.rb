@@ -143,12 +143,7 @@ module StrongMigrations
         raise_error :copy_algorithm, command: command_str("add_index", [table, columns, options.except(:algorithm)])
       end
 
-      if (mysql? || mariadb?) && [:shared, :exclusive].include?(options[:lock]) && !new_table?(table) && ar_version >= 8.2
-        raise_error :lock_option,
-          command: command_str("add_index", [table, columns, options.except(:lock)]),
-          lock_type: options[:lock].to_s,
-          lock_blocks: options[:lock] == :shared ? "reads" : "reads and writes"
-      end
+      check_lock_option("add_index", *args, **options)
     end
 
     def check_add_reference(method, *args)
@@ -399,6 +394,8 @@ module StrongMigrations
       if (mysql? || mariadb?) && options[:algorithm] == :copy && !new_table?(table) && ar_version >= 8.2
         raise_error :copy_algorithm, command: command_str("remove_index", args + [options.except(:algorithm)])
       end
+
+      check_lock_option("remove_index", *args, **options)
     end
 
     def check_rename_column
@@ -456,6 +453,15 @@ module StrongMigrations
       # escape % not followed by {
       message = message.gsub(/%(?!{)/, "%%") % vars if message.include?("%")
       @migration.stop!(message, header: header || "Dangerous operation detected")
+    end
+
+    def check_lock_option(method, *args, **options)
+      if (mysql? || mariadb?) && [:shared, :exclusive].include?(options[:lock]) && !new_table?(args[0]) && ar_version >= 8.2
+        raise_error :lock_option,
+          command: command_str(method, args + [options.except(:lock)]),
+          lock_type: options[:lock].to_s,
+          lock_blocks: options[:lock] == :shared ? "reads" : "reads and writes"
+      end
     end
 
     def constraint_str(statement, identifiers)

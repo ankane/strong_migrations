@@ -36,6 +36,12 @@ class RemoveIndexCopy < TestMigration
   end
 end
 
+class RemoveIndexLockShared < TestMigration
+  def change
+    remove_index :users, column: :name, lock: :shared
+  end
+end
+
 class RemoveIndexExtraArguments < TestMigration
   def change
     remove_index :users, :name, :extra
