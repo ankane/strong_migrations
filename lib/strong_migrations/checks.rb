@@ -139,10 +139,7 @@ module StrongMigrations
         raise_error :add_index, command: command_str("add_index", [table, columns, options.merge(algorithm: :concurrently)])
       end
 
-      if (mysql? || mariadb?) && options[:algorithm] == :copy && !new_table?(table)
-        raise_error :copy_algorithm, command: command_str("add_index", [table, columns, options.except(:algorithm)])
-      end
-
+      check_algorithm_option("add_index", *args, **options)
       check_lock_option("add_index", *args, **options)
     end
 
@@ -391,10 +388,7 @@ module StrongMigrations
       end
 
       # algorithm option ignored for Active Record < 8.2
-      if (mysql? || mariadb?) && options[:algorithm] == :copy && !new_table?(table) && ar_version >= 8.2
-        raise_error :copy_algorithm, command: command_str("remove_index", args + [options.except(:algorithm)])
-      end
-
+      check_algorithm_option("remove_index", *args, **options) if ar_version >= 8.2
       check_lock_option("remove_index", *args, **options)
     end
 
@@ -453,6 +447,12 @@ module StrongMigrations
       # escape % not followed by {
       message = message.gsub(/%(?!{)/, "%%") % vars if message.include?("%")
       @migration.stop!(message, header: header || "Dangerous operation detected")
+    end
+
+    def check_algorithm_option(method, *args, **options)
+      if (mysql? || mariadb?) && options[:algorithm] == :copy && !new_table?(args[0]) && ar_version >= 8.2
+        raise_error :copy_algorithm, command: command_str(method, args + [options.except(:algorithm)])
+      end
     end
 
     def check_lock_option(method, *args, **options)
