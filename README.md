@@ -85,6 +85,7 @@ Postgres-specific checks:
 MySQL/MariaDB-specific checks:
 
 - [using the COPY algorithm](#using-the-copy-algorithm) [unreleased]
+- [using shared or exclusive locking](#using-shared-or-exclusive-locking) [unreleased]
 
 Best practices:
 
@@ -704,6 +705,32 @@ Use the default algorithm.
 
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration[8.1]
+  def change
+    add_index :users, :some_column
+  end
+end
+```
+
+### Using shared or exclusive locking
+
+#### Bad
+
+In MySQL and MariaDB, using shared locking blocks writes, and using exclusive locking blocks reads and writes.
+
+```ruby
+class AddSomeIndexToUsers < ActiveRecord::Migration[8.2]
+  def change
+    add_index :users, :some_column, lock: :shared
+  end
+end
+```
+
+#### Good
+
+Use the default locking.
+
+```ruby
+class AddSomeIndexToUsers < ActiveRecord::Migration[8.2]
   def change
     add_index :users, :some_column
   end

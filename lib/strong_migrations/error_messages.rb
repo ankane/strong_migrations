@@ -175,6 +175,15 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
+    lock_option:
+"Using %{lock_type} locking blocks %{lock_blocks}. Instead, use:
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{command}
+  end
+end",
+
     change_table:
 "Strong Migrations does not support inspecting what happens inside a
 change_table block, so cannot help you here. Please make really sure that what

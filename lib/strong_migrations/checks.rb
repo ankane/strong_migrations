@@ -142,6 +142,13 @@ module StrongMigrations
       if (mysql? || mariadb?) && options[:algorithm] == :copy && !new_table?(table)
         raise_error :copy_algorithm, command: command_str("add_index", [table, columns, options.except(:algorithm)])
       end
+
+      if (mysql? || mariadb?) && [:shared, :exclusive].include?(options[:lock]) && !new_table?(table) && ar_version >= 8.2
+        raise_error :lock_option,
+          command: command_str("add_index", [table, columns, options.except(:lock)]),
+          lock_type: options[:lock].to_s,
+          lock_blocks: options[:lock] == :shared ? "reads" : "reads and writes"
+      end
     end
 
     def check_add_reference(method, *args)

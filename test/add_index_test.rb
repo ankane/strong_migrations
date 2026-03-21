@@ -57,6 +57,16 @@ class AddIndexTest < Minitest::Test
     assert_unsafe AddIndexCopy
   end
 
+  def test_lock_shared
+    skip unless (mysql? || mariadb?) && ActiveRecord::VERSION::STRING.to_f >= 8.2
+    assert_unsafe AddIndexLockShared
+  end
+
+  def test_lock_exclusive
+    skip unless (mysql? || mariadb?) && ActiveRecord::VERSION::STRING.to_f >= 8.2
+    assert_unsafe AddIndexLockExclusive
+  end
+
   def test_columns
     assert_unsafe AddIndexColumns, "more than three columns"
   end

@@ -1,6 +1,7 @@
 ## 2.6.0 (unreleased)
 
 - Added check for `algorithm: :copy` with MySQL and MariaDB
+- Added check for `lock: :shared` and `lock: :exclusive` with MySQL and MariaDB
 
 ## 2.5.2 (2025-12-20)
 

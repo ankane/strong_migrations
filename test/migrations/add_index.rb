@@ -41,6 +41,18 @@ class AddIndexCopy < TestMigration
   end
 end
 
+class AddIndexLockShared < TestMigration
+  def change
+    add_index :users, :name, lock: :shared
+  end
+end
+
+class AddIndexLockExclusive < TestMigration
+  def change
+    add_index :users, :name, lock: :exclusive
+  end
+end
+
 class AddIndexSafetyAssured < TestMigration
   def change
     safety_assured { add_index :users, :name, name: "boom" }
