@@ -78,6 +78,8 @@ module StrongMigrations
       end
 
       check_algorithm_option("add_column", *args, **options)
+
+      # not necessarily dangerous, but not necessary
       check_lock_option("add_column", *args, **options)
     end
 
@@ -143,6 +145,7 @@ module StrongMigrations
       end
 
       check_algorithm_option("add_index", *args, **options)
+
       check_lock_option("add_index", *args, **options)
     end
 
@@ -249,6 +252,8 @@ module StrongMigrations
       end
 
       check_algorithm_option("change_column", *args, **options)
+
+      # not necessarily dangerous, but not necessary
       check_lock_option("change_column", *args, **options)
     end
 
@@ -395,6 +400,8 @@ module StrongMigrations
       end
 
       check_algorithm_option("remove_index", *args, **options)
+
+      # not necessarily dangerous, but not necessary
       check_lock_option("remove_index", *args, **options)
     end
 
