@@ -166,24 +166,6 @@ Instead, start an index with columns that narrow down the results the most.",
 Upgrade Postgres before adding new indexes, or wrap this step in a safety_assured { ... } block
 to accept the risk.",
 
-    copy_algorithm:
-"Using the COPY algorithm blocks writes. Instead, use:
-
-class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
-  def change
-    %{command}
-  end
-end",
-
-    lock_option:
-"Using %{lock_type} locking blocks %{lock_blocks}. Instead, use:
-
-class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
-  def change
-    %{command}
-  end
-end",
-
     change_table:
 "Strong Migrations does not support inspecting what happens inside a
 change_table block, so cannot help you here. Please make really sure that what
@@ -298,6 +280,24 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
 
   def down
     %{remove_command}
+  end
+end",
+
+    copy_algorithm:
+"Using the COPY algorithm blocks writes. Instead, use:
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{command}
+  end
+end",
+
+    lock_option:
+"Using %{lock_type} locking blocks %{lock_blocks}. Instead, use:
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def change
+    %{command}
   end
 end"
   }
