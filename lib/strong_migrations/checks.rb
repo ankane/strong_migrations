@@ -199,9 +199,9 @@ module StrongMigrations
       if column && !new_table?(table)
         index_name = connection.index_name(table, {column: column})
         raise_error :add_unique_constraint,
-          index_command: command_str(:add_index, [table, column, {unique: true, algorithm: :concurrently}]),
-          constraint_command: command_str(:add_unique_constraint, [table, {using_index: index_name}]),
-          remove_command: command_str(:remove_unique_constraint, [table, column])
+          index_command: command_str("add_index", [table, column, {unique: true, algorithm: :concurrently}]),
+          constraint_command: command_str("add_unique_constraint", [table, {using_index: index_name}]),
+          remove_command: command_str("remove_unique_constraint", [table, column])
       end
     end
 
@@ -233,16 +233,16 @@ module StrongMigrations
         if constraints.any?
           change_commands = []
           constraints.each do |c|
-            change_commands << command_str(:remove_check_constraint, [table, c.expression, {name: c.name}])
+            change_commands << command_str("remove_check_constraint", [table, c.expression, {name: c.name}])
           end
-          change_commands << command_str(:change_column, args + [options])
+          change_commands << command_str("change_column", args + [options])
           constraints.each do |c|
-            change_commands << command_str(:add_check_constraint, [table, c.expression, {name: c.name, validate: false}])
+            change_commands << command_str("add_check_constraint", [table, c.expression, {name: c.name, validate: false}])
           end
 
           validate_commands = []
           constraints.each do |c|
-            validate_commands << command_str(:validate_check_constraint, [table, {name: c.name}])
+            validate_commands << command_str("validate_check_constraint", [table, {name: c.name}])
           end
 
           raise_error :change_column_constraint,
@@ -300,12 +300,12 @@ module StrongMigrations
               throw :safe
             end
 
-            add_constraint_code = command_str(:add_check_constraint, add_args)
+            add_constraint_code = command_str("add_check_constraint", add_args)
 
-            up_code = String.new(command_str(:validate_check_constraint, validate_args))
-            up_code << "\n    #{command_str(:change_column_null, change_args)}"
-            up_code << "\n    #{command_str(:remove_check_constraint, remove_args)}"
-            down_code = "#{add_constraint_code}\n    #{command_str(:change_column_null, [table, column, true])}"
+            up_code = String.new(command_str("validate_check_constraint", validate_args))
+            up_code << "\n    #{command_str("change_column_null", change_args)}"
+            up_code << "\n    #{command_str("remove_check_constraint", remove_args)}"
+            down_code = "#{add_constraint_code}\n    #{command_str("change_column_null", [table, column, true])}"
             validate_constraint_code = "def up\n    #{up_code}\n  end\n\n  def down\n    #{down_code}\n  end"
 
             raise_error :change_column_null_postgresql,
