@@ -41,11 +41,7 @@ def schema_migration
 end
 
 def connection_class
-  if ActiveRecord::VERSION::STRING.to_f >= 7.2
-    ActiveRecord::Base.connection_pool
-  else
-    ActiveRecord::Base.connection
-  end
+  ActiveRecord::Base.connection_pool
 end
 
 schema_migration.create_table
