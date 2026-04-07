@@ -190,6 +190,20 @@ module StrongMigrations
       end
 
       check_algorithm_option("add_reference", *args, **options)
+
+      if mysql? || mariadb?
+        index_value = options[:index]
+        copy_set = index_value.is_a?(Hash) && index_value[:algorithm] == :copy
+        if copy_set && !new_table?(table)
+          index_value = index_value.except(:algorithm)
+          if index_value.empty?
+            options = options.except(:index)
+          else
+            options = options.merge(index: index_value)
+          end
+          raise_error :copy_algorithm, command: command_str("add_reference", args + [options])
+        end
+      end
     end
 
     def check_add_unique_constraint(*args)

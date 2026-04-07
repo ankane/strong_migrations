@@ -83,3 +83,9 @@ class AddReferenceAlgorithmInstant < TestMigration
     add_reference :users, :device, algorithm: :instant
   end
 end
+
+class AddReferenceIndexAlgorithmCopy < TestMigration
+  def change
+    add_reference :users, :device, index: {algorithm: :copy}
+  end
+end

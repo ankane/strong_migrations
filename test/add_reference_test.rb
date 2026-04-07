@@ -104,4 +104,9 @@ class AddReferenceTest < Minitest::Test
     skip unless algorithm_option?
     assert_safe AddReferenceAlgorithmInstant
   end
+
+  def test_index_algorithm_copy
+    skip unless algorithm_option?
+    assert_unsafe AddReferenceIndexAlgorithmCopy
+  end
 end
