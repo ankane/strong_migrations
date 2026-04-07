@@ -188,6 +188,8 @@ module StrongMigrations
             append: append
         end
       end
+
+      check_algorithm_option("add_reference", *args, **options)
     end
 
     def check_add_unique_constraint(*args)

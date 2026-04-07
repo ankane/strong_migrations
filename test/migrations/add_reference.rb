@@ -71,3 +71,15 @@ class AddReferenceExtraArguments < TestMigration
     add_reference :users, :device, :extra, index: true
   end
 end
+
+class AddReferenceAlgorithmCopy < TestMigration
+  def change
+    add_reference :users, :device, algorithm: :copy
+  end
+end
+
+class AddReferenceAlgorithmInstant < TestMigration
+  def change
+    add_reference :users, :device, algorithm: :instant
+  end
+end

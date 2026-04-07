@@ -94,4 +94,14 @@ class AddReferenceTest < Minitest::Test
       assert_argument_error AddReferenceExtraArguments
     end
   end
+
+  def test_algorithm_copy
+    skip unless algorithm_option?
+    assert_unsafe AddReferenceAlgorithmCopy
+  end
+
+  def test_algorithm_instant
+    skip unless algorithm_option?
+    assert_safe AddReferenceAlgorithmInstant
+  end
 end
