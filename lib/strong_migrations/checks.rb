@@ -164,7 +164,7 @@ module StrongMigrations
 
         if index_unsafe || foreign_key_unsafe
           if index_value.is_a?(Hash)
-            options[:index] = options[:index].merge(algorithm: :concurrently)
+            options = options.merge(index: options[:index].merge(algorithm: :concurrently))
           elsif index_value
             options = options.merge(index: {algorithm: :concurrently})
           end
