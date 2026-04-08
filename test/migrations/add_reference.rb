@@ -84,6 +84,18 @@ class AddReferenceAlgorithmInstant < TestMigration
   end
 end
 
+class AddReferenceLockShared < TestMigration
+  def change
+    add_reference :users, :device, lock: :shared
+  end
+end
+
+class AddReferenceLockNone < TestMigration
+  def change
+    add_reference :users, :device, lock: :none
+  end
+end
+
 class AddReferenceIndexAlgorithmCopy < TestMigration
   def change
     add_reference :users, :device, index: {algorithm: :copy}

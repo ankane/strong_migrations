@@ -191,6 +191,9 @@ module StrongMigrations
 
       check_algorithm_option("add_reference", *args, **options)
 
+      # not necessarily dangerous, but not necessary
+      check_lock_option("add_reference", *args, **options)
+
       if (mysql? || mariadb?) && !new_table?(table)
         index_value = options[:index]
         copy_set = index_value.is_a?(Hash) && index_value[:algorithm] == :copy

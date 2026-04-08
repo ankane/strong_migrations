@@ -105,6 +105,16 @@ class AddReferenceTest < Minitest::Test
     assert_safe AddReferenceAlgorithmInstant
   end
 
+  def test_lock_shared
+    skip unless lock_option?
+    assert_unsafe AddReferenceLockShared
+  end
+
+  def test_lock_none
+    skip unless lock_option?
+    assert_safe AddReferenceLockNone
+  end
+
   def test_index_algorithm_copy
     skip unless mysql? || mariadb?
     assert_unsafe AddReferenceIndexAlgorithmCopy
