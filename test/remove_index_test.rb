@@ -42,7 +42,7 @@ class RemoveIndexTest < Minitest::Test
     skip unless lock_option?
 
     migrate AddIndex
-    assert_safe RemoveIndexLockShared
+    assert_unsafe RemoveIndexLockShared
     migrate RemoveIndex
   end
 

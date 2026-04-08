@@ -292,7 +292,7 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
-    add_index_lock:
+    lock_option:
 "Using %{lock_type} locking blocks %{lock_blocks}. Instead, use:
 
 class %{migration_name} < ActiveRecord::Migration%{migration_suffix}

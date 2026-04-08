@@ -79,7 +79,7 @@ class AddColumnTest < Minitest::Test
 
   def test_lock_shared
     skip unless lock_option?
-    assert_safe AddColumnLockShared
+    assert_unsafe AddColumnLockShared
   end
 
   def test_lock_none

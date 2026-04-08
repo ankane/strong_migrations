@@ -107,7 +107,7 @@ class AddReferenceTest < Minitest::Test
 
   def test_lock_shared
     skip unless lock_option?
-    assert_safe AddReferenceLockShared
+    assert_unsafe AddReferenceLockShared
   end
 
   def test_lock_none

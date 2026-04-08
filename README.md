@@ -85,7 +85,7 @@ Postgres-specific checks:
 MySQL and MariaDB-specific checks:
 
 - [using the COPY algorithm](#using-the-copy-algorithm) [unreleased]
-- [adding an index with shared or exclusive locking](#adding-an-index-with-shared-or-exclusive-locking) [unreleased]
+- [using shared or exclusive locking](#using-shared-or-exclusive-locking) [unreleased]
 
 Best practices:
 
@@ -711,11 +711,11 @@ class AddSomeIndexToUsers < ActiveRecord::Migration[8.1]
 end
 ```
 
-### Adding an index with shared or exclusive locking
+### Using shared or exclusive locking
 
 #### Bad
 
-In MySQL and MariaDB, adding an index with shared locking blocks writes, and adding an index with exclusive locking blocks reads and writes.
+In MySQL and MariaDB, using shared locking blocks writes, and using exclusive locking blocks reads and writes.
 
 ```ruby
 class AddSomeIndexToUsers < ActiveRecord::Migration[8.2]

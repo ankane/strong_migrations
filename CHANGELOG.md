@@ -1,7 +1,7 @@
 ## 2.6.0 (unreleased)
 
 - Added check for `algorithm: :copy` with MySQL and MariaDB
-- Added check for adding an index with `lock: :shared` and `lock: :exclusive` with MySQL and MariaDB
+- Added check for `lock: :shared` and `lock: :exclusive` with MySQL and MariaDB
 - Dropped support for Ruby < 3.3 and Active Record < 7.2
 
 ## 2.5.2 (2025-12-20)
