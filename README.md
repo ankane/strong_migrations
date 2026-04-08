@@ -84,8 +84,8 @@ Postgres-specific checks:
 
 MySQL and MariaDB-specific checks:
 
-- [using the COPY algorithm](#using-the-copy-algorithm) [unreleased]
-- [using shared or exclusive locking](#using-shared-or-exclusive-locking) [unreleased]
+- [using the COPY algorithm](#using-the-copy-algorithm)
+- [using shared or exclusive locking](#using-shared-or-exclusive-locking)
 
 Best practices:
 
