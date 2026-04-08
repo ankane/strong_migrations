@@ -437,8 +437,12 @@ class ChangeColumnAlgorithmInplace < TestMigration
 end
 
 class ChangeColumnLockShared < TestMigration
-  def change
+  def up
     change_column :users, :country, :string, limit: 21, lock: :shared
+  end
+
+  def down
+    change_column :users, :country, :string, limit: 20
   end
 end
 

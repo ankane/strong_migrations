@@ -79,8 +79,7 @@ module StrongMigrations
 
       check_algorithm_option("add_column", *args, **options)
 
-      # not necessarily dangerous, but not necessary
-      check_lock_option("add_column", *args, **options)
+      # lock: :shared/:exclusive not dangerous for safe ADD COLUMN
     end
 
     def check_add_exclusion_constraint(*args)
@@ -146,7 +145,7 @@ module StrongMigrations
 
       check_algorithm_option("add_index", *args, **options)
 
-      check_lock_option("add_index", *args, **options)
+      check_lock_option(:add_index_lock, "add_index", *args, **options)
     end
 
     def check_add_reference(method, *args)
@@ -191,8 +190,7 @@ module StrongMigrations
 
       check_algorithm_option("add_reference", *args, **options)
 
-      # not necessarily dangerous, but not necessary
-      check_lock_option("add_reference", *args, **options)
+      # lock: :shared/:exclusive not dangerous for safe ADD COLUMN
 
       if (mysql? || mariadb?) && !new_table?(table)
         index_value = options[:index]
@@ -216,7 +214,7 @@ module StrongMigrations
             else
               options = options.merge(index: index_value)
             end
-            raise_error :lock_option,
+            raise_error :add_index_lock,
               command: command_str(method, args + [options]),
               lock_type: lock.to_s,
               lock_blocks: lock == :shared ? "reads" : "reads and writes"
@@ -288,8 +286,7 @@ module StrongMigrations
 
       check_algorithm_option("change_column", *args, **options)
 
-      # not necessarily dangerous, but not necessary
-      check_lock_option("change_column", *args, **options)
+      # lock: :shared/:exclusive not dangerous for safe ALTER TABLE
     end
 
     def check_change_column_default(*args)
@@ -436,8 +433,7 @@ module StrongMigrations
 
       check_algorithm_option("remove_index", *args, **options)
 
-      # not necessarily dangerous, but not necessary
-      check_lock_option("remove_index", *args, **options)
+      # lock: :shared/:exclusive not dangerous for safe DROP INDEX
     end
 
     # supports algorithm and lock options, but always raises
@@ -504,9 +500,9 @@ module StrongMigrations
       end
     end
 
-    def check_lock_option(method, *args, **options)
+    def check_lock_option(message_key, method, *args, **options)
       if (mysql? || mariadb?) && [:shared, :exclusive].include?(options[:lock]) && !new_table?(args[0]) && ar_version >= 8.2
-        raise_error :lock_option,
+        raise_error message_key,
           command: command_str(method, args + [options.except(:lock)]),
           lock_type: options[:lock].to_s,
           lock_blocks: options[:lock] == :shared ? "reads" : "reads and writes"

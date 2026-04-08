@@ -225,7 +225,7 @@ class ChangeColumnTest < Minitest::Test
 
   def test_lock_shared
     skip unless lock_option?
-    assert_unsafe ChangeColumnLockShared
+    assert_safe ChangeColumnLockShared
   end
 
   def test_lock_none
