@@ -106,7 +106,12 @@ class AddReferenceTest < Minitest::Test
   end
 
   def test_index_algorithm_copy
-    skip unless algorithm_option?
+    skip unless mysql? || mariadb?
     assert_unsafe AddReferenceIndexAlgorithmCopy
+  end
+
+  def test_index_algorithm_inplace
+    skip unless mysql? || mariadb?
+    assert_safe AddReferenceIndexAlgorithmInplace
   end
 end
