@@ -114,4 +114,14 @@ class AddReferenceTest < Minitest::Test
     skip unless mysql? || mariadb?
     assert_safe AddReferenceIndexAlgorithmInplace
   end
+
+  def test_index_lock_shared
+    skip unless lock_option?
+    assert_unsafe AddReferenceIndexLockShared
+  end
+
+  def test_index_lock_none
+    skip unless lock_option?
+    assert_safe AddReferenceIndexLockNone
+  end
 end

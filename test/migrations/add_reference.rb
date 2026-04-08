@@ -95,3 +95,15 @@ class AddReferenceIndexAlgorithmInplace < TestMigration
     add_reference :users, :device, index: {algorithm: :inplace}
   end
 end
+
+class AddReferenceIndexLockShared < TestMigration
+  def change
+    add_reference :users, :device, index: {lock: :shared}
+  end
+end
+
+class AddReferenceIndexLockNone < TestMigration
+  def change
+    add_reference :users, :device, index: {lock: :none}
+  end
+end

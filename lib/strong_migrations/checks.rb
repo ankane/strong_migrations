@@ -191,10 +191,10 @@ module StrongMigrations
 
       check_algorithm_option("add_reference", *args, **options)
 
-      if mysql? || mariadb?
+      if (mysql? || mariadb?) && !new_table?(table)
         index_value = options[:index]
         copy_set = index_value.is_a?(Hash) && index_value[:algorithm] == :copy
-        if copy_set && !new_table?(table)
+        if copy_set
           index_value = index_value.except(:algorithm)
           if index_value.empty?
             options = options.except(:index)
@@ -202,6 +202,22 @@ module StrongMigrations
             options = options.merge(index: index_value)
           end
           raise_error :copy_algorithm, command: command_str("add_reference", args + [options])
+        end
+
+        if ar_version >= 8.2
+          lock = index_value.is_a?(Hash) && index_value[:lock]
+          if [:shared, :exclusive].include?(lock)
+            index_value = index_value.except(:lock)
+            if index_value.empty?
+              options = options.except(:index)
+            else
+              options = options.merge(index: index_value)
+            end
+            raise_error :lock_option,
+              command: command_str(method, args + [options]),
+              lock_type: lock.to_s,
+              lock_blocks: lock == :shared ? "reads" : "reads and writes"
+          end
         end
       end
     end
