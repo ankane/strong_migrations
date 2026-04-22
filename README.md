@@ -66,6 +66,7 @@ Potentially dangerous operations:
 - [creating a table with the force option](#creating-a-table-with-the-force-option)
 - [adding an auto-incrementing column](#adding-an-auto-incrementing-column)
 - [adding a stored generated column](#adding-a-stored-generated-column)
+- [adding a foreign key](#adding-a-foreign-key)
 - [adding a check constraint](#adding-a-check-constraint)
 - [executing SQL directly](#executing-SQL-directly)
 - [backfilling data](#backfilling-data)
@@ -74,7 +75,6 @@ Postgres-specific checks:
 
 - [adding an index non-concurrently](#adding-an-index-non-concurrently)
 - [adding a reference](#adding-a-reference)
-- [adding a foreign key](#adding-a-foreign-key)
 - [adding a unique constraint](#adding-a-unique-constraint)
 - [adding an exclusion constraint](#adding-an-exclusion-constraint)
 - [adding a json column](#adding-a-json-column)
@@ -297,6 +297,58 @@ end
 
 Add a non-generated column and use callbacks or triggers instead (or a virtual generated column with MySQL and MariaDB).
 
+### Adding a foreign key
+
+:turtle: Safe by default available for Postgres
+
+#### Bad
+
+Adding a foreign key blocks writes on both tables.
+
+```ruby
+class AddForeignKeyOnUsers < ActiveRecord::Migration[8.1]
+  def change
+    add_foreign_key :users, :orders
+  end
+end
+```
+
+or
+
+```ruby
+class AddReferenceToUsers < ActiveRecord::Migration[8.1]
+  def change
+    add_reference :users, :order, foreign_key: true
+  end
+end
+```
+
+#### Good - Postgres
+
+Add the foreign key without validating existing rows:
+
+```ruby
+class AddForeignKeyOnUsers < ActiveRecord::Migration[8.1]
+  def change
+    add_foreign_key :users, :orders, validate: false
+  end
+end
+```
+
+Then validate them in a separate migration.
+
+```ruby
+class ValidateForeignKeyOnUsers < ActiveRecord::Migration[8.1]
+  def change
+    validate_foreign_key :users, :orders
+  end
+end
+```
+
+#### Good - MySQL and MariaDB
+
+[Let us know](https://github.com/ankane/strong_migrations/issues/new) if you have a safe way to do this.
+
 ### Adding a check constraint
 
 :turtle: Safe by default available
@@ -453,54 +505,6 @@ class AddReferenceToUsers < ActiveRecord::Migration[8.1]
 
   def change
     add_reference :users, :city, index: {algorithm: :concurrently}
-  end
-end
-```
-
-### Adding a foreign key
-
-:turtle: Safe by default available
-
-#### Bad
-
-In Postgres, adding a foreign key blocks writes on both tables.
-
-```ruby
-class AddForeignKeyOnUsers < ActiveRecord::Migration[8.1]
-  def change
-    add_foreign_key :users, :orders
-  end
-end
-```
-
-or
-
-```ruby
-class AddReferenceToUsers < ActiveRecord::Migration[8.1]
-  def change
-    add_reference :users, :order, foreign_key: true
-  end
-end
-```
-
-#### Good
-
-Add the foreign key without validating existing rows:
-
-```ruby
-class AddForeignKeyOnUsers < ActiveRecord::Migration[8.1]
-  def change
-    add_foreign_key :users, :orders, validate: false
-  end
-end
-```
-
-Then validate them in a separate migration.
-
-```ruby
-class ValidateForeignKeyOnUsers < ActiveRecord::Migration[8.1]
-  def change
-    validate_foreign_key :users, :orders
   end
 end
 ```

@@ -2,14 +2,12 @@ require_relative "test_helper"
 
 class AddForeignKeyTest < Minitest::Test
   def test_basic
-    if postgresql?
-      assert_unsafe AddForeignKey
-    else
-      assert_safe AddForeignKey
-    end
+    assert_unsafe AddForeignKey
   end
 
   def test_safe
+    skip unless postgresql?
+
     assert_safe AddForeignKeySafe
   end
 
@@ -26,10 +24,6 @@ class AddForeignKeyTest < Minitest::Test
   end
 
   def test_extra_arguments
-    if postgresql?
-      assert_unsafe AddForeignKeyExtraArguments
-    else
-      assert_argument_error AddForeignKeyExtraArguments
-    end
+    assert_unsafe AddForeignKeyExtraArguments
   end
 end

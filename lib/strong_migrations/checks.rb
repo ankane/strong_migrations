@@ -117,6 +117,8 @@ module StrongMigrations
         raise_error :add_foreign_key,
           add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options.merge(validate: false)]),
           validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
+      elsif mysql? || mariadb?
+        raise_error :add_foreign_key_mysql
       end
     end
 
@@ -186,6 +188,10 @@ module StrongMigrations
             headline: headline,
             command: command_str(method, [table, reference, options]),
             append: append
+        end
+      elsif mysql? || mariadb?
+        if options[:foreign_key]
+          raise_error :add_foreign_key_mysql
         end
       end
 

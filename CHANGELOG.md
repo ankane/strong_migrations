@@ -1,3 +1,7 @@
+## 2.7.0 (unreleased)
+
+- Added check for `add_foreign_key` with MySQL and MariaDB
+
 ## 2.6.0 (2026-04-07)
 
 - Added check for `algorithm: :copy` with MySQL and MariaDB

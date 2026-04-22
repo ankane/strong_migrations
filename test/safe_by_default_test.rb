@@ -95,18 +95,26 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_reference_foreign_key
+    skip unless postgresql?
+
     assert_safe AddReferenceForeignKey
   end
 
   def test_add_reference_foreign_key_validate_false
+    skip unless postgresql?
+
     assert_safe AddReferenceForeignKeyValidateFalseIndex
   end
 
   def test_add_reference_foreign_key_to_table
+    skip unless postgresql?
+
     assert_safe AddReferenceForeignKeyToTable
   end
 
   def test_add_reference_foreign_key_on_delete
+    skip unless postgresql?
+
     assert_safe AddReferenceForeignKeyOnDelete
   end
 
@@ -121,14 +129,20 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_foreign_key
+    skip unless postgresql?
+
     assert_safe AddForeignKey
   end
 
   def test_add_foreign_key_extra_arguments
+    skip unless postgresql?
+
     assert_argument_error AddForeignKeyExtraArguments
   end
 
   def test_add_foreign_key_name
+    skip unless postgresql?
+
     migrate AddForeignKeyName
     foreign_keys = ActiveRecord::Schema.foreign_keys(:users)
     assert_equal 2, foreign_keys.size
@@ -141,6 +155,8 @@ class SafeByDefaultTest < Minitest::Test
   end
 
   def test_add_foreign_key_column
+    skip unless postgresql?
+
     migrate AddForeignKeyColumn
     foreign_keys = ActiveRecord::Schema.foreign_keys(:users)
     assert_equal 2, foreign_keys.size
