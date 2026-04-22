@@ -347,7 +347,7 @@ end
 
 #### Good - MySQL and MariaDB
 
-[Let us know](https://github.com/ankane/strong_migrations/issues/new) if you have a safe way to do this.
+[Let us know](https://github.com/ankane/strong_migrations/issues/new) if you have a safe way to do this (foreign keys can be added in-place if `foreign_key_checks` is disabled, but this skips validation).
 
 ### Adding a check constraint
 
