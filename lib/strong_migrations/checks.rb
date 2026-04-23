@@ -53,12 +53,19 @@ module StrongMigrations
           append: append,
           rewrite_blocks: adapter.rewrite_blocks,
           default_type: (volatile ? "volatile" : "non-null")
-      elsif default.is_a?(Proc) && postgresql?
+      elsif default.is_a?(Proc)
         # adding a column with a VOLATILE default is not safe
         # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
         # functions like random() and clock_timestamp() are VOLATILE
+        #
+        # same with adding a nondeterministic default with MySQL
+        # functions like now() are nondeterministic
+        # some functions like rand() may be blocked by the server
+        # https://dev.mysql.com/doc/refman/9.7/en/replication-rbr-safe-unsafe.html
+        #
         # check for Proc to match Active Record
-        raise_error :add_column_default_callable
+        raise_error :add_column_default_callable,
+          function_type: postgresql? ? "VOLATILE" : "nondeterministic"
       end
 
       if type.to_s == "json" && postgresql?

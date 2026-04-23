@@ -27,7 +27,7 @@ end",
 
     add_column_default_callable:
 "Strong Migrations does not support inspecting callable default values.
-Please make really sure you're not calling a VOLATILE function,
+Please make really sure you're not calling a %{function_type} function,
 then wrap it in a safety_assured { ... } block.",
 
     add_column_json:

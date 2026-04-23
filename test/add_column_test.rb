@@ -20,9 +20,11 @@ class AddColumnTest < Minitest::Test
   end
 
   def test_default_callable
-    # TODO check MySQL and MariaDB
-    skip unless postgresql?
-    assert_unsafe AddColumnDefaultCallable
+    if postgresql?
+      assert_unsafe AddColumnDefaultCallable, "a VOLATILE function"
+    else
+      assert_unsafe AddColumnDefaultCallableNow, "a nondeterministic function"
+    end
   end
 
   def test_default_uuid
