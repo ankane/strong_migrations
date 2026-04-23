@@ -54,15 +54,15 @@ module StrongMigrations
           rewrite_blocks: adapter.rewrite_blocks,
           default_type: (volatile ? "volatile" : "non-null")
       elsif default.is_a?(Proc)
-        # adding a column with a VOLATILE default is not safe
+        # adding a column with a VOLATILE default is not safe with Postgres
         # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
         # functions like random() and clock_timestamp() are VOLATILE
         # functions like concat('A', 'B') are safe
         # default expressions in Postgres cannot reference other columns
         #
-        # same with adding a default function with MySQL
-        # applies to both deterministic functions like concat('A', 'B')
-        # and nondeterministic functions like now()
+        # adding a column with a default function is not safe with MySQL
+        # applies to nondeterministic functions like now()
+        # and deterministic functions like concat('A', 'B')
         # some functions like rand() may be blocked by the server
         # https://dev.mysql.com/doc/refman/9.7/en/replication-rbr-safe-unsafe.html
         #
