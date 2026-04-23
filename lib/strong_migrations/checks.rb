@@ -57,8 +57,12 @@ module StrongMigrations
         # adding a column with a VOLATILE default is not safe
         # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
         # functions like random() and clock_timestamp() are VOLATILE
+        # functions like concat('A', 'B') are safe
+        # default expressions in Postgres cannot reference other columns
         #
-        # same with adding a default function (deterministic or nondeterministic) with MySQL
+        # same with adding a default function with MySQL
+        # applies to both deterministic functions like concat('A', 'B')
+        # and nondeterministic functions like now()
         # some functions like rand() may be blocked by the server
         # https://dev.mysql.com/doc/refman/9.7/en/replication-rbr-safe-unsafe.html
         #
