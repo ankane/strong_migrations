@@ -58,14 +58,13 @@ module StrongMigrations
         # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
         # functions like random() and clock_timestamp() are VOLATILE
         #
-        # same with adding a nondeterministic default with MySQL
-        # functions like now() are nondeterministic
+        # same with adding a default function (deterministic or nondeterministic) with MySQL
         # some functions like rand() may be blocked by the server
         # https://dev.mysql.com/doc/refman/9.7/en/replication-rbr-safe-unsafe.html
         #
         # check for Proc to match Active Record
         raise_error :add_column_default_callable,
-          function_type: postgresql? ? "VOLATILE" : "nondeterministic"
+          default_type: postgresql? ? "VOLATILE function" : "function"
       end
 
       if type.to_s == "json" && postgresql?

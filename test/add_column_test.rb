@@ -23,7 +23,7 @@ class AddColumnTest < Minitest::Test
     if postgresql?
       assert_unsafe AddColumnDefaultCallable, "a VOLATILE function"
     else
-      assert_unsafe AddColumnDefaultCallableNow, "a nondeterministic function"
+      assert_unsafe AddColumnDefaultCallableNow, "a function"
     end
   end
 
