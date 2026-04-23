@@ -236,7 +236,7 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     add_foreign_key_mysql:
-"Adding a foreign key to an existing table is not safe with your database engine.",
+"Adding a foreign key to an existing table blocks writes on both tables.",
 
     validate_foreign_key:
 "Validating a foreign key while writes are blocked is dangerous.
