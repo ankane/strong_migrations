@@ -26,4 +26,10 @@ class AddForeignKeyTest < Minitest::Test
   def test_extra_arguments
     assert_unsafe AddForeignKeyExtraArguments
   end
+
+  def test_add_foreign_key_no_checks
+    skip unless mysql? || mariadb?
+
+    assert_safe AddForeignKeyNoChecks
+  end
 end

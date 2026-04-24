@@ -347,7 +347,26 @@ end
 
 #### Good - MySQL and MariaDB
 
-[Let us know](https://github.com/ankane/strong_migrations/issues/new) if you have a safe way to do this (foreign keys can be added in-place if `foreign_key_checks` is disabled, but this skips validation).
+If you are 100% sure all rows are valid and migrations do not use a connection pooler, you can add the foreign key without validating existing rows:
+
+```ruby
+class AddForeignKeyOnUsers < ActiveRecord::Migration[8.1]
+  def up
+    safety_assured do
+      begin
+        execute "SET SESSION foreign_key_checks = 0"
+        add_foreign_key :users, :orders
+      ensure
+        execute "SET SESSION foreign_key_checks = 1"
+      end
+    end
+  end
+
+  def down
+    remove_foreign_key :users, :orders
+  end
+end
+```
 
 ### Adding a check constraint
 

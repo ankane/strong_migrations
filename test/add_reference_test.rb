@@ -36,9 +36,9 @@ class AddReferenceTest < Minitest::Test
 
   def test_foreign_key
     if postgresql?
-      assert_unsafe AddReferenceForeignKey, "Then add the foreign key"
+      assert_unsafe AddReferenceForeignKey, "Then add the foreign key in separate migrations"
     else
-      assert_unsafe AddReferenceForeignKey
+      assert_unsafe AddReferenceForeignKey, "Then add the foreign key in a separate migration"
     end
   end
 

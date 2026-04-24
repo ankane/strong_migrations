@@ -128,7 +128,10 @@ module StrongMigrations
           add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options.merge(validate: false)]),
           validate_foreign_key_code: command_str("validate_foreign_key", [from_table, to_table])
       elsif mysql? || mariadb?
-        raise_error :add_foreign_key_mysql
+        raise_error :add_foreign_key_mysql,
+          add_foreign_key_code: command_str("add_foreign_key", [from_table, to_table, options]),
+          # TODO exclude some options?
+          remove_foreign_key_code: command_str("remove_foreign_key", [from_table, to_table, options])
       end
     end
 
@@ -201,7 +204,10 @@ module StrongMigrations
         end
       elsif mysql? || mariadb?
         if options[:foreign_key]
-          raise_error :add_foreign_key_mysql
+          raise_error :add_reference,
+            headline: "Adding a foreign key blocks writes on both tables.",
+            command: command_str(method, [table, reference, options.except(:foreign_key)]),
+            append: "\n\nThen add the foreign key in a separate migration."
         end
       end
 

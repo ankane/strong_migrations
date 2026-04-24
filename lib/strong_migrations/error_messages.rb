@@ -236,7 +236,26 @@ class Validate%{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     add_foreign_key_mysql:
-"Adding a foreign key to an existing table blocks writes on both tables.",
+"Adding a foreign key blocks writes on both tables. If you are 100% sure
+all rows are valid and migrations do not use a connection pooler,
+you can add the foreign key without validating existing rows.
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def up
+    safety_assured do
+      begin
+        execute \"SET SESSION foreign_key_checks = 0\"
+        %{add_foreign_key_code}
+      ensure
+        execute \"SET SESSION foreign_key_checks = 1\"
+      end
+    end
+  end
+
+  def down
+    %{remove_foreign_key_code}
+  end
+end",
 
     validate_foreign_key:
 "Validating a foreign key while writes are blocked is dangerous.

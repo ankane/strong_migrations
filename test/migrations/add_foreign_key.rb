@@ -46,3 +46,20 @@ class AddForeignKeyColumn < TestMigration
     add_foreign_key :users, :orders, column: "other_order_id"
   end
 end
+
+class AddForeignKeyNoChecks < TestMigration
+  def up
+    safety_assured do
+      begin
+        execute "SET SESSION foreign_key_checks = 0"
+        add_foreign_key :users, :orders
+      ensure
+        execute "SET SESSION foreign_key_checks = 1"
+      end
+    end
+  end
+
+  def down
+    remove_foreign_key :users, :orders
+  end
+end
