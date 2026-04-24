@@ -899,7 +899,7 @@ ALTER ROLE myuser SET lock_timeout = '10s';
 ALTER ROLE myuser SET statement_timeout = '1h';
 ```
 
-Note: If you use PgBouncer in transaction mode, you must set timeouts on the database user.
+Note: If you use a connection pooler like PgBouncer in transaction mode, you must set timeouts on the database user.
 
 ## App Timeouts
 
@@ -915,7 +915,7 @@ production:
     lock_timeout: 10s
 ```
 
-Note: If you use PgBouncer in transaction mode, you must set the statement and lock timeouts on the database user as shown above.
+Note: If you use a connection pooler like PgBouncer in transaction mode, you must set the statement and lock timeouts on the database user as shown above.
 
 For MySQL:
 
