@@ -370,7 +370,7 @@ end
 
 ### Adding a check constraint
 
-:turtle: Safe by default available
+:turtle: Safe by default available for Postgres
 
 #### Bad
 
