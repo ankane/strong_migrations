@@ -35,7 +35,18 @@ module StrongMigrations
       # keep track of new columns of change_column_default check
       @new_columns << [table.to_s, column.to_s]
 
-      # Active Record has special case for uuid columns that allows function default values
+      # adding a column with a volatile default is not safe with Postgres
+      # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
+      # functions like random() and clock_timestamp() are volatile
+      # functions like concat('A', 'B') are safe
+      # default expressions in Postgres cannot reference other columns
+      #
+      # adding a column with an expression default is not safe with MySQL
+      # even constant expressions like (3) are not safe
+      # literals like 3 are safe
+      #
+      # Active Record quotes default values except for procs
+      # there is also a special case for uuid columns
       # https://github.com/rails/rails/blob/v7.0.3.1/activerecord/lib/active_record/connection_adapters/postgresql/quoting.rb#L92-L93
       if !default.nil? && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()") && adapter.default_volatile?(default))))
         if options[:null] == false
@@ -52,16 +63,6 @@ module StrongMigrations
           rewrite_blocks: adapter.rewrite_blocks,
           default_type: (volatile ? "volatile" : "non-null")
       elsif default.is_a?(Proc)
-        # adding a column with a VOLATILE default is not safe with Postgres
-        # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
-        # functions like random() and clock_timestamp() are VOLATILE
-        # functions like concat('A', 'B') are safe
-        # default expressions in Postgres cannot reference other columns
-        #
-        # adding a column with an expression default is not safe with MySQL
-        # even constant expressions like (3) are not safe
-        # literals like 3 are safe
-        #
         # check for Proc to match Active Record
         raise_error :add_column_default_callable,
           add_command: command_str("add_column", [table, column, type, options.except(:default)]),
