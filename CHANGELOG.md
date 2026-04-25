@@ -1,4 +1,4 @@
-## 2.7.0 (unreleased)
+## 2.7.0 (2026-04-25)
 
 - Added check for `add_foreign_key` with MySQL and MariaDB
 - Added check for `add_column` with callable default value with MySQL and MariaDB
