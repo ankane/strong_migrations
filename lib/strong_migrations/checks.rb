@@ -60,15 +60,13 @@ module StrongMigrations
         # functions like concat('A', 'B') are safe
         # default expressions in Postgres cannot reference other columns
         #
-        # adding a column with a default function is not safe with MySQL
-        # applies to nondeterministic functions like now()
-        # and deterministic functions like concat('A', 'B')
-        # some functions like rand() may be blocked by the server
-        # https://dev.mysql.com/doc/refman/9.7/en/replication-rbr-safe-unsafe.html
+        # adding a column with an expression default is not safe with MySQL
+        # even constant expressions like (3) are not safe
+        # literals like 3 are safe
         #
         # check for Proc to match Active Record
         raise_error :add_column_default_callable,
-          default_type: postgresql? ? "VOLATILE function" : "function"
+          default_type: postgresql? ? "a VOLATILE function" : "an expression"
       end
 
       if type.to_s == "json" && postgresql?
