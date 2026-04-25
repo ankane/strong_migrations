@@ -630,7 +630,7 @@ Instead, add the column without a default value, then change the default.
 class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
   def up
     add_column :users, :some_column, :uuid
-    change_column_default :users, :some_column, from: nil, to: "gen_random_uuid()"
+    change_column_default :users, :some_column, "gen_random_uuid()"
   end
 
   def down
@@ -787,7 +787,7 @@ Instead, add the column without a default value, then change the default.
 class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
   def up
     add_column :users, :some_column, :datetime
-    change_column_default :users, :some_column, from: nil, to: -> { "(now())" }
+    change_column_default :users, :some_column, -> { "(now())" }
   end
 
   def down
