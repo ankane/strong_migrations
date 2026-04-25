@@ -64,6 +64,9 @@ module StrongMigrations
         #
         # check for Proc to match Active Record
         raise_error :add_column_default_callable,
+          add_command: command_str("add_column", [table, column, type, options.except(:default)]),
+          change_command: command_str("change_column_default", [table, column]),
+          remove_command: command_str("remove_column", [table, column]),
           default_type: postgresql? ? "volatile" : "an expression"
       end
 

@@ -29,6 +29,18 @@ end",
 "Strong Migrations does not support inspecting callable default values.
 
 If the default value is %{default_type}, add the column without a default value, then change the default.
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def up
+    %{add_command}
+    %{change_command}, -> { ... }
+  end
+
+  def down
+    %{remove_command}
+  end
+end
+
 Then backfill the existing rows in the Rails console or a separate migration with disable_ddl_transaction!.
 
 Otherwise, wrap this step in a safety_assured { ... } block.",
