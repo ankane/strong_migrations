@@ -78,8 +78,8 @@ Postgres-specific checks:
 - [adding a unique constraint](#adding-a-unique-constraint)
 - [adding an exclusion constraint](#adding-an-exclusion-constraint)
 - [adding a json column](#adding-a-json-column)
-- [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
 - [adding a column with a volatile default value](#adding-a-column-with-a-volatile-default-value)
+- [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
 - [renaming a schema](#renaming-a-schema)
 
 MySQL and MariaDB-specific checks:
@@ -608,6 +608,39 @@ class AddPropertiesToUsers < ActiveRecord::Migration[8.1]
 end
 ```
 
+### Adding a column with a volatile default value
+
+#### Bad
+
+Adding a column with a volatile default value to an existing table causes the entire table to be rewritten. During this time, reads and writes are blocked.
+
+```ruby
+class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
+  def change
+    add_column :users, :some_column, :uuid, default: "gen_random_uuid()"
+  end
+end
+```
+
+#### Good
+
+Instead, add the column without a default value, then change the default.
+
+```ruby
+class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
+  def up
+    add_column :users, :some_column, :uuid
+    change_column_default :users, :some_column, from: nil, to: "gen_random_uuid()"
+  end
+
+  def down
+    remove_column :users, :some_column
+  end
+end
+```
+
+Then [backfill the data](#backfilling-data).
+
 ### Setting NOT NULL on an existing column
 
 :turtle: Safe by default available
@@ -652,39 +685,6 @@ class ValidateSomeColumnNotNull < ActiveRecord::Migration[8.1]
   end
 end
 ```
-
-### Adding a column with a volatile default value
-
-#### Bad
-
-Adding a column with a volatile default value to an existing table causes the entire table to be rewritten. During this time, reads and writes are blocked.
-
-```ruby
-class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
-  def change
-    add_column :users, :some_column, :uuid, default: "gen_random_uuid()"
-  end
-end
-```
-
-#### Good
-
-Instead, add the column without a default value, then change the default.
-
-```ruby
-class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
-  def up
-    add_column :users, :some_column, :uuid
-    change_column_default :users, :some_column, from: nil, to: "gen_random_uuid()"
-  end
-
-  def down
-    remove_column :users, :some_column
-  end
-end
-```
-
-Then [backfill the data](#backfilling-data).
 
 ### Renaming a schema
 
