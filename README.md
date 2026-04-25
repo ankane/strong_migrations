@@ -461,6 +461,8 @@ end
 
 Note: If backfilling with a method other than `update_all`, use `User.reset_column_information` to ensure the model has up-to-date column information.
 
+## Postgres Checks
+
 ### Adding an index non-concurrently
 
 :turtle: Safe by default available
@@ -709,6 +711,8 @@ A safer approach is to:
 5. Stop writing to the old schema
 6. Drop the old schema
 
+## MySQL and MariaDB Checks
+
 ### Using the COPY algorithm
 
 #### Bad
@@ -793,6 +797,8 @@ end
 ```
 
 Then [backfill the data](#backfilling-data).
+
+## Best Practices
 
 ### Keeping non-unique indexes to three columns or less
 
