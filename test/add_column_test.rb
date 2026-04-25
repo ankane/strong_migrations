@@ -52,7 +52,7 @@ class AddColumnTest < Minitest::Test
   end
 
   def test_generated_virtual
-    skip if postgresql?
+    skip "requires Postgres 18+" if postgresql?
     assert_safe AddColumnGeneratedVirtual
   end
 
