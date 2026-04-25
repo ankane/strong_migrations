@@ -61,7 +61,7 @@ module StrongMigrations
           code: backfill_code(table, column, default, volatile),
           append: append,
           rewrite_blocks: adapter.rewrite_blocks,
-          default_type: (volatile ? "volatile" : "non-null")
+          default_type: volatile ? "volatile" : "non-null"
       elsif default.is_a?(Proc)
         # check for Proc to match Active Record
         raise_error :add_column_default_callable,
