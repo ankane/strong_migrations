@@ -765,7 +765,7 @@ end
 
 #### Bad
 
-Adding a column with an expression default value to an existing table causes the entire table to be rewritten. During this time, writes are blocked.
+In MySQL and MariaDB, adding a column with an expression default value to an existing table causes the entire table to be rewritten. During this time, writes are blocked.
 
 ```ruby
 class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
