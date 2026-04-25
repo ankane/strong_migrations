@@ -64,7 +64,7 @@ module StrongMigrations
         #
         # check for Proc to match Active Record
         raise_error :add_column_default_callable,
-          default_type: postgresql? ? "calling a VOLATILE function" : "using an expression"
+          default_type: postgresql? ? "volatile" : "an expression"
       end
 
       if type.to_s == "json" && postgresql?

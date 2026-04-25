@@ -27,8 +27,11 @@ end",
 
     add_column_default_callable:
 "Strong Migrations does not support inspecting callable default values.
-Please make really sure you're not %{default_type},
-then wrap it in a safety_assured { ... } block.",
+
+If the default value is %{default_type}, add the column without a default value, then change the default.
+Then backfill the existing rows in the Rails console or a separate migration with disable_ddl_transaction!.
+
+Otherwise, wrap this step in a safety_assured { ... } block.",
 
     add_column_json:
 "There's no equality operator for the json column type, which can cause errors for
