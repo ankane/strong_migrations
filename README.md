@@ -86,6 +86,7 @@ MySQL and MariaDB-specific checks:
 
 - [using the COPY algorithm](#using-the-copy-algorithm)
 - [using shared or exclusive locking](#using-shared-or-exclusive-locking)
+- [adding a column with an expression default value](#adding-a-column-with-an-expression-default-value)
 
 Best practices:
 
@@ -759,6 +760,39 @@ class AddSomeIndexToUsers < ActiveRecord::Migration[8.2]
   end
 end
 ```
+
+### Adding a column with an expression default value
+
+#### Bad
+
+Adding a column with an expression default value to an existing table causes the entire table to be rewritten. During this time, writes are blocked.
+
+```ruby
+class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
+  def change
+    add_column :users, :some_column, :datetime, default: -> { "(now())" }
+  end
+end
+```
+
+#### Good
+
+Instead, add the column without a default value, then change the default.
+
+```ruby
+class AddSomeColumnToUsers < ActiveRecord::Migration[8.1]
+  def up
+    add_column :users, :some_column, :datetime
+    change_column_default :users, :some_column, from: nil, to: -> { "(now())" }
+  end
+
+  def down
+    remove_column :users, :some_column
+  end
+end
+```
+
+Then [backfill the data](#backfilling-data).
 
 ### Keeping non-unique indexes to three columns or less
 

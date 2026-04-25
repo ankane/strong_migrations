@@ -35,6 +35,17 @@ class AddColumnDefaultCallableNow < TestMigration
   end
 end
 
+class AddColumnDefaultCallableNowSafe < TestMigration
+  def up
+    add_column :users, :nice, :datetime
+    change_column_default :users, :nice, from: nil, to: -> { "(now())" }
+  end
+
+  def down
+    remove_column :users, :nice
+  end
+end
+
 class AddColumnDefaultUUID < TestMigration
   def change
     add_column :users, :nice, :uuid, default: "gen_random_uuid()"
