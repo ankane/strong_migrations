@@ -104,7 +104,10 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   def change
     safety_assured { %{command} }
   end
-end",
+end
+
+Note: safety_assured does not carry over when rolling back a change method.
+Use up and down methods instead if you need to roll back safely.",
 
     rename_column:
 "Renaming a column that's in use will cause errors
