@@ -1,3 +1,8 @@
+## Unreleased
+
+- Added `safe_change_table` to inspect operations inside `change_table` blocks
+- Made plain `change_table` safe by default when `StrongMigrations.safe_by_default = true`
+
 ## 2.7.0 (2026-04-25)
 
 - Added check for `add_foreign_key` with MySQL and MariaDB

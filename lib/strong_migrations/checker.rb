@@ -120,6 +120,28 @@ module StrongMigrations
       result
     end
 
+    def check_change_table_block(table_name, &block)
+      check_adapter
+      check_version_supported
+
+      recorder = ActiveRecord::Migration::CommandRecorder.new(connection)
+      table = connection.update_table_definition(table_name, recorder)
+      block.call(table)
+
+      # operations inside change_table cannot use the safe_by_default
+      # rewrites (e.g. concurrent indexes), so disable them for the dry run
+      # to avoid issuing real SQL and to surface unsafe operations as errors
+      previous_safe_by_default = StrongMigrations.safe_by_default
+      begin
+        StrongMigrations.safe_by_default = false
+        recorder.commands.each do |method, args, _inner_block|
+          perform(method, *args) { nil }
+        end
+      ensure
+        StrongMigrations.safe_by_default = previous_safe_by_default
+      end
+    end
+
     def perform_method(method, *args)
       if StrongMigrations.remove_invalid_indexes && direction == :up && method == :add_index && postgresql?
         remove_invalid_index_if_needed(*args)

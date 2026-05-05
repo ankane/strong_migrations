@@ -6,8 +6,12 @@ module StrongMigrations
       connection.begin_db_transaction if strong_migrations_checker.transaction_disabled
     end
 
-    def method_missing(method, *args)
+    def method_missing(method, *args, &block)
       return super if is_a?(ActiveRecord::Schema) || is_a?(ActiveRecord::Schema::Definition)
+
+      if method == :change_table && block && strong_migrations_checker.safe_by_default_method?(:change_table)
+        return safe_change_table(*args, &block)
+      end
 
       catch(:safe) do
         strong_migrations_checker.perform(method, *args) do
@@ -24,6 +28,13 @@ module StrongMigrations
       else
         super
       end
+    end
+
+    def safe_change_table(table_name, **options, &block)
+      raise ArgumentError, "safe_change_table requires a block" unless block
+
+      strong_migrations_checker.check_change_table_block(table_name, &block)
+      safety_assured { connection.change_table(table_name, **options, &block) }
     end
 
     def safety_assured

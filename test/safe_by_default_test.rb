@@ -297,4 +297,12 @@ class SafeByDefaultTest < Minitest::Test
 
     assert_safe ChangeColumnNullLongName
   end
+
+  def test_change_table
+    assert_safe ChangeTableSafeOps
+  end
+
+  def test_change_table_unsafe
+    assert_unsafe ChangeTableUnsafeOp, "Active Record caches attributes"
+  end
 end

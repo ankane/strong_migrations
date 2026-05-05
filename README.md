@@ -423,6 +423,31 @@ class ExecuteSQL < ActiveRecord::Migration[8.1]
 end
 ```
 
+### Inspecting change_table blocks
+
+Strong Migrations rejects plain `change_table` because it cannot see what happens inside the block. Use `safe_change_table` instead. Each operation in the block is validated as if it were a top-level call:
+
+```ruby
+class AddNamesToUsers < ActiveRecord::Migration[8.1]
+  def change
+    safe_change_table :users, bulk: true do |t|
+      t.string :first_name
+      t.string :last_name
+      t.index [:first_name, :last_name]
+    end
+  end
+end
+```
+
+If any operation in the block would be unsafe, the migration is rejected with the same error message as the equivalent top-level call.
+
+Note: the block is executed twice
+
+- once to capture operations for inspection (no SQL is issued)
+- once by the real `change_table` to apply the changes.
+
+So any non-DDL side effects in the block run twice. This matches Active Record’s existing behavior for `change_table` with `bulk: true`.
+
 ### Backfilling data
 
 Note: Strong Migrations does not detect dangerous backfills.
@@ -850,6 +875,7 @@ Make certain operations safe by default. This allows you to write the code under
 - adding a foreign key
 - adding a check constraint
 - setting NOT NULL on an existing column
+- using `change_table` (each operation in the block is validated as if it were a top-level call)
 
 Add to `config/initializers/strong_migrations.rb`:
 
