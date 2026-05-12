@@ -710,14 +710,14 @@ A safer approach is to:
 3. Backfill data from the old value to the new value
 
 ```ruby
-class AddDoneToStatus < ActiveRecord::Migration[8.1]
+class AddCompletedToStatus < ActiveRecord::Migration[8.1]
   def up
     add_enum_value :status, "completed", after: "done"
   end
 end
 ```
 
-Note: Removing enum values is not supported in Postgres (without creating a new enum).
+Removing enum values is not supported in Postgres (without creating a new enum).
 
 ### Renaming a schema
 
