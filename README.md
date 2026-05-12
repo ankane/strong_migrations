@@ -80,6 +80,7 @@ Postgres-specific checks:
 - [adding a json column](#adding-a-json-column)
 - [adding a column with a volatile default value](#adding-a-column-with-a-volatile-default-value)
 - [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
+- [renaming an enum value](#renaming-an-enum-value) [unreleased]
 - [renaming a schema](#renaming-a-schema)
 
 MySQL and MariaDB-specific checks:
@@ -685,6 +686,38 @@ class ValidateSomeColumnNotNull < ActiveRecord::Migration[8.1]
   end
 end
 ```
+
+### Renaming an enum value
+
+#### Bad
+
+Renaming an enum value that’s in use will cause errors in your application.
+
+```ruby
+class RenameDoneToCompleted < ActiveRecord::Migration[8.1]
+  def up
+    rename_enum_value :status, from: "done", to: "completed"
+  end
+end
+```
+
+#### Good
+
+A safer approach is to:
+
+1. Add a new enum value before or after the old value
+2. Update application code to handle both values and write the new value
+3. Backfill data from the old value to the new value
+
+```ruby
+class AddDoneToStatus < ActiveRecord::Migration[8.1]
+  def up
+    add_enum_value :status, "completed", after: "done"
+  end
+end
+```
+
+Note: Removing enum values is not supported in Postgres (without creating a new enum).
 
 ### Renaming a schema
 

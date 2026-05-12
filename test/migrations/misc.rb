@@ -22,6 +22,17 @@ class RenameSchema < TestMigration
   end
 end
 
+class RenameEnumValue < TestMigration
+  def up
+    create_enum :task_status, ["new", "done"]
+    rename_enum_value :task_status, from: "done", to: "completed"
+  end
+
+  def down
+    drop_enum :task_status
+  end
+end
+
 class CreateTableForce < TestMigration
   def change
     create_table :admins, force: :cascade do |t|

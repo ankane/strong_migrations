@@ -62,6 +62,10 @@ ActiveRecord::Schema.define do
     drop_table(table) if table_exists?(table)
   end
 
+  if $adapter == "postgresql"
+    drop_enum :task_status, if_exists: true
+  end
+
   create_table :users do |t|
     t.string :name
     t.string :city

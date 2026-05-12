@@ -1,3 +1,7 @@
+## 2.8.0 (unreleased)
+
+- Added check for `rename_enum_value`
+
 ## 2.7.0 (2026-04-25)
 
 - Added check for `add_foreign_key` with MySQL and MariaDB

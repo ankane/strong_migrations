@@ -467,6 +467,14 @@ module StrongMigrations
       raise_error :rename_column
     end
 
+    def check_rename_enum_value(*args)
+      options = args.extract_options!
+      type_name, _ = args
+
+      raise_error :rename_enum_value,
+        command: command_str("add_enum_value", [type_name, options[:to], {after: options[:from]}])
+    end
+
     def check_rename_schema
       raise_error :rename_schema
     end

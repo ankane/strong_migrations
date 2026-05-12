@@ -117,6 +117,20 @@ in your application. A safer approach is to:
 5. Stop writing to the old column
 6. Drop the old column",
 
+    rename_enum_value:
+"Renaming an enum value that's in use will cause errors
+in your application. A safer approach is to:
+
+1. Add a new enum value before or after the old value
+2. Update application code to handle both values and write the new value
+3. Backfill data from the old value to the new value
+
+class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
+  def up
+    %{command}
+  end
+end",
+
     rename_schema:
 "Renaming a schema that's in use will cause errors
 in your application. A safer approach is to:
