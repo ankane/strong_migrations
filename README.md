@@ -695,7 +695,7 @@ Renaming an enum value that’s in use will cause errors in your application.
 
 ```ruby
 class RenameDoneToCompleted < ActiveRecord::Migration[8.1]
-  def up
+  def change
     rename_enum_value :status, from: "done", to: "completed"
   end
 end
