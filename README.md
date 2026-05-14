@@ -80,7 +80,7 @@ Postgres-specific checks:
 - [adding a json column](#adding-a-json-column)
 - [adding a column with a volatile default value](#adding-a-column-with-a-volatile-default-value)
 - [setting NOT NULL on an existing column](#setting-not-null-on-an-existing-column)
-- [renaming an enum value](#renaming-an-enum-value) [unreleased]
+- [renaming an enum value](#renaming-an-enum-value)
 - [renaming a schema](#renaming-a-schema)
 
 MySQL and MariaDB-specific checks:

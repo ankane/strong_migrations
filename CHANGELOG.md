@@ -1,4 +1,4 @@
-## 2.8.0 (unreleased)
+## 2.8.0 (2026-05-14)
 
 - Added check for `rename_enum_value`
 
