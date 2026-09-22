@@ -15,7 +15,12 @@ module StrongMigrations
     end
 
     def columns(...)
-      @connection.columns(...).sort_by(&:name)
+      columns = @connection.columns(...)
+      if ActiveRecord::VERSION::STRING.to_f >= 8.2 && columns.is_a?(Hash)
+        columns.transform_values { |v| v.sort_by(&:name) }
+      else
+        columns.sort_by(&:name)
+      end
     end
 
     # forward private methods with send
