@@ -15,7 +15,13 @@ module StrongMigrations
     end
 
     def columns(...)
-      @connection.columns(...).sort_by(&:name)
+      @connection.columns(...).then do |cols_or_hash|
+        if cols_or_hash.is_a?(Hash)
+          cols_or_hash.transform_values { |cols| cols.sort_by(&:name) }
+        else
+          cols_or_hash.sort_by(&:name)
+        end
+      end
     end
 
     # forward private methods with send
