@@ -108,7 +108,7 @@ module StrongMigrations
             # resolve with fallback
             new_type = type_map[new_type] || new_type
 
-            safe = new_type == existing_type || time_zone == "UTC"
+            safe = new_type == existing_type || ["UTC", "Etc/UTC"].include?(time_zone)
           end
         when "time"
           precision = options[:precision] || options[:limit] || 6
