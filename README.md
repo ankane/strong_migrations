@@ -297,7 +297,7 @@ end
 
 #### Good
 
-Add a non-generated column and use callbacks or triggers instead (or a virtual generated column with MySQL and MariaDB).
+Add a non-generated column and use callbacks or triggers instead (or a virtual generated column).
 
 ### Adding a foreign key
 
