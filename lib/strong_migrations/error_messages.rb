@@ -352,5 +352,5 @@ class %{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end"
   }
-  self.enabled_checks = (error_messages.keys - [:remove_index]).map { |k| [k, {}] }.to_h
+  self.enabled_checks = (error_messages.keys - [:remove_index]).to_h { |k| [k, {}] }
 end
