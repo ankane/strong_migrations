@@ -4,17 +4,10 @@ class AlphabetizeSchemaTest < Minitest::Test
   def test_default
     schema = dump_schema
 
-    if ar_version == 8.1
-      expected_columns = <<-EOS
-    t.string "name"
-    t.bigint "order_id"
-      EOS
-    else
-      expected_columns = <<-EOS
+    expected_columns = <<-EOS
     t.string "name"
     t.string "city"
-      EOS
-    end
+    EOS
     assert_match expected_columns, schema
   end
 
