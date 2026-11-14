@@ -286,44 +286,25 @@ class SQLiteTest < Minitest::Test
   end
 
   def test_change_column_safety_assured
-    User.create!(name: "Existing")
-    with_safety_assured do
-      statements = capture_statements { migrate ChangeColumnVarcharToText }
-      assert statements.any? { |sql| sql.match?(/\AINSERT INTO "a?users".*SELECT/m) }
+    assert_column_change_rebuild(ChangeColumnVarcharToText, ["Existing"]) do
       assert_equal :text, ActiveRecord::Base.connection.columns(:users).find { |column| column.name == "name" }.type
       assert_equal [["Existing"]], ActiveRecord::Base.connection.select_rows("SELECT name FROM users")
     end
-  ensure
-    with_safety_assured { migrate ChangeColumnVarcharToText, direction: :down }
-    User.delete_all
   end
 
   def test_change_column_default_safety_assured
-    User.create!(name: "Existing")
-    with_safety_assured do
-      statements = capture_statements { migrate ChangeColumnDefaultHash }
-      assert statements.any? { |sql| sql.match?(/\AINSERT INTO "a?users".*SELECT/m) }
+    assert_column_change_rebuild(ChangeColumnDefaultHash, ["Existing"]) do
       assert_equal "Test", ActiveRecord::Base.connection.columns(:users).find { |column| column.name == "name" }.default
       assert_equal [["Existing"]], ActiveRecord::Base.connection.select_rows("SELECT name FROM users")
     end
-  ensure
-    with_safety_assured { migrate ChangeColumnDefaultHash, direction: :down }
-    User.delete_all
   end
 
   def test_change_column_null_default_safety_assured
-    User.create!(name: nil)
-    User.create!(name: "Existing")
-    with_safety_assured do
-      statements = capture_statements { migrate ChangeColumnNullDefault }
+    assert_column_change_rebuild(ChangeColumnNullDefault, [nil, "Existing"]) do |statements|
       assert statements.any? { |sql| sql.start_with?('UPDATE "users"') }
-      assert statements.any? { |sql| sql.match?(/\AINSERT INTO "a?users".*SELECT/m) }
       refute ActiveRecord::Base.connection.columns(:users).find { |column| column.name == "name" }.null
       assert_equal [["Andy"], ["Existing"]], ActiveRecord::Base.connection.select_rows("SELECT name FROM users ORDER BY id")
     end
-  ensure
-    with_safety_assured { migrate ChangeColumnNullDefault, direction: :down }
-    User.delete_all
   end
 
   def test_disabled_change_column_check
@@ -378,6 +359,18 @@ class SQLiteTest < Minitest::Test
   end
 
   private
+
+  def assert_column_change_rebuild(migration, names)
+    names.each { |name| User.create!(name: name) }
+    with_safety_assured do
+      statements = capture_statements { migrate migration }
+      assert statements.any? { |sql| sql.match?(/\AINSERT INTO "a?users".*SELECT/m) }
+      yield statements
+    end
+  ensure
+    with_safety_assured { migrate migration, direction: :down }
+    User.delete_all
+  end
 
   def assert_column_change_rejected(migration, message = "rebuild", **options)
     User.create!(name: "Existing")
