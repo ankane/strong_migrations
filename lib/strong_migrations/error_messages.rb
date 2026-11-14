@@ -25,6 +25,13 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
   end
 end",
 
+    add_column_default_sqlite:
+"Adding a column with a default on SQLite has not yet been classified as safe by Strong Migrations.
+Do not work around this by adding the column without a default and then calling change_column_default.
+Rails rebuilds the table to change defaults, which can block writes throughout the database until the transaction commits.
+
+Review the operation and plan any necessary write pause, then wrap this step in a safety_assured { ... } block.",
+
     add_column_default_callable:
 "Strong Migrations does not support inspecting callable default values.
 

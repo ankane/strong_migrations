@@ -6,6 +6,7 @@ require_relative "strong_migrations/adapters/abstract_adapter"
 require_relative "strong_migrations/adapters/mysql_adapter"
 require_relative "strong_migrations/adapters/mariadb_adapter"
 require_relative "strong_migrations/adapters/postgresql_adapter"
+require_relative "strong_migrations/adapters/sqlite_adapter"
 
 # modules
 require_relative "strong_migrations/checks"

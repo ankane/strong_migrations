@@ -3,6 +3,9 @@ require_relative "test_helper"
 class SQLiteTest < Minitest::Test
   def setup
     skip unless $adapter == "sqlite3"
+    super
+    @checker = StrongMigrations::Checker.new(TestMigration.new)
+    @adapter = @checker.send(:adapter)
   end
 
   def test_connection_and_schema
@@ -16,11 +19,115 @@ class SQLiteTest < Minitest::Test
   end
 
   def test_migration_round_trip
-    assert_output(nil, /Unsupported adapter: SQLite/) do
+    assert_output(nil, "") do
       migrate CreateJoinTable
       assert ActiveRecord::Base.connection.table_exists?(:cities_users)
       migrate CreateJoinTable, direction: :down
       refute ActiveRecord::Base.connection.table_exists?(:cities_users)
+    end
+  end
+
+  def test_adapter
+    assert_instance_of StrongMigrations::Adapters::SQLiteAdapter, @adapter
+    assert_equal "SQLite", @adapter.name
+    version = ActiveRecord::Base.connection.select_value("SELECT sqlite_version()")
+    assert_equal Gem::Version.new(version), @adapter.server_version
+  end
+
+  def test_target_version
+    with_target_version("3.23.0") do
+      assert_equal Gem::Version.new("3.23.0"), @adapter.server_version
+    end
+  end
+
+  def test_target_version_per_database
+    with_target_version(primary: "3.23.0", animals: "3.24.0") do
+      assert_equal Gem::Version.new("3.23.0"), @adapter.server_version
+    end
+  end
+
+  def test_target_version_unconfigured
+    error = assert_raises(StrongMigrations::Error) do
+      with_target_version(animals: "3.23.0") do
+        @adapter.server_version
+      end
+    end
+    assert_equal "StrongMigrations.target_version is not configured for :primary database", error.message
+  end
+
+  def test_target_version_outside_developer_env
+    outside_developer_env do
+      with_target_version(1) do
+        version = ActiveRecord::Base.connection.select_value("SELECT sqlite_version()")
+        assert_equal Gem::Version.new(version), @adapter.server_version
+      end
+    end
+  end
+
+  def test_unsupported_version
+    error = assert_raises(StrongMigrations::UnsupportedVersion) do
+      with_target_version("3.7.0") do
+        migrate CreateJoinTable
+      end
+    end
+    assert_match "SQLite version (3.7.0) not supported", error.message
+    refute ActiveRecord::Base.connection.table_exists?(:cities_users)
+  end
+
+  def test_application_compatibility_checks
+    assert_unsafe RemoveColumn, "ignored_columns"
+    assert_unsafe RenameColumn, "Renaming a column"
+    assert_unsafe RenameTable, "Renaming a table"
+    assert_unsafe CreateTableForce
+    assert ActiveRecord::Base.connection.column_exists?(:users, :name)
+    refute ActiveRecord::Base.connection.table_exists?(:admins)
+  end
+
+  def test_default
+    assert_unsafe AddColumnDefault, "has not yet been classified"
+    refute ActiveRecord::Base.connection.column_exists?(:users, :nice)
+  end
+
+  def test_callable_default
+    assert_unsafe AddColumnDefaultCallableNow, "has not yet been classified"
+    refute ActiveRecord::Base.connection.column_exists?(:users, :nice)
+  end
+
+  def test_safety_assured
+    with_safety_assured do
+      migrate AddColumnDefault
+      assert ActiveRecord::Base.connection.column_exists?(:users, :nice)
+      migrate AddColumnDefault, direction: :down
+    end
+    refute ActiveRecord::Base.connection.column_exists?(:users, :nice)
+  end
+
+  def test_disabled_default_check
+    with_option(:enabled_checks, StrongMigrations.enabled_checks.except(:add_column_default_sqlite)) do
+      migrate AddColumnDefault
+      assert ActiveRecord::Base.connection.column_exists?(:users, :nice)
+      migrate AddColumnDefault, direction: :down
+    end
+    refute ActiveRecord::Base.connection.column_exists?(:users, :nice)
+  end
+
+  def test_safe_by_default
+    with_option(:safe_by_default, true) do
+      refute @checker.safe_by_default_method?(:change_column_null)
+      with_safety_assured do
+        migrate ChangeColumnNullDefault
+        refute ActiveRecord::Base.connection.columns(:users).find { |c| c.name == "name" }.null
+        migrate ChangeColumnNullDefault, direction: :down
+        assert ActiveRecord::Base.connection.columns(:users).find { |c| c.name == "name" }.null
+      end
+    end
+  end
+
+  def test_skipped_database
+    with_option(:skipped_databases, ["primary"]) do
+      with_target_version(1) do
+        assert_safe CreateJoinTable
+      end
     end
   end
 end

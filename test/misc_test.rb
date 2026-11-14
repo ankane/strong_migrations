@@ -88,13 +88,12 @@ class MiscTest < Minitest::Test
   end
 
   def test_unsupported_adapter
-    previous_db_config = ActiveRecord::Base.connection_db_config.configuration_hash
-    ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
-    schema_migration.create_table
-    assert_output nil, "[strong_migrations] Unsupported adapter: SQLite. Use StrongMigrations.skip_database(:primary) to silence this warning.\n" do
-      assert_unsafe CreateTableForce
+    migration = CreateTableForce.new
+    checker = migration.send(:strong_migrations_checker)
+    connection = Struct.new(:adapter_name, :pool).new("Unsupported", ActiveRecord::Base.connection_pool)
+    checker.define_singleton_method(:connection) { connection }
+    assert_output nil, "[strong_migrations] Unsupported adapter: Unsupported. Use StrongMigrations.skip_database(:primary) to silence this warning.\n" do
+      assert_unsafe migration
     end
-  ensure
-    ActiveRecord::Base.establish_connection(previous_db_config) if previous_db_config
   end
 end

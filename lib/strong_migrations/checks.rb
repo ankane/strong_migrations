@@ -48,7 +48,10 @@ module StrongMigrations
       # Active Record quotes default values except for procs
       # there is also a special case for uuid columns
       # https://github.com/rails/rails/blob/v7.0.3.1/activerecord/lib/active_record/connection_adapters/postgresql/quoting.rb#L92-L93
-      if !default.nil? && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()") && adapter.default_volatile?(default))))
+      if sqlite? && !default.nil?
+        # shortcut: reject SQLite defaults until the add_column paths are classified.
+        raise_error :add_column_default_sqlite
+      elsif !default.nil? && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()") && adapter.default_volatile?(default))))
         if options[:null] == false
           options = options.except(:null)
           append = "\n\nThen add the NOT NULL constraint in separate migrations."
@@ -507,6 +510,10 @@ module StrongMigrations
 
     def mariadb?
       adapter.instance_of?(Adapters::MariaDBAdapter)
+    end
+
+    def sqlite?
+      adapter.instance_of?(Adapters::SQLiteAdapter)
     end
 
     def ar_version

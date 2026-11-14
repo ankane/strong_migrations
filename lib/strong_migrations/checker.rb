@@ -232,6 +232,8 @@ module StrongMigrations
             else
               Adapters::MySQLAdapter
             end
+          when "SQLite"
+            Adapters::SQLiteAdapter
           else
             Adapters::AbstractAdapter
           end
