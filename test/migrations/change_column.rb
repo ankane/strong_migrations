@@ -4,6 +4,12 @@ class ChangeColumn < TestMigration
   end
 end
 
+class ChangeColumnSameType < TestMigration
+  def up
+    change_column :users, :name, :string
+  end
+end
+
 class ChangeColumnVarcharToText < TestMigration
   def up
     change_column :users, :name, :text

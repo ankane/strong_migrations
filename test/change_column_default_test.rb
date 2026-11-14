@@ -28,14 +28,4 @@ class ChangeColumnDefaultTest < Minitest::Test
     # but Active Record 7 by itself does not
     assert_unsafe ChangeColumnDefault
   end
-
-  def with_partial_inserts(value, &block)
-    previous_value = ActiveRecord::Base.partial_inserts
-    begin
-      ActiveRecord::Base.partial_inserts = value
-      yield
-    ensure
-      ActiveRecord::Base.partial_inserts = previous_value
-    end
-  end
 end

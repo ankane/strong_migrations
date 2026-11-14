@@ -63,6 +63,16 @@ class Minitest::Test
     with_option(:target_version, version, &block)
   end
 
+  def with_partial_inserts(value, &block)
+    previous_value = ActiveRecord::Base.partial_inserts
+    begin
+      ActiveRecord::Base.partial_inserts = value
+      yield
+    ensure
+      ActiveRecord::Base.partial_inserts = previous_value
+    end
+  end
+
   def with_auto_analyze(&block)
     with_option(:auto_analyze, true, &block)
   end

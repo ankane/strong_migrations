@@ -4,6 +4,12 @@ class ChangeColumnNull < TestMigration
   end
 end
 
+class ChangeColumnAllowNull < TestMigration
+  def change
+    change_column_null :users, :name, true
+  end
+end
+
 class ChangeColumnNullConstraint < TestMigration
   def up
     safety_assured do

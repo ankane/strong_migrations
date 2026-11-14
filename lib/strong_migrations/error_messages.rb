@@ -85,6 +85,14 @@ end",
     add_column_auto_incrementing:
 "Adding an auto-incrementing column blocks %{rewrite_blocks} while the entire table is rewritten.",
 
+    change_column_sqlite:
+"Using %{operation} makes Rails rebuild the SQLite table, copying all existing rows.
+This blocks writes throughout the database, including unrelated tables, until the write transaction commits.
+A default argument to change_column_null can also trigger a backfill UPDATE before the rebuild.
+
+Use staged application changes where possible. Plan a write pause for the rebuild and any backfill,
+then wrap this step in a safety_assured { ... } block.",
+
     change_column:
 "Changing the type of an existing column blocks %{rewrite_blocks}
 while the entire table is rewritten. A safer approach is to:

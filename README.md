@@ -11,6 +11,8 @@ rebuild and index checks are incomplete. Do not rely on it for production migrat
 Simple column additions, including permitted literal defaults, use SQLite's metadata-only path.
 Column additions that rebuild the table are rejected. Callable defaults and column definitions
 that may hide rebuilds or validation scans require explicit acknowledgement.
+Changes to column types, defaults, and nullability are also rejected because Rails rebuilds the table,
+including when dropping NOT NULL or changing the default of a newly added column.
 `safe_by_default` does not rewrite SQLite operations. Timeout settings, lock-timeout retries,
 and `auto_analyze` are not supported for SQLite.
 

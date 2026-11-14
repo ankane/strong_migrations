@@ -282,6 +282,8 @@ module StrongMigrations
     end
 
     def check_change_column(*args)
+      return raise_error(:change_column_sqlite, operation: "change_column") if sqlite?
+
       options = args.extract_options!
       table, column, type = args
 
@@ -334,6 +336,8 @@ module StrongMigrations
     end
 
     def check_change_column_default(*args)
+      raise_error :change_column_sqlite, operation: "change_column_default" if sqlite?
+
       table, column, _default_or_changes = args
 
       # just check ActiveRecord::Base, even though can override on model
@@ -346,6 +350,8 @@ module StrongMigrations
     end
 
     def check_change_column_null(*args)
+      return raise_error(:change_column_sqlite, operation: "change_column_null") if sqlite?
+
       table, column, null, default = args
       if !null
         if postgresql?
