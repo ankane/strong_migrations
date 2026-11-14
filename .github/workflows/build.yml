@@ -24,6 +24,8 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
 
+      - run: ADAPTER=sqlite3 bundle exec rake test TEST=test/sqlite_test.rb
+
       - uses: ankane/setup-postgres@v1
         with:
           database: strong_migrations_test

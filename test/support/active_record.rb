@@ -20,6 +20,8 @@ if $adapter == "mysql2"
   end
 elsif $adapter == "trilogy"
   connection_options[:host] = "127.0.0.1"
+elsif $adapter == "sqlite3"
+  connection_options[:database] = ":memory:"
 end
 ActiveRecord::Base.establish_connection(**connection_options)
 

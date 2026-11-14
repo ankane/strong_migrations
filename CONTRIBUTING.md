@@ -40,6 +40,15 @@ Fork the project and create a pull request. A few tips:
 bundle exec rake test
 ```
 
+The SQLite test setup uses an in-memory database and can be checked without a database server:
+
+```sh
+ADAPTER=sqlite3 bundle exec rake test TEST=test/sqlite_test.rb
+```
+
+This is a smoke test for the connection, schema setup, and migration runner, not SQLite safety support.
+The unsupported-adapter warning is still expected. The full test suite is not yet SQLite-compatible.
+
 Feel free to open an issue to get feedback on your idea before spending too much time on it.
 
 ---
