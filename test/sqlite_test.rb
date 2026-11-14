@@ -17,8 +17,10 @@ class SQLiteTest < Minitest::Test
 
   def test_migration_round_trip
     assert_output(nil, /Unsupported adapter: SQLite/) do
-      assert_safe CreateJoinTable
+      migrate CreateJoinTable
+      assert ActiveRecord::Base.connection.table_exists?(:cities_users)
+      migrate CreateJoinTable, direction: :down
+      refute ActiveRecord::Base.connection.table_exists?(:cities_users)
     end
-    refute ActiveRecord::Base.connection.table_exists?(:cities_users)
   end
 end
