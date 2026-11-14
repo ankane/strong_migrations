@@ -1,6 +1,10 @@
 require_relative "test_helper"
 
 class SQLiteTest < Minitest::Test
+  class AnimalsRecord < ActiveRecord::Base
+    self.abstract_class = true
+  end
+
   def setup
     skip unless $adapter == "sqlite3"
     super
@@ -41,9 +45,16 @@ class SQLiteTest < Minitest::Test
   end
 
   def test_target_version_per_database
+    config = ActiveRecord::DatabaseConfigurations::HashConfig.new(
+      "test", "animals", adapter: "sqlite3", database: ":memory:"
+    )
+    AnimalsRecord.establish_connection(config)
+    @checker.define_singleton_method(:connection) { AnimalsRecord.connection }
     with_target_version(primary: "3.23.0", animals: "3.24.0") do
-      assert_equal Gem::Version.new("3.23.0"), @adapter.server_version
+      assert_equal Gem::Version.new("3.24.0"), @adapter.server_version
     end
+  ensure
+    AnimalsRecord.remove_connection
   end
 
   def test_target_version_unconfigured
