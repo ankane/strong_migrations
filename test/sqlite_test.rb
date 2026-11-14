@@ -191,6 +191,29 @@ class SQLiteTest < Minitest::Test
     refute ActiveRecord::Base.connection.column_exists?(:users, :nice)
   end
 
+  def test_disabled_rebuild_check_for_generated_columns
+    with_option(:enabled_checks, StrongMigrations.enabled_checks.except(:add_column_sqlite)) do
+      [{stored: true}, {null: false}].each do |options|
+        options = options.merge(type: :string, as: "LOWER(city)")
+        assert @checker.perform(:add_column, :users, :nice, :virtual, options) { true }
+      end
+    end
+  end
+
+  def test_disabled_rebuild_check_preserves_other_checks
+    with_option(:enabled_checks, StrongMigrations.enabled_checks.except(:add_column_sqlite)) do
+      error = assert_raises(StrongMigrations::UnsafeMigration) do
+        @checker.perform(:add_column, :users, :nice, :integer, primary_key: true, default: -> { "1" }) { true }
+      end
+      assert_match "expression default", error.message
+
+      error = assert_raises(StrongMigrations::UnsafeMigration) do
+        @checker.perform(:add_column, :users, :nice, :virtual, type: "integer CHECK (nice > 0)", as: "1", stored: true) { true }
+      end
+      assert_match "rebuild or scan", error.message
+    end
+  end
+
   def test_safe_by_default
     with_option(:safe_by_default, true) do
       refute @checker.safe_by_default_method?(:change_column_null)

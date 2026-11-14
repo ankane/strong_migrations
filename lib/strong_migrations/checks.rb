@@ -97,17 +97,16 @@ module StrongMigrations
 
     def check_add_column_sqlite(type, options)
       # Matches Rails' SQLite add_column rebuild path, not SQLite's native capabilities.
-      if type.to_s == "primary_key" || options[:primary_key] ||
+      rebuild = type.to_s == "primary_key" || options[:primary_key] ||
           (options[:null] == false && options[:default].nil?) ||
           (type.to_s == "virtual" && options[:stored])
-        raise_error :add_column_sqlite
-      end
+      raise_error :add_column_sqlite if rebuild
 
       raise_error :add_column_default_sqlite if options[:default].is_a?(Proc)
 
       # shortcut: only simple type names are inspected until SQL definition analysis is added.
       sql_type = type.to_s == "virtual" ? options[:type] : type
-      if (options[:as] && (options[:stored] || options[:null] == false)) ||
+      if (!rebuild && options[:as] && (options[:stored] || options[:null] == false)) ||
           !/\A\w+\z/.match?(sql_type.to_s)
         raise_error :add_column_sqlite_definition
       end
