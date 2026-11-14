@@ -10,6 +10,66 @@ class AddColumnDefaultNull < TestMigration
   end
 end
 
+class AddColumnDefaultFalse < TestMigration
+  def change
+    add_column :users, :nice, :boolean, default: false
+  end
+end
+
+class AddColumnDefaultLiteral < TestMigration
+  def change
+    add_column :users, :nice, :string, default: "CURRENT_TIMESTAMP"
+  end
+end
+
+class AddColumnDefaultNotNullLiteral < TestMigration
+  def change
+    add_column :users, :nice, :boolean, default: false, null: false
+  end
+end
+
+class AddColumnNotNull < TestMigration
+  def change
+    add_column :users, :nice, :boolean, null: false
+  end
+end
+
+class AddColumnPrimaryKeyOption < TestMigration
+  def change
+    add_column :users, :nice, :integer, primary_key: true
+  end
+end
+
+class AddColumnSqlCheck < TestMigration
+  def change
+    add_column :users, :nice, "integer CHECK (nice > 0)", default: 1
+  end
+end
+
+class AddColumnGeneratedNotNull < TestMigration
+  def change
+    add_column :users, :nice, :virtual, type: :string, as: "LOWER(city)", null: false
+  end
+end
+
+class AddColumnGeneratedStoredNativeType < TestMigration
+  def change
+    add_column :users, :nice, :string, as: "LOWER(city)", stored: true
+  end
+end
+
+class AddColumnGeneratedSqlCheck < TestMigration
+  def change
+    add_column :users, :nice, :virtual, type: "integer CHECK (nice > 0)", as: "1"
+  end
+end
+
+class AddColumnDefaultCallableLiteral < TestMigration
+  def change
+    add_column :users, :nice, :boolean, default: -> { "1" }
+  end
+end
+
 class AddColumnDefaultNotNull < TestMigration
   def change
     add_column :users, :nice, :uuid, default: "gen_random_uuid()", null: false

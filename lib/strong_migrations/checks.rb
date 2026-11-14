@@ -35,6 +35,8 @@ module StrongMigrations
       # keep track of new columns of change_column_default check
       @new_columns << [table.to_s, column.to_s]
 
+      return check_add_column_sqlite(type, options) if sqlite?
+
       # adding a column with a volatile default is not safe with Postgres
       # https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
       # functions like random() and clock_timestamp() are volatile
@@ -48,10 +50,7 @@ module StrongMigrations
       # Active Record quotes default values except for procs
       # there is also a special case for uuid columns
       # https://github.com/rails/rails/blob/v7.0.3.1/activerecord/lib/active_record/connection_adapters/postgresql/quoting.rb#L92-L93
-      if sqlite? && !default.nil?
-        # shortcut: reject SQLite defaults until the add_column paths are classified.
-        raise_error :add_column_default_sqlite
-      elsif !default.nil? && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()") && adapter.default_volatile?(default))))
+      if !default.nil? && (!adapter.add_column_default_safe? || (volatile = (postgresql? && type.to_s == "uuid" && default.to_s.include?("()") && adapter.default_volatile?(default))))
         if options[:null] == false
           options = options.except(:null)
           append = "\n\nThen add the NOT NULL constraint in separate migrations."
@@ -94,6 +93,24 @@ module StrongMigrations
 
       # not necessarily dangerous, but not necessary
       check_lock_option("add_column", *args, **options)
+    end
+
+    def check_add_column_sqlite(type, options)
+      # Matches Rails' SQLite add_column rebuild path, not SQLite's native capabilities.
+      if type.to_s == "primary_key" || options[:primary_key] ||
+          (options[:null] == false && options[:default].nil?) ||
+          (type.to_s == "virtual" && options[:stored])
+        raise_error :add_column_sqlite
+      end
+
+      raise_error :add_column_default_sqlite if options[:default].is_a?(Proc)
+
+      # shortcut: only simple type names are inspected until SQL definition analysis is added.
+      sql_type = type.to_s == "virtual" ? options[:type] : type
+      if (options[:as] && (options[:stored] || options[:null] == false)) ||
+          !/\A\w+\z/.match?(sql_type.to_s)
+        raise_error :add_column_sqlite_definition
+      end
     end
 
     def check_add_exclusion_constraint(*args)

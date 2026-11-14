@@ -95,29 +95,98 @@ class SQLiteTest < Minitest::Test
   end
 
   def test_default
-    assert_unsafe AddColumnDefault, "has not yet been classified"
-    refute ActiveRecord::Base.connection.column_exists?(:users, :nice)
+    assert_metadata_only_addition AddColumnDefault, 1
+  end
+
+  def test_default_false
+    assert_metadata_only_addition AddColumnDefaultFalse, 0
+  end
+
+  def test_default_null
+    assert_metadata_only_addition AddColumnDefaultNull, nil
+  end
+
+  def test_literal_that_looks_like_an_expression
+    assert_metadata_only_addition AddColumnDefaultLiteral, "CURRENT_TIMESTAMP"
+  end
+
+  def test_default_not_null
+    assert_metadata_only_addition AddColumnDefaultNotNullLiteral, 0
+  end
+
+  def test_generated_virtual
+    assert_metadata_only_addition AddColumnGeneratedVirtual, "amsterdam"
+  end
+
+  def test_not_null_without_default
+    assert_column_rejected AddColumnNotNull, "rebuild"
+  end
+
+  def test_primary_key
+    assert_column_rejected AddColumnPrimaryKey, "rebuild"
+  end
+
+  def test_primary_key_option
+    assert_column_rejected AddColumnPrimaryKeyOption, "rebuild"
+  end
+
+  def test_generated_stored
+    assert_column_rejected AddColumnGeneratedStored, "rebuild"
+  end
+
+  def test_generated_not_null
+    assert_column_rejected AddColumnGeneratedNotNull, "rebuild"
+  end
+
+  def test_generated_stored_native_type
+    assert_column_rejected AddColumnGeneratedStoredNativeType, "rebuild or scan"
+  end
+
+  def test_custom_sql_type
+    assert_column_rejected AddColumnSqlCheck, "rebuild or scan"
+  end
+
+  def test_generated_custom_sql_type
+    assert_column_rejected AddColumnGeneratedSqlCheck, "rebuild or scan"
   end
 
   def test_callable_default
-    assert_unsafe AddColumnDefaultCallableNow, "has not yet been classified"
-    refute ActiveRecord::Base.connection.column_exists?(:users, :nice)
+    assert_column_rejected AddColumnDefaultCallableNow, "expression default"
+  end
+
+  def test_callable_literal_default
+    assert_column_rejected AddColumnDefaultCallableLiteral, "expression default"
   end
 
   def test_safety_assured
+    User.create!(city: "Amsterdam")
     with_safety_assured do
-      migrate AddColumnDefault
+      statements = capture_statements { migrate AddColumnGeneratedStored }
+      assert statements.any? { |sql| sql.match?(/\AINSERT INTO "a?users".*SELECT/m) }
       assert ActiveRecord::Base.connection.column_exists?(:users, :nice)
-      migrate AddColumnDefault, direction: :down
+      assert_equal [["Amsterdam", "amsterdam"]], ActiveRecord::Base.connection.select_rows("SELECT city, nice FROM users")
+      migrate AddColumnGeneratedStored, direction: :down
     end
     refute ActiveRecord::Base.connection.column_exists?(:users, :nice)
+  ensure
+    migrate AddColumnGeneratedStored, direction: :down if ActiveRecord::Base.connection.column_exists?(:users, :nice)
+    User.delete_all
   end
 
   def test_disabled_default_check
     with_option(:enabled_checks, StrongMigrations.enabled_checks.except(:add_column_default_sqlite)) do
-      migrate AddColumnDefault
+      migrate AddColumnDefaultCallableLiteral
       assert ActiveRecord::Base.connection.column_exists?(:users, :nice)
-      migrate AddColumnDefault, direction: :down
+      migrate AddColumnDefaultCallableLiteral, direction: :down
+    end
+    refute ActiveRecord::Base.connection.column_exists?(:users, :nice)
+  end
+
+  def test_disabled_rebuild_check
+    with_option(:enabled_checks, StrongMigrations.enabled_checks.except(:add_column_sqlite)) do
+      migrate AddColumnNotNull
+      refute ActiveRecord::Base.connection.columns(:users).find { |column| column.name == "nice" }.null
+      migrate AddColumnNotNull, direction: :down
     end
     refute ActiveRecord::Base.connection.column_exists?(:users, :nice)
   end
@@ -140,5 +209,27 @@ class SQLiteTest < Minitest::Test
         assert_safe CreateJoinTable
       end
     end
+  end
+
+  private
+
+  def assert_metadata_only_addition(migration, value)
+    User.create!(city: "Amsterdam")
+    statements = capture_statements { migrate migration }
+    table_statements = statements.grep(/\A(?:ALTER|CREATE|DROP|INSERT INTO).*"a?users"/)
+    assert_equal 1, table_statements.size
+    assert_match(/\AALTER TABLE "users" ADD "nice"/, table_statements.first)
+    assert_equal [[value]], ActiveRecord::Base.connection.select_rows("SELECT nice FROM users")
+  ensure
+    migrate migration, direction: :down if ActiveRecord::Base.connection.column_exists?(:users, :nice)
+    User.delete_all
+  end
+
+  def assert_column_rejected(migration, message)
+    statements = capture_statements { assert_unsafe migration, message }
+    refute statements.any? { |sql| sql.match?(/\A(?:ALTER|CREATE|DROP|INSERT INTO).*"a?users"/) }
+    refute ActiveRecord::Base.connection.column_exists?(:users, :nice)
+  ensure
+    migrate migration, direction: :down if ActiveRecord::Base.connection.column_exists?(:users, :nice)
   end
 end

@@ -26,11 +26,28 @@ class Backfill%{migration_name} < ActiveRecord::Migration%{migration_suffix}
 end",
 
     add_column_default_sqlite:
-"Adding a column with a default on SQLite has not yet been classified as safe by Strong Migrations.
+"Adding a column with a callable or expression default on SQLite cannot be inspected safely.
+Use a permitted literal default directly in add_column when possible.
 Do not work around this by adding the column without a default and then calling change_column_default.
 Rails rebuilds the table to change defaults, which can block writes throughout the database until the transaction commits.
 
 Review the operation and plan any necessary write pause, then wrap this step in a safety_assured { ... } block.",
+
+    add_column_sqlite:
+"Adding this column makes Rails rebuild the SQLite table, copying its existing rows.
+This blocks writes throughout the database, including unrelated tables, until the write transaction commits.
+
+For a NOT NULL column without a default, consider adding a nullable column first and backfilling separately.
+Setting NOT NULL afterward still requires a table rebuild with the supported Rails adapters.
+Plan a write pause for the rebuild, then wrap this step in a safety_assured { ... } block.",
+
+    add_column_sqlite_definition:
+"This column definition may rebuild or scan the SQLite table.
+Custom SQL types can contain constraints that validate every existing row.
+Stored generated columns and NOT NULL generated columns also require special care.
+These operations can block writes throughout the database until the write transaction commits.
+
+Inspect the column definition and plan any necessary write pause, then wrap this step in a safety_assured { ... } block.",
 
     add_column_default_callable:
 "Strong Migrations does not support inspecting callable default values.

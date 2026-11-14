@@ -8,7 +8,9 @@ Supports PostgreSQL, MySQL, and MariaDB
 
 SQLite support is in progress. Adapter recognition and `target_version` work, but SQLite-specific
 rebuild and index checks are incomplete. Do not rely on it for production migration safety.
-Default-column additions are conservatively rejected until their safety checks are implemented.
+Simple column additions, including permitted literal defaults, use SQLite's metadata-only path.
+Column additions that rebuild the table are rejected. Callable defaults and column definitions
+that may hide rebuilds or validation scans require explicit acknowledgement.
 `safe_by_default` does not rewrite SQLite operations. Timeout settings, lock-timeout retries,
 and `auto_analyze` are not supported for SQLite.
 
